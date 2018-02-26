@@ -1,0 +1,94 @@
+--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||>OTHER
+SelectedProfileLabel							=	{ German = "Keins"										, English = "None"											, Russian = "..." };
+
+--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||>WEAPONS
+ShopItemTypeComboBoxEntryIDAllCaption			= 	{ German = "Alle"										, English = "All"											, Russian = "nachinat'" };
+ShopItemTypeComboBoxEntryIDLWCaption			= 	{ German = "Strahlenwaffe"								, English = "LW"									, Russian = "nachinat'" };
+ShopItemTypeComboBoxEntryIDRLCaption			= 	{ German = "Raketenwerfer"								, English = "RL"								, Russian = "nachinat'" };
+ShopItemTypeComboBoxEntryIDProjectileWeaponCaption=	{ German = "Projektilwaffe"								, English = "Projectileweapon"								, Russian = "nachinat'" };
+ShopItemTypeComboBoxEntryIDEngineCaption		= 	{ German = "Triebwerk"									, English = "Engine"										, Russian = "nachinat'" };
+ShopItemTypeComboBoxEntryIDGeneratorCaption		= 	{ German = "Generator"									, English = "Generator"										, Russian = "nachinat'" };
+ShopItemTypeComboBoxEntryIDShieldCaption		= 	{ German = "Schild"										, English = "Shield"										, Russian = "nachinat'" };
+ShopItemTypeComboBoxEntryIDArmorCaption			= 	{ German = "Rüstung"									, English = "Armor"											, Russian = "nachinat'" };
+ShopItemTypeComboBoxEntryIDAmmunitiondumpCaption= 	{ German = "Munitionslager"								, English = "Ammunitiondump"								, Russian = "nachinat'" };
+
+--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||>MENUSTATE
+
+PadStartButtonCaption 							= 	{ German = "Starten"									, English = "Start"											, Russian = "nachinat'" };
+PadOptionsButtonCaption 						=	{ German = "Optionen"									, English = "Options"										, Russian = "Opcii" 	};
+PadProfilesButtonCaption 						=	{ German = "Profile"									, English = "Profiles"										, Russian = "Profili" 	};
+PadCreditsButtonCaption 						= 	{ German = "Credits"									, English = "Credits"										, Russian = "Kredity"	};
+PadExitButtonCaption 							=	{ German = "Beenden"									, English = "Exit"											, Russian = "Vyhod" 	};
+ExitTitleLabel									=	{ German = "Möchten Sie das Spiel\n  wirklich beenden?"	, English = "Do you really want\n to close the Game?"		, Russian = "CYKA!" 	};
+ExitYesButtonCaption							= 	{ German = "Ja!"										, English = "Yes!"											, Russian = "Da!" 		};
+ExitCancelButtonCaption							= 	{ German = "Nein!"										, English = "No!"											, Russian = "Net!" 		};
+
+--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||>PROFILESTATE
+
+ProfileTitleLabel								=	{ German = "Profile"									, English = "Profiles"										, Russian = "Net!" 		};
+ProfileNewButtonCaption							= 	{ German = "Neues Profil"								, English = "New profile"									, Russian = "Net!" 		};
+ProfileDeleteButtonCaption						= 	{ German = "Profil löschen"								, English = "Delete profile"								, Russian = "Net!" 		};
+ProfileBackCaption								= 	{ German = "Zurück"										, English = "Back"											, Russian = "Net!" 		};
+ProfileNewProfileEditControl					= 	{ German = "Neues Profil"								, English = "New profile"									, Russian = "Net!" 		};
+DeleteTitleLabel								= 	{ German = "Möchten Sie das Profil wirklich\n\t\t\t\t   löschen?\n Alle gespeicherten Spielstände\n\t\t\t\t   werden\n\t\t\t  verloren gehen!"
+																											, English = "Do you really want to delete this\n\t\t\t\t\t  profile?\n\tAll savegames will be deleted!"
+																																										, Russian = "Net!" 		};
+DeleteYesButtonCaption							= 	{ German = "Ja!"										, English = "Yes!"											, Russian = "Net!" 		};
+DeleteCancelButtonCaption						= 	{ German = "Nein!"										, English = "No!"										, Russian = "Net!" 		};
+
+
+--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||>OPTIONSTATE
+
+OptionsTitleLabel								= 	{ German = "Optionen"									, English = "Options"										, Russian = "NULL" 		};
+OptionsGraphicButtonCaption						= 	{ German = "Grafik"										, English = "Graphic"										, Russian = "NULL" 		};
+OptionsAudioButtonCaption						= 	{ German = "Audio"										, English = "Audio"											, Russian = "NULL" 		};
+OptionsLanguageLabel							= 	{ German = "Sprache:"									, English = "Language:"										, Russian = "NULL" 		};
+OptionsLanguageComboBoxEntryIDGermanCaption		=	{ German = "Deutsch"									, English = "German"										, Russian = "NULL" 		};
+OptionsLanguageComboBoxEntryIDEnglishCaption	=	{ German = "Englisch"									, English = "English"										, Russian = "NULL" 		};
+OptionsLanguageComboBoxEntryIDRussianCaption	=	{ German = "Russisch"									, English = "Russian"										, Russian = "Russki" 	};
+
+--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||>GRAPHICOPTIONSTATE
+
+GraphicOptionsTitleLabel						= 	{ German = "Grafik"										, English = "Graphic"										, Russian = "NULL" 		};
+GraphicOptionsResolutionLabel					= 	{ German = "Auflösung"									, English = "Resolution"									, Russian = "NULL" 		};
+GraphicOptionsFullscreenLabel					= 	{ German = "Vollbild"									, English = "Fullscreen"									, Russian = "NULL" 		};
+GraphicOptionsVerticalsyncLabel					= 	{ German = "Vertikalsync"								, English = "Verticalsync"									, Russian = "NULL" 		};
+GraphicOptionsWindowsCursorLabel				= 	{ German = "Windows Cursor"								, English = "Windows cursor"								, Russian = "NULL" 		};
+
+--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||>AUDIOOPTIONSTATE
+
+AudioOptionsTitleLabel							= 	{ German = "Audio"										, English = "Audio"											, Russian = "NULL" 		};
+AudioOptionsMusicVolumeLabel					= 	{ German = "Musiklautstärke:"							, English = "Music volume:"									, Russian = "NULL" 		};
+AudioOptionsSoundVolumeLabel					= 	{ German = "Effektlautstärke:"							, English = "Sound volume:"									, Russian = "NULL" 		};
+AudioOptionsMasterVolumeLabel					= 	{ German = "Gesamtlautstärke:"							, English = "Master volume:"								, Russian = "NULL" 		};
+
+
+--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||>SpaceStationState
+
+ExitSpaceStationTitleLabel						=	{ German = "Möchten Sie wikrlich ins Menü\n             zürückkehren?"	
+																											, English = "Do you really want to go\n       back into the menu?"		
+																																										, Russian = "CYKA!" 	};
+PadEnterHangarButtonCaption						= 	{ German = "Hangar betreten"							, English = "Enter hangar"									, Russian = "NULL" 		};
+PadEnterShopButtonCaption						= 	{ German = "Shop betreten"								, English = "Enter shop"									, Russian = "NULL" 		};
+PadCelestialMapButtonCaption					= 	{ German = "Sternenkarte öffnen"						, English = "Open celestial map"							, Russian = "NULL" 		};
+CelestialMapEnterSystem1ButtonCaption			= 	{ German = "Sternensystem 1 betreten"					, English = "Enter celestial system 1"						, Russian = "NULL" 		};
+
+--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||>SpaceStationHangarState
+
+HangarShopCaption								= 	{ German = "Laden"										, English = "Shop"											, Russian = "NULL" 		};
+HangarRepositoryCaption							= 	{ German = "Lager"										, English = "Repository"									, Russian = "NULL" 		};
+HangarSpaceShipsCaption							= 	{ German = "Raumschiffe"								, English = "Spaceships"									, Russian = "NULL" 		};
+HangarProjectileWeaponsCaption					= 	{ German = "Projektil\nWaffen"							, English = "Projectile\nWeapons"							, Russian = "NULL" 		};
+HangarLaserWeaponsCaption						= 	{ German = "Laser\nWaffen"								, English = "Laser\nWeapons"								, Russian = "NULL" 		};
+HangarRocketLaunchersCaption					= 	{ German = "Rakten-\nwerfer"							, English = "Rocket-\nlaunchers"							, Russian = "NULL" 		};
+HangarEnginesCaption							= 	{ German = "Triebwerke"									, English = "Engines"										, Russian = "NULL" 		};
+HangarGeneratorsCaption							= 	{ German = "Generatoren"								, English = "Generators"									, Russian = "NULL" 		};
+HangarAmmoDumbsCaption							= 	{ German = "Munitions-\nlager"							, English = "Ammunition-\ndumbs"							, Russian = "NULL" 		};
+HangarArmorsCaption								= 	{ German = "Rüstungen"									, English = "Armors"										, Russian = "NULL" 		};
+HangarShieldsCaption							= 	{ German = "Schilde"									, English = "Shields"										, Russian = "NULL" 		};
+HangarComboBoxClassAllCaption					=	{ German = "Alle"										, English = "All "											, Russian = "NULL" 		};
+HangarComboBoxClassCaption						=	{ German = "Klasse "									, English = "Class "										, Russian = "NULL" 		};
+HangarAdditionalOptionsBuyCaption				=	{ German = "Kaufen"										, English = "Buy"											, Russian = "NULL" 		};
+HangarAdditionalOptionsCompareCaption			=	{ German = "Vergleiche mit..."							, English = "Compare with..."								, Russian = "NULL" 		};
+
+LoadingLabel									=	{ German = "Laden..."									, English = "Loading..."									, Russian = "NULL..."	};

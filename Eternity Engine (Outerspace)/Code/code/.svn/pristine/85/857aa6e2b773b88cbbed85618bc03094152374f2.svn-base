@@ -1,0 +1,1019 @@
+#include "CMovableComponent.hpp"
+#include "CRenderComponent.hpp"
+#include "CCameraComponent.hpp"
+#include "CAttributeComponent.hpp"
+#include "CItemModulesComponent.hpp"
+
+#include "CGenerator.hpp"
+#include "CEngine.hpp"
+
+#include "CEntity.hpp"
+
+#include "CMouse.hpp"
+
+
+#include "CWorld.hpp"
+#include <iostream>
+
+typedef va_list					va_ArgumentList;
+#define va_OpenArgumentList		va_start
+#define va_getArgument			va_arg
+#define va_CloseArgumentList	va_end
+
+//#########################################################################################################//
+//#########################################################################################################//
+//#########################################################################################################//
+
+							ety::CMovableComponent::CMovableComponent								( void )
+							{
+							}
+							ety::CMovableComponent::~CMovableComponent								( void )
+							{
+							}
+			
+			void			ety::CMovableComponent::continue_Movement								( const sf::Uint32& uiFrameTime )
+			{
+				ety::CRenderComponent*		p_c_etyRenderComponent		= mp_c_Owner->get_Component<ety::CRenderComponent>( "RenderComponent" );
+				ety::CAttributeComponent*	p_c_etyAttributeComponent	= mp_c_Owner->get_Component<ety::CAttributeComponent>( "AttributeComponent" );
+
+				if( p_c_etyRenderComponent != NULL && p_c_etyAttributeComponent != NULL )
+				{
+					sf::Vector2f c_sfVectorVelocity = *(p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<sf::Vector2f>( "c_sfVectorVelocity" ) );
+
+					p_c_etyRenderComponent->get_Appearance()->move( c_sfVectorVelocity.x * ( static_cast<float>( uiFrameTime ) / 1000.f ), c_sfVectorVelocity.y * ( static_cast<float>( uiFrameTime ) / 1000.f ) );
+				}
+			}
+
+			void			ety::CMovableComponent::rotate_ToAngle									( float fTargetAngle, const sf::Uint32& uiFrameTime )
+			{		
+				ety::CRenderComponent* p_c_etyRenderComponent = mp_c_Owner->get_Component<ety::CRenderComponent>("RenderComponent");
+				
+				if( p_c_etyRenderComponent != NULL )
+				{
+					const float fActualAngle = p_c_etyRenderComponent->get_Angle();
+		
+					if( fTargetAngle < 0 )
+					{
+						fTargetAngle += 360;
+					}
+
+					//Movement: Rotation
+					if( ( fActualAngle + 3.f ) < fTargetAngle || ( fActualAngle - 3.f ) > fTargetAngle )
+					{
+						if( fActualAngle < fTargetAngle )
+						{
+							if( abs( fActualAngle - fTargetAngle ) > 180) 
+							{ 
+								rotate_CounterClockwise( uiFrameTime );
+							} 
+							else 
+							{ 
+								rotate_Clockwise( uiFrameTime );
+							} 
+						}
+						else if( fActualAngle > fTargetAngle )
+						{
+							if( abs( fActualAngle - fTargetAngle ) > 180) 
+							{ 
+								rotate_Clockwise( uiFrameTime );
+							} 
+							else 
+							{ 
+								rotate_CounterClockwise( uiFrameTime );
+							} 
+						}
+					}
+				}
+			}
+			void			ety::CMovableComponent::rotate_Clockwise								( const sf::Uint32& uiFrameTime )
+			{
+				ety::CRenderComponent* p_c_etyRenderComponent = mp_c_Owner->get_Component<ety::CRenderComponent>("RenderComponent");
+				
+				if( p_c_etyRenderComponent != NULL )
+				{
+					const float fRotationSpeed = *(mp_c_Owner->get_Component<ety::CAttributeComponent>( "AttributeComponent" )->m_c_etyAttributes.get_Attribute<float>( "fRotationSpeed" ) );
+					
+					float fActualAngle = p_c_etyRenderComponent->get_Angle();
+
+					fActualAngle += fRotationSpeed * ( static_cast<float>( uiFrameTime ) / 1000.f );
+
+					if( fActualAngle > 360.f )
+					{
+						fActualAngle -= 360.f;
+					}
+					else if( fActualAngle < 0.f )
+					{
+						fActualAngle += 360.f;
+					}
+
+					p_c_etyRenderComponent->set_Angle( fActualAngle );
+				}
+			}
+			void			ety::CMovableComponent::rotate_CounterClockwise							( const sf::Uint32& uiFrameTime )
+			{
+				ety::CRenderComponent* p_c_etyRenderComponent = mp_c_Owner->get_Component<ety::CRenderComponent>("RenderComponent");
+				
+				if( p_c_etyRenderComponent != NULL )
+				{
+					const float fRotationSpeed = *(mp_c_Owner->get_Component<ety::CAttributeComponent>( "AttributeComponent" )->m_c_etyAttributes.get_Attribute<float>( "fRotationSpeed" ) );	
+					
+					float fActualAngle = p_c_etyRenderComponent->get_Angle();
+
+					fActualAngle -= fRotationSpeed * ( static_cast<float>( uiFrameTime ) / 1000.f );
+
+					if( fActualAngle > 360.f )
+					{
+						fActualAngle -= 360.f;
+					}
+					else if( fActualAngle < 0.f )
+					{
+						fActualAngle += 360.f;
+					}
+
+					p_c_etyRenderComponent->set_Angle( fActualAngle );
+				}
+			}
+
+const		std::string		ety::CMovableComponent::get_FamilyID									( void )
+			{
+				return "MovableComponent";
+			}
+
+//#########################################################################################################//
+//#########################################################################################################//
+//#########################################################################################################//
+
+							ety::CMovableSpaceshipComponent::CMovableSpaceshipComponent				( void )
+							{
+							}
+							ety::CMovableSpaceshipComponent::~CMovableSpaceshipComponent			( void )
+							{
+							}
+
+			/*void			ety::CMovableSpaceshipComponent::move_ToPosition						( const sf::Vector2f& c_sfVectorTargetPosition )
+			{
+				rotate_ToAngle(40.f, m_uiFrameTime);
+
+
+				/*sf::Vector2f	c_sfVector2fNPCPosition		=	this->get_Owner()->get_Component<CRenderComponent>("RenderComponent")->get_Position();
+
+				const sf::Vector2f c_sfVectorTarget		= ety::CMath::normalize_Vector<float>( ety::CMath::build_DirectionVector<float>( c_sfVector2fNPCPosition, sf::Vector2f( static_cast<float>( c_sfVectorTargetPosition.x ), static_cast<float>( c_sfVectorTargetPosition.y ) ) ) );	
+				const float fTargetAngle = -( atan2( c_sfVectorTarget.x, c_sfVectorTarget.y ) * 180.f / PI );
+				float current = get_Owner()->get_Component<CRenderComponent>("RenderComponent")->get_Angle();
+				
+
+
+
+				int target	=	int(fTargetAngle);
+
+				//rotate_ToAngle( fTargetAngle, m_uiFrameTime );
+				
+				
+				if(c_sfVector2fNPCPosition == c_sfVectorTargetPosition)
+				{
+					finish = true;
+					stop_Movement();
+					std::cout << "STOP!!" << std::endl;
+				}
+				else
+				{
+					finish = false;
+					accelerate_Forward(m_uiFrameTime);
+					continue_Movement( m_uiFrameTime );
+				}
+				/*if(c_sfVector2fNPCPosition.x > c_sfVectorPosition.x)
+				{
+					accelerate_Left(m_uiFrameTime);
+					std::cout << "X: " << c_sfVector2fNPCPosition.x << "\tY: " << c_sfVector2fNPCPosition.y << "      LEFT" << std::endl;
+				}
+				else if(c_sfVector2fNPCPosition.x < c_sfVectorPosition.x)
+				{
+					accelerate_Right(m_uiFrameTime);
+					std::cout << "X: " << c_sfVector2fNPCPosition.x << "\tY: " << c_sfVector2fNPCPosition.y << "      RIGHT" << std::endl;
+				}
+				else if(c_sfVector2fNPCPosition.x == c_sfVectorPosition.x)
+				{
+					stop_Movement();
+					std::cout << "STOP!!" << std::endl;
+				}*/
+
+				
+				//continue_Movement( m_uiFrameTime );
+			//}
+
+			void			ety::CMovableSpaceshipComponent::accelerate_Forward						( const sf::Uint32& uiFrameTime )
+			{
+				ety::CRenderComponent*		p_c_etyRenderComponent		= mp_c_Owner->get_Component<ety::CRenderComponent>		( "RenderComponent"			);
+				ety::CAttributeComponent*	p_c_etyAttributeComponent	= mp_c_Owner->get_Component<ety::CAttributeComponent>	( "AttributeComponent"		);
+				ety::CItemModulesComponent* p_c_etyItemModulesComponent = mp_c_Owner->get_Component<ety::CItemModulesComponent>	( "ItemModulesComponent"	);
+				
+				if( p_c_etyRenderComponent != NULL && p_c_etyAttributeComponent != NULL && p_c_etyItemModulesComponent != NULL )
+				{
+					ety::CEngine* p_c_etyEntityEngine = dynamic_cast<ety::CEngine*>( p_c_etyItemModulesComponent->get_EquipmentFromModule( ety::ModuleType::enENGINE ) );
+
+					if( p_c_etyEntityEngine != NULL )
+					{
+						sf::Vector2f c_sfVectorVelocity		= *(p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<sf::Vector2f>( "c_sfVectorVelocity" ) );
+						sf::Vector2f c_sfVectorDirection	= p_c_etyRenderComponent->get_Direction();
+						
+						const float fAcceleration = p_c_etyEntityEngine->get_Thrust() / *(p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<float>( "fMass" ) );
+						
+						c_sfVectorVelocity += c_sfVectorDirection * fAcceleration * ( static_cast<float>( uiFrameTime ) / 1000.f );
+
+						if( c_sfVectorVelocity.x >= p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.x = p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+						else if( c_sfVectorVelocity.x <= -p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.x = -p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+
+						if( c_sfVectorVelocity.y >= p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.y = p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+						else if( c_sfVectorVelocity.y <= -p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.y = -p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+
+						p_c_etyAttributeComponent->m_c_etyAttributes.change_Attribute<sf::Vector2f>( "c_sfVectorVelocity", new sf::Vector2f( c_sfVectorVelocity ), true );
+					}
+				}
+			}
+			void			ety::CMovableSpaceshipComponent::accelerate_Backward					( const sf::Uint32& uiFrameTime )
+			{
+				ety::CRenderComponent*		p_c_etyRenderComponent		= mp_c_Owner->get_Component<ety::CRenderComponent>		( "RenderComponent"			);
+				ety::CAttributeComponent*	p_c_etyAttributeComponent	= mp_c_Owner->get_Component<ety::CAttributeComponent>	( "AttributeComponent"		);
+				ety::CItemModulesComponent* p_c_etyItemModulesComponent = mp_c_Owner->get_Component<ety::CItemModulesComponent>	( "ItemModulesComponent"	);
+				
+				if( p_c_etyRenderComponent != NULL && p_c_etyAttributeComponent != NULL && p_c_etyItemModulesComponent != NULL )
+				{
+					ety::CEngine* p_c_etyEntityEngine = dynamic_cast<ety::CEngine*>( p_c_etyItemModulesComponent->get_EquipmentFromModule( ety::ModuleType::enENGINE ) );
+
+					if( p_c_etyEntityEngine != NULL )
+					{
+						sf::Vector2f c_sfVectorVelocity	 = *(p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<sf::Vector2f>( "c_sfVectorVelocity" ) );
+						sf::Vector2f c_sfVectorDirection = -p_c_etyRenderComponent->get_Direction();
+						
+						const float fAcceleration = p_c_etyEntityEngine->get_Thrust() / *(p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<float>( "fMass" ) );
+
+						c_sfVectorVelocity += c_sfVectorDirection * fAcceleration * ( static_cast<float>( uiFrameTime ) / 1000.f );
+
+						if( c_sfVectorVelocity.x >= p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.x = p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+						else if( c_sfVectorVelocity.x <= -p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.x = -p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+
+						if( c_sfVectorVelocity.y >= p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.y = p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+						else if( c_sfVectorVelocity.y <= -p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.y = -p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+						p_c_etyAttributeComponent->m_c_etyAttributes.change_Attribute<sf::Vector2f>( "c_sfVectorVelocity", new sf::Vector2f( c_sfVectorVelocity ), true );
+					}
+				}
+			}
+			void			ety::CMovableSpaceshipComponent::accelerate_Left						( const sf::Uint32& uiFrameTime )
+			{
+				ety::CRenderComponent*		p_c_etyRenderComponent		= mp_c_Owner->get_Component<ety::CRenderComponent>		( "RenderComponent"			);
+				ety::CAttributeComponent*	p_c_etyAttributeComponent	= mp_c_Owner->get_Component<ety::CAttributeComponent>	( "AttributeComponent"		);
+				ety::CItemModulesComponent* p_c_etyItemModulesComponent = mp_c_Owner->get_Component<ety::CItemModulesComponent>	( "ItemModulesComponent"	);
+				
+				if( p_c_etyRenderComponent != NULL && p_c_etyAttributeComponent != NULL && p_c_etyItemModulesComponent != NULL )
+				{
+					ety::CEngine* p_c_etyEntityEngine = dynamic_cast<ety::CEngine*>( p_c_etyItemModulesComponent->get_EquipmentFromModule( ety::ModuleType::enENGINE ) );
+
+					if( p_c_etyEntityEngine != NULL )
+					{
+						sf::Vector2f c_sfVectorVelocity		= *(p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<sf::Vector2f>( "c_sfVectorVelocity" ) );
+						sf::Vector2f c_sfVectorDirection	= -ety::CMath::rotate_Vector( p_c_etyRenderComponent->get_Direction(), 90.f );
+						
+						const float fAcceleration = p_c_etyEntityEngine->get_Thrust() / *(p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<float>( "fMass" ) );
+
+						c_sfVectorVelocity += c_sfVectorDirection * fAcceleration * ( static_cast<float>( uiFrameTime ) / 1000.f );
+
+						if( c_sfVectorVelocity.x >= p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.x = p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+						else if( c_sfVectorVelocity.x <= -p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.x = -p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+
+						if( c_sfVectorVelocity.y >= p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.y = p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+						else if( c_sfVectorVelocity.y <= -p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.y = -p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+
+						p_c_etyAttributeComponent->m_c_etyAttributes.change_Attribute<sf::Vector2f>( "c_sfVectorVelocity", new sf::Vector2f( c_sfVectorVelocity ), true );
+					}
+				}
+			}
+			void			ety::CMovableSpaceshipComponent::accelerate_Right						( const sf::Uint32& uiFrameTime )
+			{
+				ety::CRenderComponent*		p_c_etyRenderComponent		= mp_c_Owner->get_Component<ety::CRenderComponent>		( "RenderComponent"			);
+				ety::CAttributeComponent*	p_c_etyAttributeComponent	= mp_c_Owner->get_Component<ety::CAttributeComponent>	( "AttributeComponent"		);
+				ety::CItemModulesComponent* p_c_etyItemModulesComponent = mp_c_Owner->get_Component<ety::CItemModulesComponent>	( "ItemModulesComponent"	);
+				
+				if( p_c_etyRenderComponent != NULL && p_c_etyAttributeComponent != NULL && p_c_etyItemModulesComponent != NULL )
+				{
+					ety::CEngine* p_c_etyEntityEngine = dynamic_cast<ety::CEngine*>( p_c_etyItemModulesComponent->get_EquipmentFromModule( ety::ModuleType::enENGINE ) );
+
+					if( p_c_etyEntityEngine != NULL )
+					{
+						sf::Vector2f c_sfVectorVelocity		= *(p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<sf::Vector2f>( "c_sfVectorVelocity" ) );
+						sf::Vector2f c_sfVectorDirection	= ety::CMath::rotate_Vector( p_c_etyRenderComponent->get_Direction(), 90.f );
+						
+						const float fAcceleration = p_c_etyEntityEngine->get_Thrust() / *(p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<float>( "fMass" ) );
+
+						c_sfVectorVelocity += c_sfVectorDirection * fAcceleration * ( static_cast<float>( uiFrameTime ) / 1000.f );
+
+						if( c_sfVectorVelocity.x >= p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.x = p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+						else if( c_sfVectorVelocity.x <= -p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.x = -p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+
+						if( c_sfVectorVelocity.y >= p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.y = p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+						else if( c_sfVectorVelocity.y <= -p_c_etyEntityEngine->get_MaximalVelocity() )
+						{
+							c_sfVectorVelocity.y = -p_c_etyEntityEngine->get_MaximalVelocity();
+						}
+
+						p_c_etyAttributeComponent->m_c_etyAttributes.change_Attribute<sf::Vector2f>( "c_sfVectorVelocity", new sf::Vector2f( c_sfVectorVelocity ), true );
+					}
+				}
+			}
+
+			void			ety::CMovableSpaceshipComponent::stop_Movement							( void )
+			{
+				ety::CAttributeComponent*	p_c_etyAttributeComponent	= mp_c_Owner->get_Component<ety::CAttributeComponent>	( "AttributeComponent"		);
+				p_c_etyAttributeComponent->m_c_etyAttributes.change_Attribute<sf::Vector2f>( "c_sfVectorVelocity", new sf::Vector2f( 0.f, 0.f ), true );
+			}
+
+//#########################################################################################################//
+//#########################################################################################################//
+//#########################################################################################################//
+
+							ety::CMovablePlayerComponent::CMovablePlayerComponent					( void )
+							:m_uiFrameTime															( 0 )
+							{
+							}
+							ety::CMovablePlayerComponent::~CMovablePlayerComponent					( void )
+							{
+							}
+
+			void			ety::CMovablePlayerComponent::update_Component							( const sf::Uint32& uiFrameTime )
+			{
+				ety::CRenderComponent*			p_c_etyRenderComponent = mp_c_Owner->get_Component<ety::CRenderComponent>			("RenderComponent");
+				ety::CCenteredCameraComponent*	p_c_etyCameraComponent = mp_c_Owner->get_Component<ety::CCenteredCameraComponent>	("CameraComponent");
+
+				if( p_c_etyRenderComponent != NULL )
+				{
+					if( p_c_etyCameraComponent != NULL )
+					{
+						const sf::Vector2f c_sfVectorPosition	= p_c_etyRenderComponent->get_Position();
+						const sf::Vector2f c_sfVectorTarget		= ety::CMath::normalize_Vector<float>( ety::CMath::build_DirectionVector<float>( c_sfVectorPosition, sf::Vector2f( static_cast<float>( ety::CMouse::get_Position( p_c_etyCameraComponent->get_View() ).x ), static_cast<float>( ety::CMouse::get_Position( p_c_etyCameraComponent->get_View() ).y ) ) ) );
+					
+						const float fTargetAngle = -( atan2( c_sfVectorTarget.x, c_sfVectorTarget.y ) * 180.f / PI );
+					
+						rotate_ToAngle( fTargetAngle, uiFrameTime );
+					}
+
+					bool bAcceleration	= false;
+
+					if( sf::Keyboard::isKeyPressed	( sf::Keyboard::W ) )
+					{
+						accelerate_Forward( uiFrameTime );
+						bAcceleration = true;
+					}
+					if(sf::Keyboard::isKeyPressed	( sf::Keyboard::S ) )
+					{
+						accelerate_Backward( uiFrameTime );
+						bAcceleration = true;
+					}
+					if( sf::Keyboard::isKeyPressed	( sf::Keyboard::A ) )
+					{
+						accelerate_Left( uiFrameTime );
+						bAcceleration = true;
+					}
+					if( sf::Keyboard::isKeyPressed	( sf::Keyboard::D ) )
+					{
+						accelerate_Right( uiFrameTime );
+						bAcceleration = true;
+					}
+
+					if(bAcceleration == true)
+					{
+						CGenerator*	p_c_etyGenerator	=	static_cast<CGenerator*>(mp_c_Owner->get_Component<CItemModulesComponent>("ItemModulesComponent")->get_EquipmentFromModule(ModuleType::enGENERATOR));
+						CEngine*	p_c_etyEngine		=	static_cast<CEngine*>(mp_c_Owner->get_Component<CItemModulesComponent>("ItemModulesComponent")->get_EquipmentFromModule(ModuleType::enENGINE));
+					}
+
+					continue_Movement( uiFrameTime );
+
+					m_uiFrameTime += uiFrameTime;
+
+					if(m_uiFrameTime >= 1000)
+					{
+						//sf::Vector2f c_sfVector2fPlayerPosition = mp_c_Owner->get_Component<ety::CRenderComponent>("RenderComponent")->get_Position();
+						//std::cout << "Player Position: " << c_sfVector2fPlayerPosition.x << " || " << c_sfVector2fPlayerPosition.y << std::endl;
+						m_uiFrameTime = 0;
+					}	
+				}
+			}
+
+const		std::string		ety::CMovablePlayerComponent::get_ComponentID							( void )
+			{
+				return "MovablePlayerComponent";
+			}
+
+//#########################################################################################################//
+//#########################################################################################################//
+//#########################################################################################################//
+
+							ety::CMovableNPCComponent::CMovableNPCComponent							( void )
+							:m_bRotationFinished													( true )
+							,m_fTargetAngle															( 0.f )
+							,m_bMovementInitialized													( false )
+							,m_bPatrolModus															( false )
+							{
+							}
+							ety::CMovableNPCComponent::~CMovableNPCComponent						( void )
+							{
+							}
+
+			void			ety::CMovableNPCComponent::update_Component								( const sf::Uint32& uiFrameTime )
+			{
+				m_uiFrameTime	=	uiFrameTime;
+				if(m_bPatrolModus == true)
+				{
+					patrol_BetweenPoints();
+				}
+				else
+				{
+					if(this->get_Owner()->get_UniqueID() == "testNPCEntity1")
+					{
+						start_Patrol ( 4, new sf::Vector2f( 2000.f, 1300.f ), new sf::Vector2f( 2400.f, 1300.f ), 
+										new sf::Vector2f( 2400.f, 1700.f ), new sf::Vector2f( 2000.f, 1700.f ));
+					}
+					else if(this->get_Owner()->get_UniqueID() == "testNPCEntity2")
+					{
+						start_Patrol ( 4, new sf::Vector2f( 2400.f, 1300.f ), new sf::Vector2f( 2400.f, 1700.f ), 
+										new sf::Vector2f( 2000.f, 1700.f ), new sf::Vector2f( 2000.f, 1300.f ));
+					}
+					else if(this->get_Owner()->get_UniqueID() == "testNPCEntity3")
+					{
+						start_Patrol ( 4, new sf::Vector2f( 2400.f, 1700.f ), new sf::Vector2f( 2000.f, 1700.f ),
+										new sf::Vector2f( 2000.f, 1300.f ), new sf::Vector2f( 2400.f, 1300.f ));
+					}
+					else if(this->get_Owner()->get_UniqueID() == "testNPCEntity4")
+					{
+						start_Patrol ( 4, new sf::Vector2f( 2000.f, 1700.f ), new sf::Vector2f( 2000.f, 1300.f ), 
+										new sf::Vector2f( 2400.f, 1300.f ), new sf::Vector2f( 2400.f, 1700.f ));
+					}
+				}
+
+
+				//sf::Vector2f yo = sf::Vector2f(0.f, 0.f);
+				/*start_Patrol(2, new sf::Vector2f(0.f,0.f), new sf::Vector2f(550.f,550.f) );
+
+				if(c_sfVector2fTarget.x	==	0)
+				{
+					//c_sfVector2fTarget = mp_c_Owner->get_Component<CRenderComponent>("RenderComponent")->get_Position();
+					//c_sfVector2fTarget.x += 200.f;
+					//c_sfVector2fTarget.y -= 100.f;
+
+					if(this->get_Owner()->get_UniqueID() == "testNPCEntity1")
+					{
+						c_sfVector2fTarget	=	sf::Vector2f(2400.f, 1300.f);
+					}
+					else if(this->get_Owner()->get_UniqueID() == "testNPCEntity2")
+					{
+						c_sfVector2fTarget	=	sf::Vector2f(2000.f, 1300.f);
+					}
+					else if(this->get_Owner()->get_UniqueID() == "testNPCEntity3")
+					{
+						c_sfVector2fTarget	=	sf::Vector2f(2400.f, 1700.f);
+					}
+					else if(this->get_Owner()->get_UniqueID() == "testNPCEntity4")
+					{
+						c_sfVector2fTarget	=	sf::Vector2f(2000.f, 1700.f);
+					}
+				}
+
+				m_uiFrameTime	=	uiFrameTime;
+
+				CEntity*		p_c_etyEntityPlayer			=	gp_c_etyWorld->get_Entitymanager()->get_Entity("Player");
+				sf::Vector2f	c_sfVector2fPlayerPosition	=	p_c_etyEntityPlayer->get_Component<CRenderComponent>("RenderComponent")->get_Position();
+				sf::Vector2f	c_sfVector2fNPCPosition		=	mp_c_Owner->get_Component<CRenderComponent>("RenderComponent")->get_Position();
+
+				if(finish == true)
+				{
+					if(c_sfVector2fTarget == sf::Vector2f(2000, 1300))
+					{
+						c_sfVector2fTarget	=	sf::Vector2f(2400, 1300);
+					}
+					else if(c_sfVector2fTarget == sf::Vector2f(2400, 1300))
+					{
+						c_sfVector2fTarget	=	sf::Vector2f(2400, 1700);
+					}
+					else if(c_sfVector2fTarget == sf::Vector2f(2400, 1700))
+					{
+						c_sfVector2fTarget	=	sf::Vector2f(2000, 1700);
+					}
+					else if(c_sfVector2fTarget == sf::Vector2f(2000, 1700))
+					{
+						c_sfVector2fTarget	=	sf::Vector2f(2000, 1300);
+					}
+				}
+
+				finish = move_ToPosition(c_sfVector2fTarget);*/
+				
+
+				/*if(finish == false)
+				{
+					//rotate_ToAngle(90, uiFrameTime);
+					//finish = true;
+				}
+
+				if(CMath::calculate_Length<float>(CMath::build_DirectionVector<float>(c_sfVector2fNPCPosition, c_sfVector2fTarget)) <= 50.f)
+				{
+					if(c_sfVector2fTarget == sf::Vector2f(50, 0))
+					{
+						//c_sfVector2fTarget	=	sf::Vector2f(450, 0);
+					}
+					else if(c_sfVector2fTarget == sf::Vector2f(450, 0))
+					{
+						//c_sfVector2fTarget	=	sf::Vector2f(50, 0);
+					}
+
+					
+				}*/
+
+
+				/*if(finish == false)
+				{
+					move_ToPosition(c_sfVector2fTarget);
+				}*/
+				
+				
+
+				
+
+
+
+
+
+				/*if(c_sfVector2fNPCPosition.x	!=	c_sfVector2fPlayerPosition.x)
+				{
+					//this->move_ToPosition(sf::Vector2f(c_sfVector2fPlayerPosition.x, c_sfVector2fNPCPosition.y));
+				}
+				
+
+				if(m_uiFrameTime2 >= 5000)
+				{
+					//if()
+					//{
+						//accelerate_Forward( uiFrameTime )
+					//}
+				}
+
+				const sf::Vector2f c_sfVectorTarget		= ety::CMath::normalize_Vector<float>( ety::CMath::build_DirectionVector<float>( c_sfVector2fNPCPosition, sf::Vector2f( static_cast<float>( c_sfVector2fPlayerPosition.x ), static_cast<float>( c_sfVector2fPlayerPosition.y ) ) ) );	
+				const float fTargetAngle = -( atan2( c_sfVectorTarget.x, c_sfVectorTarget.y ) * 180.f / PI );
+					
+				rotate_ToAngle( fTargetAngle, uiFrameTime );
+				
+
+				int y = int(ety::CMath::calculate_Length(ety::CMath::build_DirectionVector<float>(c_sfVector2fPlayerPosition, c_sfVector2fNPCPosition)));
+
+
+				/*srand(time(NULL));
+				int zufallszahl = rand() % 10 + 1;
+
+				std::cout << zufallszahl << std::endl;
+				if(zufallszahl >= 8)
+				{
+					
+					if(left == true)
+					{
+						left = false;
+					}
+					else if(left == false)
+					{
+						left = true;
+					}
+				}*/
+
+				/*if(y > 280.f)
+				{
+					//accelerate_Left( uiFrameTime );
+					accelerate_Forward( uiFrameTime );
+					//
+				}
+				else if(y < 220.f)
+				{
+					
+					accelerate_Backward( uiFrameTime );
+					//
+				}
+				else if(y > 220.f && y < 280.f)
+				{
+					/*if(left == true)
+					{
+						accelerate_Left( uiFrameTime );
+					}
+					else
+					{
+						accelerate_Right( uiFrameTime );
+					}*/
+					
+					//stop_Movement();
+				//}
+
+				//>std::cout << y << std::endl;
+				
+				//continue_Movement( m_uiFrameTime );
+			}
+			bool			ety::CMovableNPCComponent::move_ToPosition								( const sf::Vector2f& c_sfVectorTargetPosition )
+			{
+				ety::CRenderComponent* p_c_etyRenderComponent			=	mp_c_Owner->get_Component<ety::CRenderComponent>("RenderComponent");
+				ety::CAttributeComponent*	p_c_etyAttributeComponent	=	mp_c_Owner->get_Component<ety::CAttributeComponent>( "AttributeComponent" );
+
+				if(p_c_etyRenderComponent == NULL || p_c_etyAttributeComponent == NULL)
+				{
+					return false;
+				}
+
+				const sf::Vector2f	c_sfVector2fNPCPosition				=	p_c_etyRenderComponent->get_Position();
+				sf::Vector2f c_sfVectorDirectionVector					=	ety::CMath::build_DirectionVector<float>(c_sfVectorTargetPosition, c_sfVector2fNPCPosition);
+				float fDistance											=	ety::CMath::calculate_Length<float>(c_sfVectorDirectionVector);
+
+				if(m_bMovementInitialized == false)
+				{
+					m_bMovementInitialized = true;
+					m_bRotationFinished = false;
+				}
+
+				const sf::Vector2f c_sfVectorTarget				=	ety::CMath::normalize_Vector<float>( ety::CMath::build_DirectionVector<float>( c_sfVector2fNPCPosition, c_sfVectorTargetPosition));
+				m_fTargetAngle									=	-( atan2( c_sfVectorTarget.x, c_sfVectorTarget.y ) * 180.f / PI );
+
+				if( m_fTargetAngle < 0 )
+				{
+					m_fTargetAngle += 360;
+				}
+
+				if(m_fTargetAngle != p_c_etyRenderComponent->get_Angle())
+				{
+					if(rotate_ToAngle2(m_fTargetAngle, m_uiFrameTime) == false)
+					{
+						return false;
+					}
+				}
+
+				accelerate_Forward(m_uiFrameTime);
+
+				sf::Vector2f c_sfVectorVelocity				=	*(p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<sf::Vector2f>( "c_sfVectorVelocity" ) );
+				
+				const sf::Vector2f c_sfVectorABS			=	sf::Vector2f(abs( c_sfVector2fNPCPosition.x - c_sfVectorTargetPosition.x ), abs( c_sfVector2fNPCPosition.y - c_sfVectorTargetPosition.y ));
+				const sf::Vector2f c_sfVector2fMoveDistance	=	sf::Vector2f(c_sfVectorVelocity.x * ( static_cast<float>( m_uiFrameTime ) / 1000.f ), c_sfVectorVelocity.y * ( static_cast<float>( m_uiFrameTime ) / 1000.f ));
+
+				if(fDistance <= ety::CMath::calculate_Length<float>(c_sfVector2fMoveDistance))
+				{
+					p_c_etyRenderComponent->get_Appearance()->setPosition( c_sfVectorTargetPosition );
+					stop_Movement();
+
+					return true;
+				}
+				else
+				{
+					p_c_etyRenderComponent->get_Appearance()->move( c_sfVectorVelocity.x * ( static_cast<float>( m_uiFrameTime ) / 1000.f ), 
+						c_sfVectorVelocity.y * ( static_cast<float>( m_uiFrameTime ) / 1000.f ) );
+					return false;
+				}
+
+				return false;
+			}
+			/*bool			ety::CMovableNPCComponent::move_ToPosition								( const sf::Vector2f& c_sfVectorTargetPosition )
+			{
+				ety::CRenderComponent* p_c_etyRenderComponent			=	mp_c_Owner->get_Component<ety::CRenderComponent>("RenderComponent");
+				ety::CAttributeComponent*	p_c_etyAttributeComponent	=	mp_c_Owner->get_Component<ety::CAttributeComponent>( "AttributeComponent" );
+
+				if(p_c_etyRenderComponent == NULL || p_c_etyAttributeComponent == NULL)
+				{
+					return false;
+				}
+
+
+				const sf::Vector2f	c_sfVector2fNPCPosition				=	p_c_etyRenderComponent->get_Position();
+				sf::Vector2f c_sfVectorDirectionVector					=	ety::CMath::build_DirectionVector<float>(c_sfVectorTargetPosition, c_sfVector2fNPCPosition);
+				float fDistance											=	ety::CMath::calculate_Length<float>(c_sfVectorDirectionVector);
+				float fRadius = 0.f;
+				if(p_c_etyRenderComponent->get_Appearance()->getGlobalBounds().width > p_c_etyRenderComponent->get_Appearance()->getGlobalBounds().height)
+				{
+					fRadius = p_c_etyRenderComponent->get_Appearance()->getGlobalBounds().width/2;
+				}
+				else
+				{
+					fRadius = p_c_etyRenderComponent->get_Appearance()->getGlobalBounds().height/2;
+				}
+
+				if(m_bMovementInitialized == false)
+				{
+					m_c_sfVector2fConnectingLine = CMath::build_StraightLine<float>(p_c_etyRenderComponent->get_Position(), c_sfVectorTargetPosition);
+					m_bMovementInitialized = true;
+					m_bRotationFinished = false;
+				}
+
+				const sf::Vector2f c_sfVectorTarget				=	ety::CMath::normalize_Vector<float>( ety::CMath::build_DirectionVector<float>( c_sfVector2fNPCPosition, sf::Vector2f( static_cast<float>( c_sfVectorTargetPosition.x ), static_cast<float>( c_sfVectorTargetPosition.y ) ) ) );	
+				m_fTargetAngle									=	-( atan2( c_sfVectorTarget.x, c_sfVectorTarget.y ) * 180.f / PI );
+
+				if( m_fTargetAngle < 0 )
+				{
+					m_fTargetAngle += 360;
+				}
+
+				if(fDistance >= fRadius && m_fTargetAngle != p_c_etyRenderComponent->get_Angle())
+				{
+					if(rotate_ToAngle2(m_fTargetAngle, m_uiFrameTime) == false)
+					{
+						return false;
+					}
+				}
+
+				accelerate_Forward(m_uiFrameTime);
+
+				sf::Vector2f c_sfVectorVelocity				=	*(p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<sf::Vector2f>( "c_sfVectorVelocity" ) );
+				
+				const sf::Vector2f c_sfVectorABS			=	sf::Vector2f(abs( c_sfVector2fNPCPosition.x - c_sfVectorTargetPosition.x ), abs( c_sfVector2fNPCPosition.y - c_sfVectorTargetPosition.y ));
+				const sf::Vector2f c_sfVector2fMoveDistance	=	sf::Vector2f(c_sfVectorVelocity.x * ( static_cast<float>( m_uiFrameTime ) / 1000.f ), c_sfVectorVelocity.y * ( static_cast<float>( m_uiFrameTime ) / 1000.f ));
+
+				//std::cout << (c_sfVectorVelocity.x * ( static_cast<float>( m_uiFrameTime ) / 1000.f )) << std::endl;
+
+				float yo = c_sfVector2fNPCPosition.x;
+				yo += (c_sfVectorVelocity.x * ( static_cast<float>( m_uiFrameTime ) / 1000.f ));
+				sf::Vector2f c_sfVector2fIdealPosition		=	sf::Vector2f(c_sfVector2fNPCPosition.x, CMath::get_FunctionValue<float>(m_c_sfVector2fConnectingLine, 
+																	yo));
+
+				float	fMoveDistance						=	CMath::calculate_Length<float>(c_sfVector2fMoveDistance);
+
+				//(c_sfVectorVelocity.x * ( static_cast<float>( m_uiFrameTime ) / 1000.f ))
+
+				if( c_sfVector2fMoveDistance.x >= c_sfVectorABS.x - 3.f && c_sfVector2fMoveDistance.y >= c_sfVectorABS.y - 3.f)
+				{
+					p_c_etyRenderComponent->get_Appearance()->setPosition( c_sfVectorTargetPosition );
+					stop_Movement();
+					//std::cout << "!!!!!!!DONE!!!!!!!" << std::endl;
+					return true;
+				}
+				else
+				{
+					p_c_etyRenderComponent->get_Appearance()->move( c_sfVectorVelocity.x * ( static_cast<float>( m_uiFrameTime ) / 1000.f ), c_sfVectorVelocity.y * ( static_cast<float>( m_uiFrameTime ) / 1000.f ) );
+					//std::cout << p_c_etyRenderComponent->get_Position().x << " || " << p_c_etyRenderComponent->get_Position().y << std::endl;
+					return false;
+				}
+
+				
+
+				p_c_etyRenderComponent->get_Appearance()->setPosition( c_sfVector2fIdealPosition );
+				
+				return false;
+			}*/
+			/*bool			ety::CMovableNPCComponent::move_ToPosition								( const sf::Vector2f& c_sfVectorTargetPosition )
+			{
+				ety::CRenderComponent* p_c_etyRenderComponent		=	mp_c_Owner->get_Component<ety::CRenderComponent>("RenderComponent");
+				const sf::Vector2f	c_sfVector2fNPCPosition			=	p_c_etyRenderComponent->get_Position();
+				const sf::Vector2f c_sfVectorABS					=	sf::Vector2f(abs( c_sfVector2fNPCPosition.x - c_sfVectorTargetPosition.x ), abs( c_sfVector2fNPCPosition.y - c_sfVectorTargetPosition.y ));
+				sf::Vector2f c_sfVectorDirectionVector				=	ety::CMath::build_DirectionVector<float>(c_sfVectorTargetPosition, c_sfVector2fNPCPosition);
+				float fDistance										=	ety::CMath::calculate_Length<float>(c_sfVectorDirectionVector);
+
+				if(check_DistanceBetweenPositions(c_sfVector2fNPCPosition, c_sfVectorTargetPosition) == true)
+				{
+					stop_Movement();
+					return true;
+				}
+
+
+				const sf::Vector2f c_sfVectorTarget				=	ety::CMath::normalize_Vector<float>( ety::CMath::build_DirectionVector<float>( c_sfVector2fNPCPosition, sf::Vector2f( static_cast<float>( c_sfVectorTargetPosition.x ), static_cast<float>( c_sfVectorTargetPosition.y ) ) ) );	
+				m_fTargetAngle									=	-( atan2( c_sfVectorTarget.x, c_sfVectorTarget.y ) * 180.f / PI );
+
+				if( m_fTargetAngle < 0 )
+				{
+					m_fTargetAngle += 360;
+				}
+
+				float fRadius = 0.f;
+				if(p_c_etyRenderComponent->get_Appearance()->getGlobalBounds().width > p_c_etyRenderComponent->get_Appearance()->getGlobalBounds().height)
+				{
+					fRadius = p_c_etyRenderComponent->get_Appearance()->getGlobalBounds().width/2;
+				}
+				else
+				{
+					fRadius = p_c_etyRenderComponent->get_Appearance()->getGlobalBounds().height/2;
+				}
+
+				if(fRadius < fDistance )
+				{
+					if(m_fTargetAngle != p_c_etyRenderComponent->get_Angle())
+					{
+						rotate_ToAngle(m_fTargetAngle, m_uiFrameTime);
+					}
+
+					if(abs(m_fTargetAngle) != p_c_etyRenderComponent->get_Angle())
+					{
+						return false;
+					}
+				}
+
+				accelerate_Forward(m_uiFrameTime);
+				ety::CAttributeComponent*	p_c_etyAttributeComponent	= mp_c_Owner->get_Component<ety::CAttributeComponent>( "AttributeComponent" );
+
+				if( p_c_etyRenderComponent != NULL && p_c_etyAttributeComponent != NULL )
+				{
+					sf::Vector2f c_sfVectorVelocity				=	*(p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<sf::Vector2f>( "c_sfVectorVelocity" ) );
+
+					const sf::Vector2f c_sfVectorABS			=	sf::Vector2f(abs( c_sfVector2fNPCPosition.x - c_sfVectorTargetPosition.x ), abs( c_sfVector2fNPCPosition.y - c_sfVectorTargetPosition.y ));
+					const sf::Vector2f c_sfVector2fMoveDistance	=	sf::Vector2f(c_sfVectorVelocity.x * ( static_cast<float>( m_uiFrameTime ) / 1000.f ), c_sfVectorVelocity.y * ( static_cast<float>( m_uiFrameTime ) / 1000.f ));
+
+					if( c_sfVector2fMoveDistance.x >= c_sfVectorABS.x - 3.f && c_sfVector2fMoveDistance.y >= c_sfVectorABS.y - 3.f)
+					{
+						p_c_etyRenderComponent->get_Appearance()->setPosition( c_sfVectorTargetPosition );
+						stop_Movement();
+						std::cout << "!!!!!!!DONE!!!!!!!" << std::endl;
+						return true;
+					}
+					else
+					{
+						p_c_etyRenderComponent->get_Appearance()->move( c_sfVectorVelocity.x * ( static_cast<float>( m_uiFrameTime ) / 1000.f ), c_sfVectorVelocity.y * ( static_cast<float>( m_uiFrameTime ) / 1000.f ) );
+						std::cout << p_c_etyRenderComponent->get_Position().x << " || " << p_c_etyRenderComponent->get_Position().y << std::endl;
+						return false;
+					}
+				}
+
+				return false;
+			}*/
+			bool			ety::CMovableNPCComponent::rotate_ToAngle2								( float fTargetAngle, const sf::Uint32& uiFrameTime )
+			{
+				//m_bRotationFinished = false;
+				ety::CRenderComponent* p_c_etyRenderComponent = mp_c_Owner->get_Component<ety::CRenderComponent>("RenderComponent");
+				
+				if( p_c_etyRenderComponent != NULL )
+				{
+					float fActualAngle			=	p_c_etyRenderComponent->get_Angle();
+					const float fRotationSpeed	=	*(mp_c_Owner->get_Component<ety::CAttributeComponent>( "AttributeComponent" )->m_c_etyAttributes.get_Attribute<float>( "fRotationSpeed" ) );	
+					const float fRotation		=	fRotationSpeed * ( static_cast<float>( uiFrameTime ) / 1000.f );
+
+					if( fTargetAngle < 0 )
+					{
+						fTargetAngle += 360;
+					}
+
+					const float fABS = abs( fActualAngle - fTargetAngle );
+
+					if(fRotation >= fABS)
+					{
+						p_c_etyRenderComponent->set_Angle( fTargetAngle );
+						return true;
+						//m_bRotationFinished = true;
+						
+					}
+
+					if( fActualAngle < fTargetAngle )
+					{
+						if( abs( fActualAngle - fTargetAngle ) > 180) 
+						{ 
+							//rotate_CounterClockwise( fTargetAngle, uiFrameTime );
+							fActualAngle -= fRotation;
+						} 
+						else 
+						{ 
+							//rotate_Clockwise( fTargetAngle, uiFrameTime );
+							fActualAngle += fRotation;
+						} 
+					}
+					else if( fActualAngle > fTargetAngle )
+					{
+						if( abs( fActualAngle - fTargetAngle ) > 180) 
+						{ 
+							//rotate_Clockwise( fTargetAngle, uiFrameTime );
+							fActualAngle += fRotation;
+						} 
+						else 
+						{ 
+							//rotate_CounterClockwise( fTargetAngle, uiFrameTime );
+							fActualAngle -= fRotation;
+						} 
+					}
+
+					if( fActualAngle > 360.f )
+					{
+						fActualAngle -= 360.f;
+					}
+					else if( fActualAngle < 0.f )
+					{
+						fActualAngle += 360.f;
+					}
+
+					if(fActualAngle == fTargetAngle)
+					{
+						return true;
+						//m_bRotationFinished = true;
+					}
+
+					p_c_etyRenderComponent->set_Angle( fActualAngle );
+				}
+
+				return false;
+			}
+
+			void			ety::CMovableNPCComponent::patrol_BetweenPoints							( void )
+			{
+				if(m_bPatrolModus == false || m_listPatrolPoints.size() <= 1)
+				{
+					return ;
+				}
+
+				sf::Vector2f c_sfVector2fNextTarget	=	m_listPatrolPoints.front();
+
+				if(move_ToPosition(c_sfVector2fNextTarget) == true)
+				{
+					m_listPatrolPoints.pop_front();
+					m_listPatrolPoints.push_back(c_sfVector2fNextTarget);
+				}
+			}
+			void			ety::CMovableNPCComponent::start_Patrol									( int iAmount,  ... )
+			{
+				if(iAmount <= 1)
+				{
+					m_bPatrolModus	=	false;
+					return ;
+				}
+
+				m_bPatrolModus	=	true;
+				
+				va_ArgumentList va_ALParameter;
+				va_OpenArgumentList(va_ALParameter, iAmount);
+
+				for(int iLoop = 0 ; iLoop < iAmount ; iLoop++)
+				{
+					m_listPatrolPoints.push_back(*static_cast<sf::Vector2f*>(va_getArgument(va_ALParameter, void*)));
+				}
+				
+				va_CloseArgumentList(va_ALParameter);
+			}
+			void			ety::CMovableNPCComponent::stop_Patrol									( void )
+			{
+				m_bPatrolModus	=	false;
+				m_listPatrolPoints.clear();
+				stop_Movement();
+			}
+
+const		std::string		ety::CMovableNPCComponent::get_ComponentID								( void )
+			{
+				return "MovableNPCComponent";
+			}
+
+//#########################################################################################################//
+//#########################################################################################################//
+//#########################################################################################################//
+
+							ety::CMovableEnvironmentComponent::CMovableEnvironmentComponent			( void )
+							{
+							}
+							ety::CMovableEnvironmentComponent::~CMovableEnvironmentComponent		( void )
+							{
+							}
+
+			void			ety::CMovableEnvironmentComponent::update_Component						( const sf::Uint32& uiFrameTime )
+			{
+				continue_Movement	( uiFrameTime );
+				rotate_Clockwise	( uiFrameTime );
+			}
+
+const		std::string		ety::CMovableEnvironmentComponent::get_ComponentID						( void )
+			{
+				return "MovableEnvironmentComponent";
+			}
+
+//#########################################################################################################//
+//#########################################################################################################//
+//#########################################################################################################//

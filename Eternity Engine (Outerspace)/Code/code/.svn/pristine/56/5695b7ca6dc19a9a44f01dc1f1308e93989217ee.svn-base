@@ -1,0 +1,185 @@
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////																																	   ///////////
+///////////																LUA.hpp																   ///////////
+///////////																									                                   ///////////
+///////////			Diese Klasse wird zum starten von LUA-Scripts verwendet. Sie bietet Funktionen zur leichteren Verwendung				   ///////////
+///////////			der Scripts. Diese Scripts sollen zum modifizieren des Programmes dienen.												   ///////////
+///////////																																	   ///////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+//Includes der LUA-Bibliothek
+extern "C" {
+  #include <lua.h>
+  #include <lualib.h>
+  #include <lauxlib.h>
+}
+
+#include "luabind/luabind.hpp"
+#include <luabind/adopt_policy.hpp>
+
+namespace ety
+{
+	class CLua
+	{
+	private:
+		//Zum Überprüfen ob Lua initialisiert worden ist.
+		bool								m_bLuaInitiated;
+
+		//Eine Instanz von Lua.
+		lua_State*							m_s_Lua;
+
+	protected:
+		//Diese Klasse wird nicht abgeleitet.
+
+	public:
+		//Standart Konstruktor und Destruktor.
+											CLua				( void );
+											~CLua				( void );
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		///	Ruft eine LUA-Funktion eines LUA-Scripts auf mit angegebener Anzahl von Argumenten und Rückgabewerten.
+		///
+		///	1P. Name der LUA-Funktion.
+		///	2P. Mit wievielen Parametern soll die Funktion aufgerufen werden.
+		///	3P. Wieviele Rückgabewerte hat die Funktion.
+		///
+		/// \parameter	const int, const int
+		/// \rückgabe	const bool
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		const		bool					call_Function		( const std::string& strKey, const int iNumberofArguments, const int iNumberofResults );
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		/// Schließt die LUA-Bibliotheken.
+		///
+		/// \parameter	void
+		/// \rückgabe	void
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					void					close_Lua			( void );
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		/// Initialisiert LUA und öffnet die benötigten Bibliotheken.
+		///
+		/// \parameter	void
+		/// \rückgabe	void
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					void					init_Lua			( void );
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		/// Schiebt einen String auf den Stack, damit man es einer LUA-Funktion übergeben kann.
+		///
+		///	1P. Der String der auf den Stack geschoben werden soll.
+		///
+		/// \parameter	const std::string&
+		/// \rückgabe	void
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					void					push_String			( const std::string& strString );
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		/// Schiebt einen Integer auf den Stack, damit man es einer LUA-Funktion übergeben kann.
+		///
+		///	1P. Der Integer-Wert der auf den Stack geschoben werden soll.
+		///
+		/// \parameter	const int
+		/// \rückgabe	void
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					void					push_Integer		( const int iInteger );
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		/// Schiebt ein Objekt einer Klasse auf den LUA-Stack, um mit diesem Objekt 
+		///	in Lua-Script Dateien arbeiten zu können.
+		///
+		///	1P. Das Objekt welches an dem LUA-Script übergeben werden soll.
+		///	2P. Der Name des Objektes mit dem man im LUA-Script drauf zugreifen kann.
+		///
+		/// \parameter	tObject*, const std::string&
+		/// \rückgabe	void
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*					template< class tObject >
+					void					push_Object			( tObject* tNewObject, const std::string& strGlobalName )
+					{
+						if( m_bLuaInitiated == true )
+						{
+							luabridge::push			( m_s_Lua, tNewObject );
+							lua_setglobal			( m_s_Lua, strGlobalName.c_str() );
+						}
+					}*/
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		/// Startet eine LUA-Scriptdatei.
+		///
+		///	1P. Der LUA-Script Name.
+		///
+		/// \parameter	const std::string&
+		/// \rückgabe	const bool
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		const		bool					start_Script		( const std::string& strScriptname );
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		///	Gibt an ob LUA initialisiert worden ist.
+		///
+		/// \parameter	void
+		/// \rückgabe	const bool
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+		const		bool					get_IsInitiated		( void );
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		/// Holt aus einer LUA-Script Datei aus einer globalen Variable einen Integer.
+		///
+		///	1P. Der Name der Globalen Integer Variable im Script.
+		///
+		/// \parameter	const std::string&
+		/// \rückgabe	const int	
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		const		int						get_Integer			( const std::string& strKey = "");
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		/// Holt aus einer LUA-Script Datei aus einem globalen Table einen Integer.
+		///
+		///	1P. Der Name des Tables.
+		///	2P. Der Name des Schlüsselwortes im Table.
+		///
+		/// \parameter	const std::string&, const std::string&
+		/// \rückgabe	const int								
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		const		int						get_TableInteger	( const std::string& strTable, const std::string& strKey );
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		/// Holt aus einer LUA-Script Datei aus einer Globalen-Variable einen String.
+		///
+		///	1P. Der Name des globalen Strings im Script.
+		///
+		/// \parameter	const std::string&
+		/// \rückgabe	const int	
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		const		std::string				get_String			( const std::string& strKey = "" );
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		/// Holt aus einer LUA-Script Datei aus einem globalen Table einen String.
+		///
+		///	1P. Der Name des Tables.
+		///	2P. Der Name des Schlüsselwortes im Table.
+		///
+		/// \parameter	const std::string&, const std::string&
+		/// \rückgabe	const std::string									
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		const		std::string				get_TableString		( const std::string& strTable, const std::string& strKey );
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		/// Gibt den Lua-State zurück für eventuelle feinheiten im LUA-Code.
+		/// Beispiel: Klassen Deklarationen für ein LUA-Script.
+		///
+		/// \parameter	void
+		/// \rückgabe	lua_State*	const
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					lua_State*		const	get_LuaState		( void );
+	};
+}
+
+

@@ -1,0 +1,25 @@
+-Einleitung
+	-Wie wir dazu kamen	(Johannes/(Julien))
+	-Thema (was es ist)	(Julien/(Johannes/)
+	
+
+-Wissenschaftlicher Teil	
+	-SFML			(Julien)
+	-LUA			(Julien)
+	-V. m. d. P. P.		(Johannes)
+
+-Eternity-Engine		(Julien)
+	-Resourcenverwaltung
+	-GameStateSystem
+
+-Dialogsystem			(Johannes)
+	-Funktion
+	-Eingabe-Events
+	-Wiederverwendbarkeit
+
+-Spiel		
+	-Worldsystem		(Julien)
+	-Physiksystem		(Julien)
+	-Mission-System		(Johannes)
+	-Trigger		(Johannes)
+	-KI			(Johannes)

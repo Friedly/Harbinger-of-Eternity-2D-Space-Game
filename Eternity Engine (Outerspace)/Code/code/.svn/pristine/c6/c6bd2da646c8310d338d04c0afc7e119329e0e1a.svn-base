@@ -1,0 +1,12 @@
+function Flyer()
+	print("Aufruf Template Flyer")
+	if c_etyItemModulesComponent ~= nil then
+		if c_etyItemManagement ~= nil then
+			c_etyItemModulesComponent:set_ItemToModule( "Engine" 			,	c_etyItemManagement:get_Item( "LightEngine" 		)	);
+			c_etyItemModulesComponent:set_ItemToModule( "Generator" 		,	c_etyItemManagement:get_Item( "LightGenerator" 		)	);
+			c_etyItemModulesComponent:set_ItemToModule( "Shield" 			,	c_etyItemManagement:get_Item( "LightShield" 		)	);
+			c_etyItemModulesComponent:set_ItemToModule( "Armor" 			,	c_etyItemManagement:get_Item( "LightArmor" 			)	);
+			c_etyItemModulesComponent:set_ItemToModule(	"AmmunitionDump"	,	c_etyItemManagement:get_Item( "LightAmmoDump" 		)	);
+		end
+	end
+end

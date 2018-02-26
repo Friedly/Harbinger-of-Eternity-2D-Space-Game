@@ -1,0 +1,27 @@
+--[Events]
+function Events()
+	c_etyTrigger:add_TimeEvent( 0, 2.0, true);
+end
+--[Events]
+
+--[Actions]
+function Actions()
+
+	print("YOOO");
+	testEntity 					= 	c_etyEntitymanager:get_Entity("testNPCEntity1");
+	testMoveableNPCComponent 	= 	testEntity:get_MoveableNPCComponent("MovableComponent");
+	testMoveableNPCComponent:stop_Patrol();
+end
+--[Actions]
+
+--[Conditions]
+function Conditions()
+	if true then
+		Actions()
+		return true;
+	else
+		return false;
+	end
+end
+--[Conditions]
+

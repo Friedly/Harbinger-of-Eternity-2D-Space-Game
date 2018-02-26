@@ -1,0 +1,550 @@
+#include "CWorld.hpp"
+#include "CIniFile.hpp"
+#include "CRessourceManager.hpp"
+#include "CGamesettings.hpp"
+#include "CTrigger.hpp"
+#include "CTask.hpp"
+#include "CKillTask.hpp"
+#include "CExploreTask.hpp"
+#include "CAttributeTask.hpp"
+#include "CMission.hpp"
+#include "CLua.hpp"
+
+#include <iostream>
+
+//Nur zu Testzwecken
+#include <stdlib.h>
+#include <time.h>
+
+														ety::CWorld::CWorld								( void )
+															: mp_c_etyCurrentRessourceManager	( NULL )
+															, mp_c_etyCurrentGamesettings		( NULL )
+															, mp_c_etyCurrentItemManagement		( NULL )
+															, m_c_etyRenderComponentsystem		( &m_c_etyEntitymanager )
+															, m_c_etyMovableComponentsystem		( &m_c_etyEntitymanager )
+															, m_c_etyCollisionComponentsystem	( &m_c_etyEntitymanager )
+															, m_bShowCollisions					( false )
+														{
+														}
+														ety::CWorld::~CWorld							( void )
+														{
+															clear_World();
+														}
+
+const		bool										ety::CWorld::check_Limits						( const float& fLayer, const sf::Vector2f& c_sfVectorEntityPosition )
+			{
+				if(		( fLayer					 >= m_c_sfVectorLayerLimit.x	&& fLayer						<= m_c_sfVectorLayerLimit.y	) 
+					&&	( c_sfVectorEntityPosition.x >= 0							&& c_sfVectorEntityPosition.x	<= m_c_sfVectorSize.x		)
+					&&  ( c_sfVectorEntityPosition.y >= 0							&& c_sfVectorEntityPosition.y	<= m_c_sfVectorSize.y		) )
+				{
+					return true;
+				}
+
+				return false;
+			}
+
+			boost::weak_ptr<ety::CEntity>				ety::CWorld::create_StaticBackground			( const std::string& strBackgroundTexturename )
+			{
+				if( mp_c_etyCurrentGamesettings != NULL && mp_c_etyCurrentRessourceManager != NULL )
+				{
+					boost::weak_ptr<ety::CEntity> p_c_etyEntity( m_c_etyEntitymanager.create_Entity("StaticBackground") );
+
+					if( p_c_etyEntity.use_count() > 0 )
+					{
+						p_c_etyEntity.lock()->add_Component( new CStaticBackgroundRenderComponent( mp_c_etyCurrentRessourceManager->get_Texture( strBackgroundTexturename ), mp_c_etyCurrentGamesettings->get_Videomode(), m_c_sfVectorLayerLimit.x-1 ) );
+					}
+
+					return p_c_etyEntity;
+				}
+
+				return boost::weak_ptr<ety::CEntity>();
+			}
+			boost::weak_ptr<ety::CEntity>				ety::CWorld::create_PlayerEntity				( const std::string& c_stdStringEntityKey, const float fAngle )
+			{
+				if( mp_c_etyCurrentGamesettings != NULL && mp_c_etyCurrentRessourceManager != NULL &&  mp_c_etyCurrentItemManagement != NULL )
+				{
+					boost::weak_ptr<ety::CEntity> p_c_etyEntity( create_SpaceshipEntity( "Player", c_stdStringEntityKey, static_cast<const sf::Vector2f>( m_c_sfVectorStartPoint ), 0.f, fAngle ) );
+			
+					if( p_c_etyEntity.use_count() > 0 )
+					{
+						ety::CIniFile c_etyIniFile;
+						c_etyIniFile.set_IniFileDirectory( "Initialisation/Gamesettings.ini" );
+
+						p_c_etyEntity.lock()->add_Component( new CCenteredCameraComponent( sf::Vector2f( static_cast<float>( c_etyIniFile.read_Integer( "INGAME", "iCameraX", 800 ) ), static_cast<float>( c_etyIniFile.read_Integer( "INGAME", "iCameraY", 600 ) ) ) ) );
+						p_c_etyEntity.lock()->add_Component( new ety::CMovablePlayerComponent() );
+
+						ety::CItemModulesComponent* p_c_etyTempItemModules = p_c_etyEntity.lock()->get_Component<ety::CItemModulesComponent>("ItemModulesComponent");
+
+						if( p_c_etyTempItemModules != NULL )
+						{
+							p_c_etyTempItemModules->set_EquipmentItemToModule( mp_c_etyCurrentItemManagement->get_Item( "LightEngine"		) );
+							p_c_etyTempItemModules->set_EquipmentItemToModule( mp_c_etyCurrentItemManagement->get_Item( "LightAmmoDump"		) );
+							p_c_etyTempItemModules->set_EquipmentItemToModule( mp_c_etyCurrentItemManagement->get_Item( "LightArmor"		) );
+							p_c_etyTempItemModules->set_EquipmentItemToModule( mp_c_etyCurrentItemManagement->get_Item( "LightGenerator"	) );
+							p_c_etyTempItemModules->set_EquipmentItemToModule( mp_c_etyCurrentItemManagement->get_Item( "LightShield"		) );
+							p_c_etyTempItemModules->set_WeaponItemToModule( "LEFT" ,mp_c_etyCurrentItemManagement->get_Item( "Turret"		) );
+						}
+					}
+
+					return p_c_etyEntity;
+				}
+
+				return boost::weak_ptr<ety::CEntity>();
+			}
+			boost::weak_ptr<ety::CEntity>				ety::CWorld::create_NPCEntity					( const std::string& c_stdStringUniqueID, const std::string& c_stdStringEntityKey, const sf::Vector2f& c_sfEntityPosition, const float fAngle, const std::string& c_stdStringItemTemplate )
+			{
+				if( mp_c_etyCurrentGamesettings != NULL && mp_c_etyCurrentRessourceManager != NULL &&  mp_c_etyCurrentItemManagement != NULL )
+				{
+					boost::weak_ptr<ety::CEntity> p_c_etyEntity( create_SpaceshipEntity( c_stdStringUniqueID, c_stdStringEntityKey, c_sfEntityPosition, 0.f, fAngle ) );
+			
+					if( p_c_etyEntity.use_count() > 0 )
+					{
+						ety::CIniFile c_etyIniFile;
+						c_etyIniFile.set_IniFileDirectory( "Initialisation/Gamesettings.ini" );
+
+						
+						p_c_etyEntity.lock()->add_Component( new ety::CMovableNPCComponent() );
+
+						ety::CItemModulesComponent* p_c_etyTempItemModules = p_c_etyEntity.lock()->get_Component<ety::CItemModulesComponent>("ItemModulesComponent");
+
+						if( p_c_etyTempItemModules != NULL )
+						{
+							p_c_etyTempItemModules->set_EquipmentItemToModule( mp_c_etyCurrentItemManagement->get_Item( "LightEngine2"		) );
+							p_c_etyTempItemModules->set_EquipmentItemToModule( mp_c_etyCurrentItemManagement->get_Item( "LightAmmoDump"		) );
+							p_c_etyTempItemModules->set_EquipmentItemToModule( mp_c_etyCurrentItemManagement->get_Item( "LightArmor"		) );
+							p_c_etyTempItemModules->set_EquipmentItemToModule( mp_c_etyCurrentItemManagement->get_Item( "LightGenerator"	) );
+							p_c_etyTempItemModules->set_EquipmentItemToModule( mp_c_etyCurrentItemManagement->get_Item( "LightShield"		) );
+						}
+					}
+
+					return p_c_etyEntity;
+				}
+
+				return boost::weak_ptr<ety::CEntity>();
+			}
+			boost::weak_ptr<ety::CEntity>				ety::CWorld::create_SpaceshipEntity				( const std::string& c_stdStringUniqueID, const std::string& c_stdStringEntityKey, const sf::Vector2f& c_sfEntityPosition, const float fLayer, const float fAngle, const std::string& c_stdStringItemTemplate )
+			{
+				if( mp_c_etyCurrentGamesettings != NULL && mp_c_etyCurrentRessourceManager != NULL &&  mp_c_etyCurrentItemManagement != NULL )
+				{
+					if( check_Limits( fLayer, c_sfEntityPosition ) == false )
+					{
+						return boost::weak_ptr<ety::CEntity>();
+					}
+
+					boost::weak_ptr<ety::CEntity> p_c_etyEntity( m_c_etyEntitymanager.create_Entity( c_stdStringUniqueID ) );
+
+					if( p_c_etyEntity.use_count() > 0 )
+					{
+						ety::CIniFile c_etyIniFile;
+						c_etyIniFile.set_IniFileDirectory( "Initialisation/Entities/Entities.ini" );
+
+						p_c_etyEntity.lock()->add_Component( new ety::CStaticRenderComponent( mp_c_etyCurrentRessourceManager->get_Texture( c_etyIniFile.read_String( c_stdStringEntityKey, "strEntityAppearance", "ERROR!" ) ), c_sfEntityPosition, m_c_sfVectorLayerScaling, mp_c_etyCurrentGamesettings->get_Videomode(), true, fLayer, fAngle, true ) );
+						p_c_etyEntity.lock()->add_Component( new ety::CCircleCollisionComponent() );
+						p_c_etyEntity.lock()->add_Component( new ety::CSpaceshipAttributeComponent( c_stdStringEntityKey ) );
+						p_c_etyEntity.lock()->add_Component( new ety::CItemModulesComponent( c_stdStringEntityKey ) );
+
+						if( c_stdStringItemTemplate != "NONE" )
+						{
+							p_c_etyEntity.lock()->get_Component<ety::CItemModulesComponent>("ItemModulesComponent")->call_ItemScript( c_stdStringItemTemplate, mp_c_etyCurrentItemManagement );
+						}
+					}
+
+					return p_c_etyEntity;
+				}
+
+				return boost::weak_ptr<ety::CEntity>();
+			}
+			boost::weak_ptr<ety::CEntity>				ety::CWorld::create_EnvironmentalEntity			( const std::string& c_stdStringUniqueID, const std::string& c_stdStringEntityKey, const sf::Vector2f& c_sfEntityPosition, const sf::Vector2f& c_sfVectorVelocity, const float fLayer, const float fAngle, const float fRotationSpeed )
+			{
+				sf::Vector2f c_sfEntityPosition2 = c_sfEntityPosition;
+
+				//srand(time(NULL));
+				int iRandomX = rand() % 850 +1;
+				int iRandomY = rand() % 850 +1;
+
+				if(rand() % 2 +1 == 2)
+				{
+					c_sfEntityPosition2.x += iRandomX;
+					//srand(time(NULL));
+					if(rand() % 2 +1 == 2)
+					{
+						c_sfEntityPosition2.y += iRandomY;
+					}
+				}
+				else
+				{
+					c_sfEntityPosition2.x -= iRandomX;
+					//srand(time(NULL));
+					if(rand() % 2 +1 == 2)
+					{
+						c_sfEntityPosition2.y -= iRandomY;
+					}
+				}
+
+				if( mp_c_etyCurrentGamesettings != NULL && mp_c_etyCurrentRessourceManager != NULL )
+				{
+					if( check_Limits( fLayer, c_sfEntityPosition ) == false )
+					{
+						return boost::weak_ptr<ety::CEntity>();
+					}
+
+					boost::weak_ptr<ety::CEntity> p_c_etyEntity( m_c_etyEntitymanager.create_Entity( c_stdStringUniqueID ) );
+
+					if( p_c_etyEntity.use_count() > 0 )
+					{
+						ety::CIniFile c_etyIniFile;
+						c_etyIniFile.set_IniFileDirectory( "Initialisation/Entities/Entities.ini" );
+
+						p_c_etyEntity.lock()->add_Component( new ety::CStaticRenderComponent( mp_c_etyCurrentRessourceManager->get_Texture( c_etyIniFile.read_String( c_stdStringEntityKey, "strEntityAppearance", "ERROR!" ) ), c_sfEntityPosition2, m_c_sfVectorLayerScaling, mp_c_etyCurrentGamesettings->get_Videomode(), true, fLayer, fAngle, false ) );
+						p_c_etyEntity.lock()->add_Component( new ety::CCircleCollisionComponent() );
+						p_c_etyEntity.lock()->add_Component( new ety::CEnvironmentAttributeComponent( c_stdStringEntityKey ) );
+						p_c_etyEntity.lock()->add_Component( new ety::CMovableEnvironmentComponent() );
+					}
+
+					p_c_etyEntity.lock()->get_Component<ety::CAttributeComponent>("AttributeComponent")->m_c_etyAttributes.change_Attribute<float>			( "fRotationSpeed"		, new float( fRotationSpeed )			, true );
+					p_c_etyEntity.lock()->get_Component<ety::CAttributeComponent>("AttributeComponent")->m_c_etyAttributes.change_Attribute<sf::Vector2f>	( "c_sfVectorVelocity"	, new sf::Vector2f( c_sfVectorVelocity ), true );
+
+					return p_c_etyEntity;
+				}
+
+				return boost::weak_ptr<ety::CEntity>();
+			}
+
+			ety::CMission*					const		ety::CWorld::create_Mission						( std::string strMissionID, bool bMainMission, bool bActive, bool bDiscovered )
+			{
+				std::map<std::string, CMission*>::iterator itMission = m_mapMissions.find(strMissionID);
+
+				if(itMission != m_mapMissions.end())
+				{
+					return NULL;
+				}
+
+				m_mapMissions[strMissionID] = new CMission(strMissionID, bMainMission, bActive, bDiscovered);
+
+				CLua c_etyLuaScript;
+				c_etyLuaScript.init_Lua();
+
+				ety::CWorld::register_ClassToLuabind( &c_etyLuaScript );
+				luabind::globals( c_etyLuaScript.get_LuaState() )["c_etyMission"]	= m_mapMissions[strMissionID];
+
+				c_etyLuaScript.close_Lua();
+
+				return m_mapMissions[strMissionID];
+			}
+			ety::CTask*						const		ety::CWorld::create_AttributeTask				( std::string strTaskID, bool bTaskActive )
+			{
+				CAttributeTask* p_c_etyAttributeTask	=	new CAttributeTask(strTaskID, bTaskActive);
+
+				return p_c_etyAttributeTask;
+			}
+			ety::CTask*						const		ety::CWorld::create_AttributeTask2				( std::string strTaskID, bool bTaskActive, CAttribute& c_etyAttribute )
+			{
+				CAttributeTask* p_c_etyAttributeTask	=	new CAttributeTask(strTaskID, bTaskActive, c_etyAttribute);
+
+				return p_c_etyAttributeTask;
+			}
+			ety::CTask*						const		ety::CWorld::create_ExploreTask					( std::string strTaskID, bool bTaskActive )
+			{
+				CExploreTask* p_c_etyExploreTask		=	new CExploreTask();
+
+				return p_c_etyExploreTask;
+			}
+			ety::CTask*						const		ety::CWorld::create_KillTask					( std::string strTaskID, bool bTaskActive, int iKillCounter )
+			{
+				CKillTask* p_c_etyKillTask				=	new CKillTask(strTaskID, bTaskActive, iKillCounter);
+
+				return p_c_etyKillTask;
+			}
+			ety::CTrigger*					const		ety::CWorld::create_Trigger						( std::string strTriggerID, bool bActive )
+			{
+				std::map<std::string, CTrigger*>::iterator itTrigger = m_mapTrigger.find(strTriggerID);
+
+				if(itTrigger != m_mapTrigger.end())
+				{
+					return NULL;
+				}
+
+				m_mapTrigger[strTriggerID] = new CTrigger(strTriggerID, bActive);
+
+				CLua c_etyLuaScript;
+				c_etyLuaScript.init_Lua();
+
+				ety::CWorld::register_ClassToLuabind( &c_etyLuaScript );
+				luabind::globals( c_etyLuaScript.get_LuaState() )["c_etyTrigger"]	= m_mapTrigger[strTriggerID];
+
+				c_etyLuaScript.start_Script( "Scripts/Trigger/" + strTriggerID + ".lua" );
+				c_etyLuaScript.call_Function( "Events", 0, 0 );
+
+				c_etyLuaScript.close_Lua();
+
+				return m_mapTrigger[strTriggerID];
+				return NULL;
+			}
+
+			void										ety::CWorld::clear_World						( void )
+			{
+				m_c_etyEntitymanager			.clear_Entities		();
+			}
+
+			void										ety::CWorld::update_World						( const sf::Uint32& uiFrameTime )
+			{
+				std::map<std::string, CTrigger*>::iterator itTriggers = m_mapTrigger.begin();
+
+				for(itTriggers ; itTriggers != m_mapTrigger.end() ; itTriggers++)
+				{
+					if((*itTriggers).second->get_Active() == true)
+					{
+						(*itTriggers).second->update_Trigger(uiFrameTime);
+					}				
+				}
+
+				m_c_etyMovableComponentsystem	.update_Components	( uiFrameTime );
+				m_c_etyCollisionComponentsystem	.update_Components	( uiFrameTime );
+				m_c_etyRenderComponentsystem	.update_Components	( uiFrameTime );
+			}
+
+			void										ety::CWorld::render_World						( sf::RenderTexture* const p_c_sfRenderTextureGameScene )
+			{
+				m_c_etyRenderComponentsystem.render_Components( p_c_sfRenderTextureGameScene );
+				
+				if( m_bShowCollisions )
+				{
+					m_c_etyCollisionComponentsystem.render_Components( p_c_sfRenderTextureGameScene );
+				}
+
+				p_c_sfRenderTextureGameScene->setView( p_c_sfRenderTextureGameScene->getDefaultView() );
+			}
+
+			void										ety::CWorld::load_World							( const std::string& strName, const std::string& strDirectory )
+			{
+				if( mp_c_etyCurrentRessourceManager != NULL && mp_c_etyCurrentGamesettings != NULL )
+				{
+					ety::CLua		c_etyLuaScript;
+					ety::CIniFile	c_etyIniFile;
+
+					c_etyLuaScript.init_Lua();
+
+					c_etyLuaScript.start_Script( "Initialisation/Gamestates/Language.lua"	);
+					c_etyIniFile.set_IniFileDirectory( strDirectory + strName + ".ini"			);
+
+					m_strName										=   strName;
+
+					m_c_sfVectorAvailableItemClasses				=	sf::Vector2i(	c_etyIniFile.read_Integer	( (strName+("-Shop")), "uiMinItemClassInShop"		, 1		),
+																						c_etyIniFile.read_Integer	( (strName+("-Shop")), "uiMaxItemClassInShop"		, 1		) );
+						
+					m_c_sfVectorStartPoint							=	sf::Vector2i(	c_etyIniFile.read_Integer	( (strName+("-Map")), "iStartPointX"				, 0		),
+																						c_etyIniFile.read_Integer	( (strName+("-Map")), "iStartPointY"				, 0		) );
+
+					m_c_sfVectorSize								=	sf::Vector2i(	c_etyIniFile.read_Integer	( (strName+("-Map")), "iWidth"						, 5000	),
+																						c_etyIniFile.read_Integer	( (strName+("-Map")), "iHeight"						, 5000	) );
+		
+					m_c_sfVectorLayerLimit							=	sf::Vector2f(	c_etyIniFile.read_Float		( (strName+("-Map")), "fMinLayer"					, -5.f	),
+																						c_etyIniFile.read_Float		( (strName+("-Map")), "fMaxLayer"					, 5.f	) );
+
+					m_c_sfVectorLayerScaling						=	sf::Vector2f(	c_etyIniFile.read_Float		( (strName+("-Map")), "fLayerScalingAboveZero"		, 0.2f	),
+																						c_etyIniFile.read_Float		( (strName+("-Map")), "fLayerScalingUnderZero"		, 0.8f	) );
+
+					m_c_sfVectorCelestialButtonPosition				=	sf::Vector2i(	c_etyIniFile.read_Integer	( (strName+("-CelestialMap")), "iWorldButtonX"		, 0		),
+																						c_etyIniFile.read_Integer	( (strName+("-CelestialMap")), "iWorldButtonY"		, 0		) );
+
+					m_strInfo										=	c_etyLuaScript.get_TableString( c_etyIniFile.read_String( (strName+("-CelestialMap")), "strInfoKey", "NULL" ), mp_c_etyCurrentGamesettings->get_Language() );
+
+					m_strCelestialButtonTexture						=   c_etyIniFile.read_String( (strName+("-CelestialMap")), "strButtonTexture", "NULL" );
+
+					c_etyLuaScript.close_Lua();
+				}
+				else
+				{
+					std::cout << "RessourceManager and/or Gamesettings not set for loading World :" << strName << std::endl;
+				}
+			
+			}
+
+			void										ety::CWorld::register_ClassToLuabind			( ety::CLua* const p_c_etyLuaScript )
+			{
+				ety::CEntitymanager::register_ClassToLuabind	( p_c_etyLuaScript );
+				ety::CTrigger::register_ClassToLuabind			( p_c_etyLuaScript );
+
+				luabind::module( p_c_etyLuaScript->get_LuaState() )
+				[ 
+					luabind::class_<ety::CTask>("CTask")
+					.def( "set_TaskActive"				, &CTask::set_TaskActive									)
+					.def( "set_TaskCompleted"			, &CTask::set_TaskCompleted									)
+					.def( "get_TaskActive"				, &CTask::get_TaskActive									)
+					.def( "get_TaskCompleted"			, &CTask::get_TaskCompleted									)
+					.def( "get_TaskID"					, &CTask::get_TaskID										),
+
+					luabind::class_<ety::CKillTask>("CKillTask")
+					.def( "decrease_KillCounter"		, &CKillTask::decrease_KillCounter							)
+					.def( "increase_KillCounter"		, &CKillTask::increase_KillCounter							)
+					.def( "set_KillCounter"				, &CKillTask::set_KillCounter								)
+					.def( "get_KillCounter"				, &CKillTask::get_KillCounter								),
+
+					luabind::class_<ety::CAttributeTask>("CAttributeTask")
+					.def( "set_Attribute"				, &CAttributeTask::set_Attribute							)
+					.def( "get_Attribute"				, &CAttributeTask::get_Attribute							),
+
+					luabind::class_<ety::CMission>("CMission")
+					.def( "add_Task"					, &CMission::add_Task										)
+					.def( "set_MissionCompleted"		, &CMission::set_MissionCompleted							)
+					.def( "set_MissionDiscovered"		, &CMission::set_MissionDiscovered							)
+					.def( "get_MainMission"				, &CMission::get_MainMission								)
+					.def( "get_MissionCompleted"		, &CMission::get_MissionCompleted							)
+					.def( "get_MissionDiscovered"		, &CMission::get_MissionDiscovered							)
+					.def( "get_MissionID"				, &CMission::get_MissionID									)
+					.def( "get_KillTaskByID"			, &CMission::get_TaskByID<CKillTask*>						)
+					.def( "get_ExploreTaskByID"			, &CMission::get_TaskByID<CExploreTask*>					)
+					.def( "get_AttributeTaskByID"		, &CMission::get_TaskByID<CAttributeTask*>					),
+
+					luabind::class_<ety::CWorld>("CWorld")
+					.def( "create_EnvironmentalEntity"	, &CWorld::create_EnvironmentalEntity						)
+					.def( "create_SpaceshipEntity"		, &CWorld::create_SpaceshipEntity							)
+					.def( "create_PlayerEntity"			, &CWorld::create_PlayerEntity								)
+					.def( "create_NPCEntity"			, &CWorld::create_NPCEntity									)
+					.def( "create_StaticBackground"		, &CWorld::create_StaticBackground							)
+					.def( "create_Trigger"				, &CWorld::create_Trigger									)
+					.def( "create_Mission"				, &CWorld::create_Mission									)
+					.def( "create_KillTask"				, &CWorld::create_KillTask									)
+					.def( "create_AttributeTask"		, &CWorld::create_AttributeTask								)
+					.def( "create_AttributeTask2"		, &CWorld::create_AttributeTask2							)
+					.def( "create_ExploreTask"			, &CWorld::create_ExploreTask								)
+					.def( "check_Limits"				, &CWorld::check_Limits										)
+					.def( "load_World"					, &CWorld::load_World										)
+					.def( "clear_World"					, &CWorld::clear_World										)
+					.def( "get_LayerLimit"				, &CWorld::get_LayerLimit									)
+					.def( "get_Name"					, &CWorld::get_Name											)
+					.def( "get_WorldSize"				, &CWorld::get_WorldSize									)
+					.def( "get_AvailableItemClasses"	, &CWorld::get_AvailableItemClasses							)
+					.def( "get_MissionByID"				, &CWorld::get_MissionByID									),
+
+					luabind::class_<ety::CEntity>("CEntity")
+					.def( "add_Component"				, &CEntity::add_Component									)		
+					.def( "clear_Components"			, &CEntity::clear_Components								)		
+					.def( "get_UniqueID"				, &CEntity::get_UniqueID									)		
+					.def( "has_Component"				, &CEntity::has_Component									)		
+					.def( "remove_Component"			, &CEntity::remove_Component								)
+					.def( "get_AttributeComponent"		, &CEntity::get_Component<ety::CAttributeComponent>			)
+					.def( "get_CenteredCameraComponent"	, &CEntity::get_Component<ety::CCenteredCameraComponent>	)
+					.def( "get_CircleCollisionComponent", &CEntity::get_Component<ety::CCircleCollisionComponent>	)
+					.def( "get_ItemModulesComponent"	, &CEntity::get_Component<ety::CItemModulesComponent>		)
+					.def( "get_MoveableComponent"		, &CEntity::get_Component<ety::CMovableComponent>			)
+					.def( "get_MoveableNPCComponent"	, &CEntity::get_Component<ety::CMovableNPCComponent>		),
+
+					luabind::class_<ety::CComponent>("CComponent")
+					.def( "get_FamilyID"				, &CComponent::get_FamilyID									)
+					.def( "get_ComponentID"				, &CComponent::get_ComponentID								)
+					.def( "get_Active"					, &CComponent::get_Active									)
+					.def( "set_Owner"					, &CComponent::set_Owner									)
+					.def( "get_Owner"					, &CComponent::get_Owner									),
+
+					luabind::class_<ety::CMovableComponent, ety::CComponent>("CMovableComponent")
+					.def( "rotate_ToAngle"				, &ety::CMovableComponent::rotate_ToAngle					)
+					.def( "rotate_Clockwise"			, &ety::CMovableComponent::rotate_Clockwise					)
+					.def( "rotate_CounterClockwise"		, &ety::CMovableComponent::rotate_CounterClockwise			)
+					.def( "continue_Movement"			, &ety::CMovableComponent::continue_Movement				),
+
+					luabind::class_<ety::CMovableSpaceshipComponent, ety::CMovableComponent>("CMovableSpaceshipComponent")
+					.def( "accelerate_Forward"			, &ety::CMovableSpaceshipComponent::accelerate_Forward		)
+					.def( "accelerate_Backward"			, &ety::CMovableSpaceshipComponent::accelerate_Backward		)
+					.def( "accelerate_Left"				, &ety::CMovableSpaceshipComponent::accelerate_Left			)
+					.def( "accelerate_Right"			, &ety::CMovableSpaceshipComponent::accelerate_Right		)
+					.def( "stop_Movement"				, &ety::CMovableSpaceshipComponent::stop_Movement			),
+
+					luabind::class_<ety::CMovableNPCComponent, ety::CMovableComponent>("CMovableNPCComponent")
+					.def( "stop_Patrol"					, &ety::CMovableNPCComponent::stop_Patrol					),
+					//.def( "start_Patrol"				, &ety::CMovableNPCComponent::start_Patrol					),
+
+					luabind::class_<ety::CCollisionComponent, ety::CComponent>("CCollisionComponent"),
+
+					luabind::class_<ety::CCircleCollisionComponent, ety::CCollisionComponent>("CCircleCollisionComponent")
+					.def( "get_Radius"					, &ety::CCircleCollisionComponent::get_Radius				)
+					.def( "get_Center"					, &ety::CCircleCollisionComponent::get_Center				),
+
+					luabind::class_<ety::CAttributeComponent, ety::CComponent>("CAttributeComponent")
+					.def_readwrite( "m_c_etyAttributes"	, &ety::CAttributeComponent::m_c_etyAttributes				),
+
+					luabind::class_<ety::CCameraComponent, ety::CComponent>("CCameraComponent")
+					.def( "get_View"					, &ety::CCameraComponent::get_View							),
+
+					luabind::class_<ety::CCenteredCameraComponent, ety::CCameraComponent>("CCenteredCameraComponent"),
+
+					/* VIEW */
+
+					luabind::class_<ety::CAttribute>("CAttribute")
+					.def( "add_StringAttribute"			, ( const bool(ety::CAttribute::*)( const std::string& strAttributeName, const std::string& tValue	) ) &ety::CAttribute::add_Attribute<std::string>		)
+					.def( "add_UnsignedIntAttribute"	, ( const bool(ety::CAttribute::*)( const std::string& strAttributeName, const unsigned int& tValue	) ) &ety::CAttribute::add_Attribute<unsigned int>		)
+					.def( "add_FloatAttribute"			, ( const bool(ety::CAttribute::*)( const std::string& strAttributeName, const float& tValue		) ) &ety::CAttribute::add_Attribute<float>				)
+					.def( "add_Vector2fAttribute"		, ( const bool(ety::CAttribute::*)( const std::string& strAttributeName, const sf::Vector2f& tValue	) ) &ety::CAttribute::add_Attribute<sf::Vector2f>		)
+					.def( "change_StringAttribute"		, ( const bool(ety::CAttribute::*)( const std::string& strAttributeName, const std::string& tValue	) ) &ety::CAttribute::change_Attribute<std::string>		)
+					.def( "change_UnsignedIntAttribute"	, ( const bool(ety::CAttribute::*)( const std::string& strAttributeName, const unsigned int& tValue	) ) &ety::CAttribute::change_Attribute<unsigned int>	)
+					.def( "change_FloatAttribute"		, ( const bool(ety::CAttribute::*)( const std::string& strAttributeName, const float& tValue		) ) &ety::CAttribute::change_Attribute<float>			)
+					.def( "change_Vector2fAttribute"	, ( const bool(ety::CAttribute::*)( const std::string& strAttributeName, const sf::Vector2f& tValue	) ) &ety::CAttribute::change_Attribute<sf::Vector2f>	)
+					.def( "get_StringAttribute"			, &ety::CAttribute::get_AttributeAsObject<std::string>		)
+					.def( "get_UnsignedIntAttribute"	, &ety::CAttribute::get_AttributeAsObject<unsigned int>		)
+					.def( "get_FloatAttribute"			, &ety::CAttribute::get_AttributeAsObject<float>			)
+					.def( "get_Vector2fAttribute"		, &ety::CAttribute::get_AttributeAsObject<sf::Vector2f>		)
+				];
+			}
+
+			void										ety::CWorld::set_CollisionRenderStatus			( const bool bCollisionRenderStatus )
+			{
+				m_bShowCollisions = bCollisionRenderStatus;
+			}
+			ety::CWorld*					const		ety::CWorld::set_RessourceManager				( ety::CRessourceManager* const p_c_etyCurrentRessourceManager )
+			{
+				mp_c_etyCurrentRessourceManager = p_c_etyCurrentRessourceManager;
+
+				return this;
+			}
+			ety::CWorld*					const		ety::CWorld::set_Gamesettings					( ety::CGamesettings* const	p_c_etyCurrentGamesettings )
+			{
+				mp_c_etyCurrentGamesettings = p_c_etyCurrentGamesettings;
+
+				return this;
+			}
+			ety::CWorld*					const		ety::CWorld::set_ItemManagement					( ety::CItemManagement*	const p_c_etyCurrentItemManagement )
+			{
+				mp_c_etyCurrentItemManagement = p_c_etyCurrentItemManagement;
+
+				return this;
+			}
+
+			ety::CEntitymanager*			const		ety::CWorld::get_Entitymanager					( void )
+			{
+				return &m_c_etyEntitymanager;
+			}
+const		bool										ety::CWorld::get_CollisionRenderStatus			( void )
+			{
+				return m_bShowCollisions;
+			}
+const		std::string&								ety::CWorld::get_CelestialButtonTexturename		( void )
+			{
+				return m_strCelestialButtonTexture;
+			}
+const		std::string&								ety::CWorld::get_Name							( void )
+			{
+				return m_strName;
+			}
+const		sf::Vector2f&								ety::CWorld::get_LayerLimit						( void )
+			{
+				return m_c_sfVectorLayerLimit;
+			}
+const		sf::Vector2i&								ety::CWorld::get_WorldSize						( void )
+			{
+				return m_c_sfVectorSize;
+			}
+const		sf::Vector2i&								ety::CWorld::get_AvailableItemClasses			( void )
+			{
+				return m_c_sfVectorAvailableItemClasses;
+			}
+const		sf::Vector2i&								ety::CWorld::get_CelestialButtonPosition		( void )
+			{
+				return m_c_sfVectorCelestialButtonPosition;
+			}
+
+			ety::CMission*					const		ety::CWorld::get_MissionByID					( std::string strMissionID )
+			{
+				return m_mapMissions[strMissionID];
+			}
+
+

@@ -1,0 +1,46 @@
+#pragma once
+#include <SFML\Graphics.hpp>
+#include <map>
+#include <string>
+
+namespace ety
+{
+	class CDialog;
+	class CIngameState;
+	class CRessourceManager;
+	class CGamesettings;
+	class CEntity;
+
+	namespace GameStateRunning
+	{
+		enum						en_etyGameStateRunning;
+	}
+
+	class CUserInterface
+	{
+
+	private:
+	protected:
+				std::map<std::string, CDialog*>						m_mapDialogs;
+				CIngameState*										mp_c_etyIngameState;
+				CEntity*											mp_c_etyEntityPlayer;
+	public:
+																	CUserInterface			( void );
+																	~CUserInterface			( void );
+
+																	CUserInterface			( CIngameState* const p_c_etyIngameState );
+
+				void												add_Dialog				( CDialog* const p_c_etyDialog );
+				void												init_UserInterface		( ety::CRessourceManager* const p_c_etyCurrentRessourceManager, 
+																								ety::CGamesettings* const p_c_etyCurrentGamesettingManager );
+
+				void												update_UserInterface	( const sf::Uint32& uiFrameTime );
+
+				void												set_Player				( CEntity* const p_c_etyEntityPlayer);
+				
+				CDialog*	const									get_DialogByID			( std::string strDialogID );
+
+		static	ety::GameStateRunning::en_etyGameStateRunning		event_closeIngameMenu	( int iAmount, ... );
+		static	ety::GameStateRunning::en_etyGameStateRunning		event_openIngameMenu	( int iAmount, ... );
+	};
+}

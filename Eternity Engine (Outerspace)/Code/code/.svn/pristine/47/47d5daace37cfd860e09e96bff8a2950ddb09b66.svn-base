@@ -1,0 +1,636 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien\Assistant">
+      <UniqueIdentifier>{b3f62aa3-702a-4091-a3c6-fc2bc6e3b766}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Eternity-Engine">
+      <UniqueIdentifier>{e01207cd-9658-4719-8f88-404943df30e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Eternity-Engine\Dialog-System">
+      <UniqueIdentifier>{f5464f51-84f3-463e-a3a1-c9248ad25854}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Eternity-Engine\Gamestate-System">
+      <UniqueIdentifier>{6ba3409a-df76-4dfc-8817-6d7abee04de4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Eternity-Engine\Ressource-System">
+      <UniqueIdentifier>{7d5efec2-cf43-4d4a-b3ee-a46fe74cdc65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Eternity-Engine\Settings-System">
+      <UniqueIdentifier>{d6e03508-7a86-4c2a-bdbe-f78e6b4de20e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Eternity-Engine\Script-System">
+      <UniqueIdentifier>{c37d0e40-171b-4f08-878e-68a6c704149e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Assistant">
+      <UniqueIdentifier>{7fdaac39-cd7f-4c90-ad78-978a30fa21f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Eternity-Engine">
+      <UniqueIdentifier>{f1ecbcb4-84ea-4cb5-b41c-fb801d9ec57e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Eternity-Engine\Dialog-System">
+      <UniqueIdentifier>{052db366-e536-4072-a0fe-b441f758fd98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Eternity-Engine\Gamestate-System">
+      <UniqueIdentifier>{af72714f-ddd7-4959-858c-ba01a55a5544}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Eternity-Engine\Script-System">
+      <UniqueIdentifier>{11c6ca8a-22bf-4570-a043-6feab2b2e849}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Eternity-Engine\Settings-System">
+      <UniqueIdentifier>{e292c5a6-3fb6-4f47-9d0d-4bd37bb24380}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Eternity-Engine\Ressource-System">
+      <UniqueIdentifier>{58531699-137f-4794-8ef4-f1ddf16e5aca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Externe Dateien">
+      <UniqueIdentifier>{76630135-cd26-40af-bf97-3354b995944c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Game">
+      <UniqueIdentifier>{b993e01e-ab19-4c1b-a4af-2adbb18fb921}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Game\Gamestates">
+      <UniqueIdentifier>{11488f7d-6c3c-4cd6-8a15-2d527165ca53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Game">
+      <UniqueIdentifier>{072f576c-418b-4d97-94dc-481f2988c56e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Game\Gamestates">
+      <UniqueIdentifier>{bee85608-bec8-4dfc-8897-1149480e033d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Eternity-Engine\Animation-System">
+      <UniqueIdentifier>{03ebec95-8600-4e25-b380-1ab9fb3fd4d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Eternity-Engine\Animation-System">
+      <UniqueIdentifier>{f1da31e4-19dc-46b8-8b3f-0c2ad497fbef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Eternity-Engine\Animation-System\Animation">
+      <UniqueIdentifier>{646a6de9-34a9-48e2-9cba-0e2eea7c1784}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Eternity-Engine\Profile-System">
+      <UniqueIdentifier>{0faf7c06-12a9-495c-a890-6fb02aa43059}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Eternity-Engine\Profile-System">
+      <UniqueIdentifier>{0d37fbaa-5b3a-469d-a6f8-4302b4256435}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Game\Displays">
+      <UniqueIdentifier>{2bb355cc-a174-4afd-8ca4-ee1339b6c8b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Game\Displays">
+      <UniqueIdentifier>{ade82036-991b-4a06-aec2-5b44cb9b64a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Game\Items">
+      <UniqueIdentifier>{e734ead1-57ff-4936-95b3-b83e629dbfcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Game\Items\framework">
+      <UniqueIdentifier>{87ebeabb-ea69-4832-8e59-82e92238050c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Game\Items">
+      <UniqueIdentifier>{ad73db0c-ad5c-421e-ae87-fd951d179aed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Game\Items\framework">
+      <UniqueIdentifier>{6ee2d22d-e712-45ab-ac7f-4c3c67447660}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Eternity-Engine\Entity-System">
+      <UniqueIdentifier>{b6d4cac9-0a79-431a-88a2-2c8f48af0c45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Eternity-Engine\Entity-System">
+      <UniqueIdentifier>{a346e1cd-7439-46fe-b9d5-22829dee27cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Eternity-Engine\Physic-System">
+      <UniqueIdentifier>{9ca82ec8-5db0-4a45-bab3-9d5a504bf0f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Eternity-Engine\Physic-System">
+      <UniqueIdentifier>{2edd851d-089c-4e71-a1fb-12f3976ecb0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Game\Trigger-System">
+      <UniqueIdentifier>{9701251f-8907-4d1b-a9c5-6571417bf2a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Game\Trigger-System">
+      <UniqueIdentifier>{47a912bd-f004-4579-adda-0aad9b777b8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Game\World">
+      <UniqueIdentifier>{aa23e7c7-49fc-4d52-adee-8632c9506b8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Game\World\Components">
+      <UniqueIdentifier>{edad7b74-eb4f-4b4f-aac4-67330e3636f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Game\World\Component-Systems">
+      <UniqueIdentifier>{69d8be6e-6568-44d7-aa9e-a2d5cb81c42e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Game\World">
+      <UniqueIdentifier>{7ff29fee-e055-4989-96a7-0cb1296ef1c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Game\World\Components">
+      <UniqueIdentifier>{057ca0d9-c827-4316-8213-acf5cd6ba1cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Game\World\Component-Systems">
+      <UniqueIdentifier>{9855ed3d-0a2e-4795-83d7-89b069f5205d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Game\Mission-System">
+      <UniqueIdentifier>{f69ad2f0-d173-4dc3-a361-38fe889641be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Game\Mission-System">
+      <UniqueIdentifier>{cb28bdc2-47ce-4237-8007-ce5908004ff2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SourceCode\CGameState.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Gamestate-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CGameStateManager.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Gamestate-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CButton.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Dialog-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CCheckbox.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Dialog-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CComboBox.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Dialog-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CDialog.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Dialog-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CDialogitem.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Dialog-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CEditControl.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Dialog-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CLabel.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Dialog-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CSlideControl.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Dialog-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CScrollbar.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Dialog-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CFilemanagement.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Ressource-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CLogfile.hpp">
+      <Filter>Headerdateien\Assistant</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CSingleton.hpp">
+      <Filter>Headerdateien\Assistant</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CEternityEngine.hpp">
+      <Filter>Headerdateien\Eternity-Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CMouse.hpp">
+      <Filter>Headerdateien\Assistant</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CGamesettings.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Settings-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CLua.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Script-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CApplication.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Settings-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CMenuState.hpp">
+      <Filter>Headerdateien\Game\Gamestates</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CPictureControl.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Dialog-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CRessourceManager.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Ressource-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CDialogManager.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Dialog-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CColor.hpp">
+      <Filter>Headerdateien\Assistant</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CRadioButtonBox.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Dialog-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CArmor.hpp">
+      <Filter>Headerdateien\Game\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CEngine.hpp">
+      <Filter>Headerdateien\Game\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CGenerator.hpp">
+      <Filter>Headerdateien\Game\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CLaserWeapon.hpp">
+      <Filter>Headerdateien\Game\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CProjectileWeapon.hpp">
+      <Filter>Headerdateien\Game\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CRocketLauncher.hpp">
+      <Filter>Headerdateien\Game\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CShield.hpp">
+      <Filter>Headerdateien\Game\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CWeapon.hpp">
+      <Filter>Headerdateien\Game\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CAnimatedSprite.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Animation-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CIniFile.hpp">
+      <Filter>Headerdateien\Assistant</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CProfile.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Profile-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CLoadingState.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Gamestate-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CModule.hpp">
+      <Filter>Headerdateien\Game\Items\framework</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CAmmunitionDump.hpp">
+      <Filter>Headerdateien\Game\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CTextBox.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Dialog-System</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CIniLoader.hpp">
+      <Filter>Headerdateien\Assistant</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CItem.hpp">
+      <Filter>Headerdateien\Game\Items\framework</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CItemManagement.hpp">
+      <Filter>Headerdateien\Game\Items\framework</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CProfileState.hpp">
+      <Filter>Headerdateien\Game\Gamestates</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CGraphicOptionState.hpp">
+      <Filter>Headerdateien\Game\Gamestates</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CAudioOptionState.hpp">
+      <Filter>Headerdateien\Game\Gamestates</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CIntroState.hpp">
+      <Filter>Headerdateien\Game\Gamestates</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CCreditsState.hpp">
+      <Filter>Headerdateien\Game\Gamestates</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CIngameState.hpp">
+      <Filter>Headerdateien\Game\Gamestates</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CSpaceStationHangarState.hpp">
+      <Filter>Headerdateien\Game\Gamestates</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CSpaceStationState.hpp">
+      <Filter>Headerdateien\Game\Gamestates</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\COptionState.hpp">
+      <Filter>Headerdateien\Game\Gamestates</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CDialogGameState.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Gamestate-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CWorld.hpp">
+      <Filter>Headerdateien\Game\World</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CCollision.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Physic-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CRenderComponent.hpp">
+      <Filter>Headerdateien\Game\World\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CAttributeComponent.hpp">
+      <Filter>Headerdateien\Game\World\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CCameraComponent.hpp">
+      <Filter>Headerdateien\Game\World\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CCollisionComponent.hpp">
+      <Filter>Headerdateien\Game\World\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CMovableComponent.hpp">
+      <Filter>Headerdateien\Game\World\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CEntity.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Entity-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CComponent.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Entity-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CComponentsystem.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Entity-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CEntitymanager.hpp">
+      <Filter>Headerdateien\Eternity-Engine\Entity-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CCollisionComponentsystem.hpp">
+      <Filter>Headerdateien\Game\World\Component-Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CMovableComponentsystem.hpp">
+      <Filter>Headerdateien\Game\World\Component-Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CRenderComponentsystem.hpp">
+      <Filter>Headerdateien\Game\World\Component-Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CAttribute.hpp">
+      <Filter>Headerdateien\Assistant</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CItemModulesComponent.hpp">
+      <Filter>Headerdateien\Game\World\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CTimeEvent.hpp">
+      <Filter>Headerdateien\Game\Trigger-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CTrigger.hpp">
+      <Filter>Headerdateien\Game\Trigger-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CUnitEvent.hpp">
+      <Filter>Headerdateien\Game\Trigger-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CTriggerEvent.hpp">
+      <Filter>Headerdateien\Game\Trigger-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CMathConvertClasses.hpp">
+      <Filter>Headerdateien\Assistant</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CExploreTask.hpp">
+      <Filter>Headerdateien\Game\Mission-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CKillTask.hpp">
+      <Filter>Headerdateien\Game\Mission-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CMission.hpp">
+      <Filter>Headerdateien\Game\Mission-System</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceCode\CTask.hpp">
+      <Filter>Headerdateien\Game\Mission-System</Filter>
+    </ClInclude>
+    <ClInclude Include="CAttributeTask.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SourceCode\CAnimatedSprite.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Animation-System\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CApplication.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Settings-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CButton.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Dialog-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CCheckbox.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Dialog-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CComboBox.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Dialog-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CDialog.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Dialog-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CDialogitem.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Dialog-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CEditControl.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Dialog-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CEternityEngine.cpp">
+      <Filter>Quelldateien\Eternity-Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CFilemanagement.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Ressource-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CGamesettings.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Settings-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CGameState.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Gamestate-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CGameStateManager.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Gamestate-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CMenuState.cpp">
+      <Filter>Quelldateien\Game\Gamestates</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CLogfile.cpp">
+      <Filter>Quelldateien\Assistant</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CLua.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Script-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CMouse.cpp">
+      <Filter>Quelldateien\Assistant</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CLabel.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Dialog-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CPictureControl.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Dialog-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CScrollbar.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Dialog-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CSlideControl.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Dialog-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CSingleton.cpp">
+      <Filter>Quelldateien\Assistant</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CRessourceManager.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Ressource-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CDialogManager.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Dialog-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CColor.cpp">
+      <Filter>Quelldateien\Assistant</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CRadioButtonBox.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Dialog-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CAmmunitionDump.cpp">
+      <Filter>Quelldateien\Game\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CArmor.cpp">
+      <Filter>Quelldateien\Game\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CEngine.cpp">
+      <Filter>Quelldateien\Game\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CGenerator.cpp">
+      <Filter>Quelldateien\Game\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CLaserWeapon.cpp">
+      <Filter>Quelldateien\Game\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CProjectileWeapon.cpp">
+      <Filter>Quelldateien\Game\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CRocketLauncher.cpp">
+      <Filter>Quelldateien\Game\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CShield.cpp">
+      <Filter>Quelldateien\Game\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CWeapon.cpp">
+      <Filter>Quelldateien\Game\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\main.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CIniFile.cpp">
+      <Filter>Quelldateien\Assistant</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CProfile.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Profile-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CLoadingState.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Gamestate-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CModule.cpp">
+      <Filter>Quelldateien\Game\Items\framework</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CTextBox.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Dialog-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CItem.cpp">
+      <Filter>Quelldateien\Game\Items\framework</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CItemManagement.cpp">
+      <Filter>Quelldateien\Game\Items\framework</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CAudioOptionState.cpp">
+      <Filter>Quelldateien\Game\Gamestates</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CGraphicOptionState.cpp">
+      <Filter>Quelldateien\Game\Gamestates</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\COptionState.cpp">
+      <Filter>Quelldateien\Game\Gamestates</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CSpaceStationState.cpp">
+      <Filter>Quelldateien\Game\Gamestates</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CSpaceStationHangarState.cpp">
+      <Filter>Quelldateien\Game\Gamestates</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CIntroState.cpp">
+      <Filter>Quelldateien\Game\Gamestates</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CCreditsState.cpp">
+      <Filter>Quelldateien\Game\Gamestates</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CProfileState.cpp">
+      <Filter>Quelldateien\Game\Gamestates</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CDialogGameState.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Gamestate-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CWorld.cpp">
+      <Filter>Quelldateien\Game\World</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CIngameState.cpp">
+      <Filter>Quelldateien\Game\Gamestates</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CCollision.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Physic-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CAttributeComponent.cpp">
+      <Filter>Quelldateien\Game\World\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CCameraComponent.cpp">
+      <Filter>Quelldateien\Game\World\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CCollisionComponent.cpp">
+      <Filter>Quelldateien\Game\World\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CMovableComponent.cpp">
+      <Filter>Quelldateien\Game\World\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CRenderComponent.cpp">
+      <Filter>Quelldateien\Game\World\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CEntitymanager.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Entity-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CEntity.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Entity-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CComponentsystem.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Entity-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CComponent.cpp">
+      <Filter>Quelldateien\Eternity-Engine\Entity-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CMovableComponentsystem.cpp">
+      <Filter>Quelldateien\Game\World\Component-Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CCollisionComponentsystem.cpp">
+      <Filter>Quelldateien\Game\World\Component-Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CRenderComponentsystem.cpp">
+      <Filter>Quelldateien\Game\World\Component-Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CItemModulesComponent.cpp">
+      <Filter>Quelldateien\Game\World\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CTimeEvent.cpp">
+      <Filter>Quelldateien\Game\Trigger-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CTrigger.cpp">
+      <Filter>Quelldateien\Game\Trigger-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CTriggerEvent.cpp">
+      <Filter>Quelldateien\Game\Trigger-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CUnitEvent.cpp">
+      <Filter>Quelldateien\Game\Trigger-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CExploreTask.cpp">
+      <Filter>Quelldateien\Game\Mission-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CKillTask.cpp">
+      <Filter>Quelldateien\Game\Mission-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CMission.cpp">
+      <Filter>Quelldateien\Game\Mission-System</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceCode\CTask.cpp">
+      <Filter>Quelldateien\Game\Mission-System</Filter>
+    </ClCompile>
+    <ClCompile Include="CAttributeTask.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ETY-Engine.rc">
+      <Filter>Ressourcendateien</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Waldis Ordner\Icon\256.ico">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
+  </ItemGroup>
+</Project>

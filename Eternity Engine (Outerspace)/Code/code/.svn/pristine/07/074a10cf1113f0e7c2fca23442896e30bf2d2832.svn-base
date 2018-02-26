@@ -1,0 +1,145 @@
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////																																	   ///////////
+///////////															CGamesettings.hpp														   ///////////
+///////////																									                                   ///////////
+///////////			Diese Klasse dient zum Laden und Speichern von Spieleinstellungen mit optionaler Hilfe einer INI-Datei.					   ///////////
+///////////																																	   ///////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+//Includes der SFML-Bibliothek
+#include <sfml\Window\VideoMode.hpp>
+#include <sfml\System\NonCopyable.hpp>
+
+#include "CIniFile.hpp"
+
+namespace ety
+{
+	//Vordeklarationen der Klassen, es verhindert mehrfaches Einbinden.
+	class CApplication;
+	class CRessourceManager;
+	class CLua;
+
+	class CGamesettings : private sf::NonCopyable
+	{
+	private:
+		//Diese Bool-Variable birgt die Information, ob der Vollbildmodus an oder aus geschaltet ist.
+		bool																		m_bFullscreenEnabled;
+		//Diese Bool-Variable birgt die Information, ob die vertikale Synchronisation an oder aus geschaltet ist.
+		bool																		m_bVerticalSyncEnabled;
+		//Diese Bool-Variable birgt die Information, ob der Windows-Mauszeiger an oder aus geschaltet ist.
+		bool																		m_bShowWindowsCursor;
+
+		//Die Audio-Einstellungen werden in diesen drei Variablen gespeichert.
+		//Mastervolume	->	Gesamtlautstärke
+		//Musicvolume	->  Lautstärke der Musik
+		//Soundvolume	->	Lautstärke von Effekten
+		unsigned short																m_usMastervolume;
+		unsigned short																m_usMusicvolume;
+		unsigned short																m_usSoundvolume;
+		//Die Begrenzung von Bildern in der Sekunde wird in dieser Variable gespeichert.
+		//Dies dient dazu ein gleichmäßiges und stabiles Spielerlebnis zu garantieren,
+		//falls das System auch die Bilder in der Sekunde konstant hält.
+		//Zum anderen entlastet es auch das System, ohne Begrenzung würde das System
+		//volle Leistung bieten und bei manchen System zur Überhitzung führen.
+		unsigned short																m_usFramesPerSecondLimit;
+
+		//Die Sprache des Spiels wird in dieser Variable gespeichert.
+		std::string																	m_strLanguage;
+
+		//Die Breite und Höhe des Fensters wird in dieser Variable gespeichert.
+		sf::VideoMode																m_c_sfVideoMode;		
+
+		//Ein Zeiger auf den aktuellen Audiomanager um die Soundeinstellungen
+		//zu übernehmen wird ebenfalls gebraucht.
+		ety::CRessourceManager*														mp_c_etyRessourceManager;
+		//Sowie ein Zeiger auf die Applikation um das Fenster zu erstellen und
+		//bei neuen Einstellungen zu modifizieren.
+		ety::CApplication*															mp_c_etyApplication;	
+
+		ety::CIniFile																m_c_etyIniFile;
+
+	protected:
+		//Die Klasse wird nicht abgeleitet.
+
+	public:
+		//Standart Konstruktor und Destruktor.
+																					CGamesettings				( void );
+																					~CGamesettings				( void );
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		///	Die Übernahme der neuen Einstellungen findet in dieser Methode statt. Diese Methode übernimmt
+		/// als Standart immer alle Einstellungen, wenn man einzelne Einstellungen übernehmen will,
+		///	müssen die richten Parameter gewählt werden.
+		///
+		/// 1P. Die Übernahme der neuen Auflösung.
+		///	2P. Die Übernahme des neuen Status der vertikalen Synchronisation.
+		///	3P.	Die Übernahme des neuen Status des Windows-Mauszeigers. 
+		///	4P. Die Übernahme der neuen Audio-Einstellungen.
+		///
+		/// \parameter	const bool, const bool, const bool, const bool
+		/// \rückgabe	const bool
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		const bool																	apply_Settings				( const bool bChangeVideomode = true, const bool bChangeVerticalSync = true, const bool bChangeWindowsCursor = true, const bool bChangeAudiosettings = true );
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		///	Diese Methode lädt alle Einstellungen aus einer vorher angegebenen INI-Datei.
+		///
+		/// \parameter	void
+		/// \rückgabe	const bool
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				void																load_Settings				( void );
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		///	Registriert diese Klasse zum Lua-Script.
+		///
+		///	1P. Das Lua-Script.
+		///
+		/// \parameter	ety::CLua* const
+		/// \rückgabe	void
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		static	void																register_ClassToLuabind		( ety::CLua* const p_c_etyLuaScript );
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		///	Diese Methode speichert alle Einstellungen in eine vorher angegebenen INI-Datei.
+		///
+		/// \parameter	void
+		/// \rückgabe	const bool
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				void																save_Settings				( void );
+
+		//Die Set-Methoden zum setzen privater Membervariablen.
+		void																		set_FullscreenStatus		( const bool bNewFullscreenStatus );
+		void																		set_VerticalSyncStatus		( const bool bNewVerticalSyncStatus );
+		void																		set_WindowsCursorStatus		( const bool bNewWindowsCursorStatus );
+		void																		set_FramesPerSecondLimit	( const unsigned short usNewFramesPerSecondLimit );
+		void																		set_Mastervolume			( const unsigned short usNewMastervolume );
+		void																		set_Musicvolume				( const unsigned short usNewMusicvolume );
+		void																		set_Soundvolume				( const unsigned short usNewSoundvolume );
+		void																		set_Videomode				( const sf::VideoMode& c_sfNewVideomode );
+		void																		set_IniFileName				( const std::string& strIniFileName );
+		void																		set_Language				( const std::string& strNewLanguage );
+		void																		set_Application				( ety::CApplication* const p_c_etyNewApplication );
+		void																		set_RessourceManager		( ety::CRessourceManager* const p_c_etyNewRessourceManager );
+
+		//Die Get-Methoden zur Rückgabe von privaten Membervariablen.
+		const bool																	get_FullscreenStatus		( void );
+		const bool																	get_VerticalSyncStatus		( void );
+		const bool																	get_WindowsCursorStatus		( void );
+		const unsigned short														get_FramesPerSecondLimit	( void );
+		const unsigned short														get_Mastervolume			( void );
+		const unsigned short														get_Musicvolume				( void );
+		const unsigned short														get_Soundvolume				( void );
+		const std::string&															get_Language				( void );
+		const sf::VideoMode& 														get_Videomode				( void );
+	};
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////							CGamesettings.hpp								///////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+

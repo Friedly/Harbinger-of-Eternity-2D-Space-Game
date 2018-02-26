@@ -1,0 +1,118 @@
+#pragma once
+
+//Eternity-Engine
+#include "CComponent.hpp"
+
+#include "CMathConvertClasses.hpp"
+
+//SFML-Bibliothek
+#include <SFML\Graphics\Sprite.hpp>
+
+#include <boost\shared_ptr.hpp>
+
+namespace ety
+{
+
+	//#########################################################################################################//
+	//#########################################################################################################//
+	//#########################################################################################################//
+
+	class CMovableComponent : public CComponent
+	{
+	private:
+		
+	protected:
+		sf::Uint32 m_uiFrameTime;
+	public:
+																	CMovableComponent					( void );
+		virtual														~CMovableComponent					( void );
+
+								void								continue_Movement					( const sf::Uint32& uiFrameTime );
+
+								void								rotate_ToAngle						( float fTargetAngle, const sf::Uint32& uiFrameTime );
+								void								rotate_Clockwise					( const sf::Uint32& uiFrameTime );
+								void								rotate_CounterClockwise				( const sf::Uint32& uiFrameTime );
+
+					const		std::string							get_FamilyID						( void );
+		virtual		const		std::string							get_ComponentID						( void ) = 0;
+	};
+
+	//#########################################################################################################//
+	//#########################################################################################################//
+	//#########################################################################################################//
+
+	class CMovableSpaceshipComponent : public CMovableComponent
+	{
+		private:
+		protected:
+		public:
+																	CMovableSpaceshipComponent			( void );
+		virtual														~CMovableSpaceshipComponent			( void );
+
+								void								accelerate_Forward					( const sf::Uint32& uiFrameTime );
+								void								accelerate_Backward					( const sf::Uint32& uiFrameTime );
+								void								accelerate_Left						( const sf::Uint32& uiFrameTime );
+								void								accelerate_Right					( const sf::Uint32& uiFrameTime );
+
+								void								move_ToPosition						( const sf::Vector2f& c_sfVectorPosition );
+
+								void								stop_Movement						( void );
+	};
+
+	//#########################################################################################################//
+	//#########################################################################################################//
+	//#########################################################################################################//
+
+	class CMovablePlayerComponent : public CMovableSpaceshipComponent
+	{
+		private:
+		protected:
+		public:
+																	CMovablePlayerComponent				( void );
+		virtual														~CMovablePlayerComponent			( void );
+
+		virtual					void								update_Component					( const sf::Uint32& uiFrameTime );
+
+		virtual		const		std::string							get_ComponentID						( void );
+	};
+
+	//#########################################################################################################//
+	//#########################################################################################################//
+	//#########################################################################################################//
+
+	class CMovableNPCComponent : public CMovableSpaceshipComponent
+	{
+		private:
+		protected:
+			bool left;
+		public:
+																	CMovableNPCComponent				( void );
+		virtual														~CMovableNPCComponent				( void );
+
+		virtual					void								update_Component					( const sf::Uint32& uiFrameTime );
+
+		virtual		const		std::string							get_ComponentID						( void );
+	};
+
+	//#########################################################################################################//
+	//#########################################################################################################//
+	//#########################################################################################################//
+	
+	class CMovableEnvironmentComponent : public CMovableComponent
+	{
+		private:
+		protected:
+		public:
+																	CMovableEnvironmentComponent		( void );
+		virtual														~CMovableEnvironmentComponent		( void );
+
+		virtual					void								update_Component					( const sf::Uint32& uiFrameTime );
+
+		virtual		const		std::string							get_ComponentID						( void );
+	};
+
+	//#########################################################################################################//
+	//#########################################################################################################//
+	//#########################################################################################################//
+}
+

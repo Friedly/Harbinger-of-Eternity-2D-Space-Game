@@ -1,0 +1,50 @@
+#pragma once
+#include "CGameState.hpp"
+#include "CDialogManager.hpp"
+
+
+namespace ety
+{
+	typedef ety::GameStateRunning::en_etyGameStateRunning (*p_Function)(int, ...);
+	typedef std::map<std::string, std::map<enum EventType::en_etyEventType, p_Function>> EventMap;
+	typedef va_list					va_ArgumentList;
+	#define va_OpenArgumentList		va_start
+	#define va_getArgument			va_arg
+	#define va_CloseArgumentList	va_end
+
+	class CDialogGameState :	public CGameState
+	{
+	private:
+
+	protected:
+						EventMap										m_EventMap;
+						ety::CDialogManager*							mp_c_etyDialogManager;
+
+	public:
+
+																		CDialogGameState			(const std::string& strStateName);
+																		~CDialogGameState			(void);
+
+
+
+		virtual			void											reinit_Gamestate			( const sf::VideoMode& c_sfNewVideoMode, const bool bFullscreen );
+
+		virtual 		void											reinit_Gamestate			( const std::string strNewLanguage );
+
+
+		virtual			void											render_GameState			( sf::RenderTexture* const p_c_sfRenderTextureGameScene );
+
+						//Aktualisiert den Spielzustand.
+		virtual			void											update_GameState			( const sf::Uint32& uiFrameTime );
+
+
+		virtual	const	ety::GameStateRunning::en_etyGameStateRunning	handle_GameStateEvents		( const sf::Event& sfEventLastEvent )			= 0;
+
+
+						p_Function										get_EventFunction			( const std::string& strCustomID, const sf::Event& c_sfEvent );
+						ety::CDialogManager*	const					get_DialogManager			( void );
+
+	};
+}
+
+

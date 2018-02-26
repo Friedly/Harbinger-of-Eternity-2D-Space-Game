@@ -1,0 +1,6 @@
+Wir brauchen noch ein ordentlichen Hauptmenü-Hintergrund. Schon klar, dass das bekannt ist :D
+Wollte nur nochmal dran erinnern! Cool wäre ihrgendwas animiertes!
+
+Würde den Technischen Rahmen des Spiels übersteigen. Implementiert erst die
+bereits vertig gestelte Menü Animation für das herausgleiten der Einzelnen Menüpunkte dan reden wir
+über sowas komplexes wie ein Animiertes intro als hintergrund im Menü selbst.

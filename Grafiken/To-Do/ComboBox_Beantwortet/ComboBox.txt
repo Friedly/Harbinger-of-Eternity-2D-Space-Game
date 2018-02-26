@@ -1,0 +1,8 @@
+Es wäre schön wenn nochmal jemand den HeaderButton der ComboBox noch etwas anpasst.
+Ich finde einfach er bettet sich nicht wirklich gut in den Rest des Headers ein.
+Desweiteren finde ich seine Textur ihrgendwie nicht so gut und passend zum
+Rest der ComboBox!
+
+Das ist unwichtig. Hauptsache eine ist das schon mal eine gemacht wurde. Es wäre eine zeitverschwendung
+stendig an ein und dem selben zu arbeiten weil es beim ersten mal nicht 100% zufriedenstellend ist.
+Es gilt das Projekt als ganzes abzuschließen danach kann bei lust nachgearbeitet werden.

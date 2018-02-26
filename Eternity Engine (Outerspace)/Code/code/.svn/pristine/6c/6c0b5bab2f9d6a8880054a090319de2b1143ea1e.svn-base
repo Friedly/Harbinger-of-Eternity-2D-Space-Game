@@ -1,0 +1,117 @@
+#pragma once
+
+#include <SFML\Graphics\Sprite.hpp>
+#include <SFML\Window\VideoMode.hpp>
+#include <SFML\Graphics\View.hpp>
+#include <SFML\Graphics\RenderTexture.hpp>
+
+#include "CSingleton.hpp"
+#include "CEntitymanager.hpp"
+#include "CItemManagement.hpp"
+#include "CRenderComponent.hpp"
+#include "CMovableComponent.hpp"
+#include "CCameraComponent.hpp"
+#include "CAttributeComponent.hpp"
+#include "CCollisionComponent.hpp"
+#include "CItemModulesComponent.hpp"
+#include "CRenderComponentsystem.hpp"
+#include "CMovableComponentsystem.hpp"
+#include "CCollisionComponentsystem.hpp"
+
+#include <map>
+
+//Makro zur einfacheren Verwendung des Singletons
+#define	gp_c_etyWorld ety::CWorld::get_Singleton()
+
+namespace ety
+{
+	class CGamesettings;
+	class CRessourceManager;
+	class CTrigger;
+
+	class CWorld : public CSingleton<ety::CWorld>
+	{
+	private:
+				ety::CEntitymanager								m_c_etyEntitymanager;
+
+				ety::CRenderComponentsystem						m_c_etyRenderComponentsystem;
+				ety::CMovableComponentsystem					m_c_etyMovableComponentsystem;
+				ety::CCollisionComponentsystem					m_c_etyCollisionComponentsystem;
+
+				ety::CRessourceManager*							mp_c_etyCurrentRessourceManager;
+				ety::CGamesettings*								mp_c_etyCurrentGamesettings;
+				ety::CItemManagement*							mp_c_etyCurrentItemManagement;
+
+				//Min-Max layers available in this world
+				sf::Vector2f									m_c_sfVectorLayerLimit;
+				//Variable to scale the layers differently on each world when its intended
+				sf::Vector2f									m_c_sfVectorLayerScaling;
+
+				//Min-Max Itemclasses available in the shop in this by choosing this world
+				sf::Vector2i									m_c_sfVectorAvailableItemClasses;
+				//The size of the world ingame.
+				sf::Vector2i									m_c_sfVectorSize;
+				//The ingame startpoint of the player.
+				sf::Vector2i									m_c_sfVectorStartPoint;
+				//Position of the Button to choose this world on the celestialmap
+				sf::Vector2i									m_c_sfVectorCelestialButtonPosition;
+
+				//Name of the world
+				std::string										m_strName;
+				//Info to the world
+				std::string										m_strInfo;
+				//Name of the Texture to represent the world on the celestialmap
+				std::string										m_strCelestialButtonTexture;
+
+				std::map<std::string, CTrigger*>				m_mapTrigger;
+
+				bool											m_bShowCollisions;
+
+	protected:
+
+	public:														
+																CWorld							( void );
+																~CWorld							( void );
+
+				//Methods to create entities
+				boost::weak_ptr<ety::CEntity>					create_StaticBackground			( const std::string& strBackgroundTexturename );
+				boost::weak_ptr<ety::CEntity>					create_PlayerEntity				( const std::string& c_stdStringEntityKey, const float fAngle );
+				boost::weak_ptr<ety::CEntity>					create_NPCEntity				( const std::string& c_stdStringEntityKey, const float fAngle, const std::string& c_stdStringItemTemplate = "NONE" );
+				boost::weak_ptr<ety::CEntity>					create_SpaceshipEntity			( const std::string& c_stdStringUniqueID, const std::string& c_stdStringTexture, const sf::Vector2f& c_sfEntityPosition, const float fLayer, const float fAngle, const std::string& c_stdStringItemTemplate = "NONE" );
+				boost::weak_ptr<ety::CEntity>					create_EnvironmentalEntity		( const std::string& c_stdStringUniqueID, const std::string& c_stdStringEntityKey, const sf::Vector2f& c_sfEntityPosition, const float fVelocity, const sf::Vector2f& c_sfDirection, const float fLayer, const float fAngle, const float fRotationSpeed );
+
+				CTrigger*	const								create_Trigger					( std::string strTriggerID );
+
+				void											clear_World						( void );
+
+				//Checking whether the layer or the position of a new entity is in the world range
+		const	bool											check_Limits					( const float& fLayer, const sf::Vector2f& c_sfVectorEntityPosition );
+
+				//Loading a world
+				void											load_World						( const std::string& strName, const std::string& strDirectory );
+
+				void											update_World					( const sf::Uint32& uiFrameTime );
+
+				void											render_World					( sf::RenderTexture* const p_c_sfRenderTextureGameScene );
+
+				//Register creation-methods to LuaBind
+		static	void											register_ClassToLuabind			( ety::CLua* const p_c_etyLuaScript );
+
+				void											set_CollisionRenderStatus		( const bool bCollisionRenderStatus );
+
+				CWorld* const									set_RessourceManager			( ety::CRessourceManager* const p_c_etyCurrentRessourceManager );
+				CWorld* const									set_Gamesettings				( ety::CGamesettings* const	p_c_etyCurrentGamesettings );
+				CWorld* const									set_ItemManagement				( ety::CItemManagement*	const p_c_etyCurrentItemManagement );
+
+				//Get Methods
+				ety::CEntitymanager*			const			get_Entitymanager				( void );
+		const	bool											get_CollisionRenderStatus		( void );
+		const	std::string&									get_CelestialButtonTexturename	( void );
+		const	std::string&									get_Name						( void );
+		const	sf::Vector2f&									get_LayerLimit					( void );
+		const	sf::Vector2i&									get_WorldSize					( void );
+		const	sf::Vector2i&									get_AvailableItemClasses		( void );
+		const	sf::Vector2i&									get_CelestialButtonPosition		( void );
+	};
+}
+

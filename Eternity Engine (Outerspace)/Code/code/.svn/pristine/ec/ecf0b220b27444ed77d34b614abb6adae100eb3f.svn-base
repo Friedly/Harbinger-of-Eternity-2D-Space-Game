@@ -1,0 +1,52 @@
+#include "CUserInterface.hpp"
+#include "CDialogitem.hpp"
+#include "CDialogManager.hpp"
+#include "CDialogGameState.hpp"
+#include "CGamesettings.hpp"
+
+
+									ety::CUserInterface::CUserInterface				(void)
+									:mp_c_etyDialogGameState						(NULL)
+{
+}
+
+
+									ety::CUserInterface::~CUserInterface			(void)
+{
+}
+
+									ety::CUserInterface::CUserInterface				( CDialogGameState* const p_c_etyDialogGameState )
+									:mp_c_etyDialogGameState						( p_c_etyDialogGameState )
+{
+}
+
+void								ety::CUserInterface::add_Dialog					( CDialog* const p_c_etyDialog )
+{
+	m_mapDialogs[p_c_etyDialog->get_DialogID()]	=	p_c_etyDialog;
+}
+void								ety::CUserInterface::init_UserInterface			( ety::CRessourceManager* const p_c_etyCurrentRessourceManager, 
+																					  ety::CGamesettings* const p_c_etyCurrentGamesettingManager )
+{	
+	sf::VideoMode	c_sfCurrentVideomode	=	p_c_etyCurrentGamesettingManager->get_Videomode();
+	CDialogManager* p_c_etyDialogManager	=	mp_c_etyDialogGameState->get_DialogManager();
+
+	CDialog* p_c_etyDialogShipStatus	=	new CDialog(
+		"ShipStatus", p_c_etyCurrentRessourceManager->get_Texture( "ShipStatus.png" ), 400.f, 130.f,
+		sf::Vector2f( 0, 0 ), sf::IntRect( 0, 0, 400, 130 ), p_c_etyDialogManager, c_sfCurrentVideomode);
+
+	p_c_etyDialogShipStatus->set_Affinity(Affinity::enFOREGROUND);
+	p_c_etyDialogShipStatus->set_Anchor(Anchor::enMID);
+	p_c_etyDialogShipStatus->set_AnchorCentered(true);
+
+	m_mapDialogs["ShipStatus"]	=	p_c_etyDialogShipStatus;
+}
+				
+ety::CDialog*	const				ety::CUserInterface::get_DialogByID				( std::string strDialogID )
+{
+	if(m_mapDialogs.find(strDialogID) != m_mapDialogs.end())
+	{
+		return	m_mapDialogs[strDialogID];
+	}
+	
+	return NULL;
+}

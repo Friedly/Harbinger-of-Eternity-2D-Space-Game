@@ -1,0 +1,767 @@
+#include "CMenuState.hpp"
+#include "CGameStateManager.hpp"
+
+#include <sstream>
+
+#include "CButton.hpp"
+#include "CPictureControl.hpp"
+
+#include "CLabel.hpp"
+
+
+
+//Überladener Konstruktor, welcher nen Zeiger auf den Statemanager setzt.
+															ety::CMenuState::CMenuState						( const std::string& strStateName )
+															: CDialogGameState							( strStateName )
+															, m_bUpdateMouseHoverEvents					( true )
+															, m_bColorfilterChanged						( false )
+															, m_strModificatedButtonID					( "" )
+{
+}
+//Default Destruktor.
+															ety::CMenuState::~CMenuState					( void )
+{
+}
+
+void														ety::CMenuState::on_Enter						( ety::CRessourceManager* const p_c_etyCurrentRessourceManager, ety::CGamesettings* const p_c_etyCurrentGamesettingManager )
+{
+}
+void														ety::CMenuState::on_Exit						( ety::CRessourceManager* const p_c_etyCurrentRessourceManager, ety::CGamesettings* const p_c_etyCurrentGamesettingManager )
+{
+	mp_c_etyDialogManager->change_FocusedDialogitem(NULL);
+}
+
+//Funktionen, welche Ressourcen initialisieren und ihn wieder freigeben,
+//sowie z.B alle Objekte aktualisieren und zeichnen.
+void														ety::CMenuState::init_GameState					( ety::CRessourceManager* const p_c_etyCurrentRessourceManager, ety::CGamesettings* const p_c_etyCurrentGamesettingManager )
+{
+	CLua* const p_c_etyLuaScript			= get_GameStatemanager()			->get_LuaScript();
+
+	unsigned int	uiScreen_Height			= p_c_etyCurrentGamesettingManager	->get_Videomode().height;
+	unsigned int	uiScreen_Width			= p_c_etyCurrentGamesettingManager	->get_Videomode().width;
+
+	std::string		strLanguage				= p_c_etyCurrentGamesettingManager	->get_Language();
+
+	sf::VideoMode	c_sfCurrentVideomode	= p_c_etyCurrentGamesettingManager	->get_Videomode();
+	sf::Font		c_sfCurrentFont			= p_c_etyCurrentRessourceManager	->get_Font("Standard.ttf");
+
+	mp_c_etyDialogManager->set_GamesettingsManager	( p_c_etyCurrentGamesettingManager );
+	mp_c_etyDialogManager->set_StandardFont			( c_sfCurrentFont );
+
+	p_c_etyLuaScript->init_Lua();
+	p_c_etyLuaScript->start_Script("Initialisation/Gamestates/Language.lua");
+
+	
+	enum EventType::en_etyEventType en_etyEventType = EventType::enNONE;
+	std::map<enum EventType::en_etyEventType, p_Function> mapEventTypeFunction;
+
+	////////////////////////////////////////////*Background ANFANG*////////////////////////////////////////////
+
+	ety::CDialog* p_c_etyDialogBackground = new CDialog(
+		"MainMenuBackground", p_c_etyCurrentRessourceManager->get_Texture( "MainMenuBackground.jpg" ), 1680.f, 1050.f, sf::Vector2f( 0, 0 ), 
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 1280, 1024 )), mp_c_etyDialogManager, c_sfCurrentVideomode					
+		);		
+
+	p_c_etyDialogBackground->set_Affinity(Affinity::enBACKGROUND);
+	
+
+	////////////////////////////////////////////*Labels ANFANG*////////////////////////////////////////////
+
+	p_c_etyDialogBackground->createDialogitem_Label( 
+		"SelectedProfileLabel", p_c_etyLuaScript->get_TableString("SelectedProfileLabel",strLanguage), 16.f, ety::Color( 8.f, 201.f, 206.f ), sf::Vector2f( 101.f, (55.f/2.f) )
+		);
+		
+	CLabel* p_c_etyLabelSelectedProfileLabel = p_c_etyDialogBackground->get_DialogitemByCustomID<CLabel*>("SelectedProfileLabel");
+	p_c_etyLabelSelectedProfileLabel->set_Anchor(Anchor::enBOTTOMLEFT);
+	p_c_etyLabelSelectedProfileLabel->set_AnchorCentered(true);
+	p_c_etyLabelSelectedProfileLabel->set_TextwriteoutStyle(TextwriteoutStyle::enSTANDARD);
+	p_c_etyLabelSelectedProfileLabel->set_Textwriteout(true);
+	p_c_etyLabelSelectedProfileLabel->set_TextwriteoutDuration(500.f);
+	p_c_etyLabelSelectedProfileLabel->set_DrawPosition(1);
+	
+	////////////////////////////////////////////*Labels ENDE*////////////////////////////////////////////
+
+	////////////////////////////////////////////*PictureControls ANFANG*////////////////////////////////////////////
+
+	p_c_etyDialogBackground->createDialogitem_PictureControl(
+		"ProfileDisplayPictureControl", p_c_etyCurrentRessourceManager->get_Texture( "ProfileDisplay.png" ), 202.f, 55.f, sf::Vector2f( 0.f, 55.f ), 
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 202, 55 ))
+		);
+		
+	CPictureControl* p_c_etyPictureControlProfileDisplayPictureControl = p_c_etyDialogBackground->get_DialogitemByCustomID<CPictureControl*>("ProfileDisplayPictureControl");
+	p_c_etyPictureControlProfileDisplayPictureControl->set_Anchor(Anchor::enBOTTOMLEFT);
+
+	////////////////////////////////////////////*PictureControls ENDE*////////////////////////////////////////////
+
+	////////////////////////////////////////////*Background ENDE*////////////////////////////////////////////
+
+	////////////////////////////////////////////*Menu ANFANG*////////////////////////////////////////////
+
+	ety::CDialog* p_c_etyDialogMenu = new CDialog(
+		"MainMenuPad", p_c_etyCurrentRessourceManager->get_Texture( "MainMenuDialog.png" ), 480.f, 495.f, sf::Vector2f( 1200.f, 560.f ), 
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 480, 495 )), mp_c_etyDialogManager, c_sfCurrentVideomode
+		);
+		
+	////////////////////////////////////////////*Buttons ANFANG*//////////////////////////////////////////// 
+	
+	p_c_etyDialogMenu->createDialogitem_Button(
+		"PadStartButton", p_c_etyCurrentRessourceManager->get_Texture( "PadStartButton.png" ), 294.f, 50.f, sf::Vector2f( 111.f, -136.f ), 
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 294, 50 ))
+		);
+
+	CButton* p_c_etyButtonTmp = p_c_etyDialogMenu->get_DialogitemByCustomID<CButton*>("PadStartButton");
+	p_c_etyButtonTmp->set_Active(false);
+
+	//////////////////////////EVENTS/////////////////////////////////
+	en_etyEventType = EventType::enMOUSELEFTRELEASED;
+	mapEventTypeFunction[en_etyEventType] = &event_startGame;
+	en_etyEventType = EventType::enMOUSEHOVER;
+	mapEventTypeFunction[en_etyEventType] = &event_PadStartButtonHover;
+
+	m_EventMap["PadStartButton"] = mapEventTypeFunction;
+	mapEventTypeFunction.clear();
+	//////////////////////////EVENTS/////////////////////////////////
+
+	p_c_etyDialogMenu->createDialogitem_Button( 
+		"PadOptionsButton", p_c_etyCurrentRessourceManager->get_Texture( "PadOptionsButton.png" ), 294.f, 50.f, sf::Vector2f( 111.f, -193.f ), 
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 294, 50 ))
+		);
+
+	//////////////////////////EVENTS/////////////////////////////////
+	en_etyEventType = EventType::enMOUSELEFTRELEASED;
+	mapEventTypeFunction[en_etyEventType] = &event_enterOptionsMenu;
+	en_etyEventType = EventType::enMOUSEHOVER;
+	mapEventTypeFunction[en_etyEventType] = &event_PadOptionsButtonHover;
+
+	m_EventMap["PadOptionsButton"] = mapEventTypeFunction;
+	mapEventTypeFunction.clear();
+	//////////////////////////EVENTS/////////////////////////////////
+
+	p_c_etyDialogMenu->createDialogitem_Button( 
+		"PadProfilesButton", p_c_etyCurrentRessourceManager->get_Texture( "PadProfilesButton.png" ), 294.f, 50.f, sf::Vector2f( 111.f, -251.f ), 
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 294, 50 ))
+		);
+
+	//////////////////////////EVENTS/////////////////////////////////
+	en_etyEventType = EventType::enMOUSELEFTRELEASED;
+	mapEventTypeFunction[en_etyEventType] = &event_enterProfileMenu;
+	en_etyEventType = EventType::enMOUSEHOVER;
+	mapEventTypeFunction[en_etyEventType] = &event_PadProfileButtonHover;
+
+	m_EventMap["PadProfilesButton"] = mapEventTypeFunction;
+	mapEventTypeFunction.clear();
+	//////////////////////////EVENTS/////////////////////////////////
+
+	p_c_etyDialogMenu->createDialogitem_Button( 
+		"PadCreditsButton", p_c_etyCurrentRessourceManager->get_Texture( "PadCreditsButton.png" ), 294.f, 50.f, sf::Vector2f( 111.f, -308.f ), 
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 294, 50 ))
+		);
+
+	//////////////////////////EVENTS/////////////////////////////////
+	en_etyEventType = EventType::enMOUSELEFTRELEASED;
+	mapEventTypeFunction[en_etyEventType] = &event_enterCreditsMenu;
+	en_etyEventType = EventType::enMOUSEHOVER;
+	mapEventTypeFunction[en_etyEventType] = &event_PadCreditsButtonHover;
+
+	m_EventMap["PadCreditsButton"] = mapEventTypeFunction;
+	mapEventTypeFunction.clear();
+	//////////////////////////EVENTS/////////////////////////////////
+
+	p_c_etyDialogMenu->createDialogitem_Button( 
+		"PadExitButton", p_c_etyCurrentRessourceManager->get_Texture( "PadExitButton.png" ), 294.f, 50.f, sf::Vector2f( 111.f, -364.f ), 
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 294, 50 ))
+		);
+
+	//////////////////////////EVENTS/////////////////////////////////
+	en_etyEventType = EventType::enMOUSELEFTRELEASED;
+	mapEventTypeFunction[en_etyEventType] = &event_exitGame;
+	en_etyEventType = EventType::enMOUSEHOVER;
+	mapEventTypeFunction[en_etyEventType] = &event_PadExitButtonHover;
+
+	m_EventMap["PadExitButton"] = mapEventTypeFunction;
+	mapEventTypeFunction.clear();
+	//////////////////////////EVENTS/////////////////////////////////
+
+
+	////////////////////////////////////////////*Captions ANFANG*////////////////////////////////////////////
+
+	p_c_etyDialogMenu->get_DialogitemByCustomID<ety::CButton*>( "PadStartButton" )
+					 ->create_CaptionLabel(
+					 ety::Color( 8.f, 201.f, 206.f ), p_c_etyLuaScript->get_TableString( "PadStartButtonCaption", strLanguage ), 27.f, ety::Color( 44.f, 44.f, 44.f )
+					 );
+
+	p_c_etyDialogMenu->get_DialogitemByCustomID<ety::CButton*>( "PadOptionsButton" )
+					 ->create_CaptionLabel(
+					 ety::Color( 8.f, 201.f, 206.f ), p_c_etyLuaScript->get_TableString( "PadOptionsButtonCaption", strLanguage ), 27.f, ety::Color( 85.f, 85.f, 85.f )
+					 );
+
+
+	p_c_etyDialogMenu->get_DialogitemByCustomID<ety::CButton*>( "PadProfilesButton" )
+					 ->create_CaptionLabel(
+					 ety::Color( 8.f, 201.f, 206.f ), p_c_etyLuaScript->get_TableString( "PadProfilesButtonCaption", strLanguage ), 27.f, ety::Color( 85.f, 85.f, 85.f )
+					 );
+
+
+	p_c_etyDialogMenu->get_DialogitemByCustomID<ety::CButton*>( "PadCreditsButton" )
+					 ->create_CaptionLabel(
+					 ety::Color( 8.f, 201.f, 206.f ), p_c_etyLuaScript->get_TableString( "PadCreditsButtonCaption", strLanguage ), 27.f, ety::Color( 85.f, 85.f, 85.f )
+					 );
+
+
+	p_c_etyDialogMenu->get_DialogitemByCustomID<ety::CButton*>( "PadExitButton" )
+					 ->create_CaptionLabel(
+					 ety::Color( 8.f, 201.f, 206.f ), p_c_etyLuaScript->get_TableString( "PadExitButtonCaption", strLanguage ), 27.f, ety::Color( 85.f, 85.f, 85.f )
+					 );
+
+
+	////////////////////////////////////////////*Captions ENDE*////////////////////////////////////////////
+	////////////////////////////////////////////*Buttons ENDE*////////////////////////////////////////////
+
+
+	////////////////////////////////////////////*PictureControls ANFANG*////////////////////////////////////////////
+
+	p_c_etyDialogMenu->createDialogitem_PictureControl(
+		"PadReflectionStartButton", p_c_etyCurrentRessourceManager->get_Texture( "ReflektionErsterButtonLicht.png" ), 86.f, 88.f, sf::Vector2f( 56, -394.f ),
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 86, 88 ))
+		);
+
+	CPictureControl* p_c_etyPictureControlTmp = p_c_etyDialogMenu->get_DialogitemByCustomID<CPictureControl*>("PadReflectionStartButton");
+	p_c_etyPictureControlTmp->set_DrawPosition(1);
+	p_c_etyPictureControlTmp->set_Active(false);
+
+	p_c_etyDialogMenu->createDialogitem_PictureControl(
+		"PadReflectionOptionsButton", p_c_etyCurrentRessourceManager->get_Texture( "ReflektionZweiterButtonLicht.png" ), 86.f, 88.f, sf::Vector2f( 56, -394.f ),
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 86, 88 ))
+		);
+
+	p_c_etyPictureControlTmp = p_c_etyDialogMenu->get_DialogitemByCustomID<CPictureControl*>("PadReflectionOptionsButton");
+	p_c_etyPictureControlTmp->set_DrawPosition(1);
+
+	p_c_etyDialogMenu->createDialogitem_PictureControl(
+		"PadReflectionProfilesButton", p_c_etyCurrentRessourceManager->get_Texture( "ReflektionDritterButtonLicht.png" ), 86.f, 88.f, sf::Vector2f( 56, -394.f ),
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 86, 88 ))
+		);
+
+	p_c_etyPictureControlTmp = p_c_etyDialogMenu->get_DialogitemByCustomID<CPictureControl*>("PadReflectionProfilesButton");
+	p_c_etyPictureControlTmp->set_DrawPosition(1);
+
+	p_c_etyDialogMenu->createDialogitem_PictureControl(
+		"PadReflectionCreditsButton", p_c_etyCurrentRessourceManager->get_Texture( "ReflektionVierterButtonLicht.png" ), 86.f, 88.f, sf::Vector2f( 56, -394.f ),
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 86, 88 ))
+		);
+
+	p_c_etyPictureControlTmp = p_c_etyDialogMenu->get_DialogitemByCustomID<CPictureControl*>("PadReflectionCreditsButton");
+	p_c_etyPictureControlTmp->set_DrawPosition(1);
+
+	p_c_etyDialogMenu->createDialogitem_PictureControl(
+		"PadReflectionExitButton", p_c_etyCurrentRessourceManager->get_Texture( "ReflektionFuenfterButtonLicht.png" ), 86.f, 88.f, sf::Vector2f( 56, -394.f ),
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 86, 88 ))
+		);
+
+	////////////////////////////////////////////*PictureControls ENDE*////////////////////////////////////////////
+
+	////////////////////////////////////////////*Menu ENDE*////////////////////////////////////////////
+
+
+	////////////////////////////////////////////*ExitMenu ANFANG*////////////////////////////////////////////
+
+	ety::CDialog* p_c_etyDialogExitMenu = new CDialog(
+		"MainMenuExitMenu", p_c_etyCurrentRessourceManager->get_Texture( "ExitMenuSet.png" ), 600.f, 350.f, sf::Vector2f( 0.f, 0.f ), 
+		sf::IntRect(sf::Vector2i(0,0), sf::Vector2i(600,350)), mp_c_etyDialogManager, c_sfCurrentVideomode
+		);
+
+	p_c_etyDialogExitMenu->set_Visibility(false);
+	p_c_etyDialogExitMenu->set_Anchor(Anchor::enMID);
+	p_c_etyDialogExitMenu->set_AnchorCentered(true);
+	p_c_etyDialogExitMenu->set_Affinity(Affinity::enFOREGROUND);
+
+	////////////////////////////////////////////*Buttons ANFANG*////////////////////////////////////////////
+
+	p_c_etyDialogExitMenu->createDialogitem_Button(	
+		"ExitYesButton", p_c_etyCurrentRessourceManager->get_Texture( "transparentBackground.png" ), 137.f, 74.f, sf::Vector2f(161.f, -205.f), 
+		sf::IntRect(sf::Vector2i(0,0), sf::Vector2i(0,0))
+		);
+
+	//////////////////////////EVENTS/////////////////////////////////
+	en_etyEventType = EventType::enMOUSELEFTRELEASED;
+	mapEventTypeFunction[en_etyEventType] = &event_exitGame;
+	en_etyEventType = EventType::enMOUSEHOVER;
+	mapEventTypeFunction[en_etyEventType] = &event_exitButtonHover;
+
+	m_EventMap["ExitYesButton"] = mapEventTypeFunction;
+	mapEventTypeFunction.clear();
+	//////////////////////////EVENTS/////////////////////////////////
+
+	p_c_etyDialogExitMenu->createDialogitem_Button(	
+		"ExitCancelButton", p_c_etyCurrentRessourceManager->get_Texture( "transparentBackground.png" ), 137.f, 74.f, sf::Vector2f(305.f, -205.f), 
+		sf::IntRect(sf::Vector2i(0,0), sf::Vector2i(0,0))
+		);
+
+	//////////////////////////EVENTS/////////////////////////////////
+	en_etyEventType = EventType::enMOUSELEFTRELEASED;
+	mapEventTypeFunction[en_etyEventType] = &event_cancelExitGame;
+	en_etyEventType = EventType::enMOUSEHOVER;
+	mapEventTypeFunction[en_etyEventType] = &event_exitButtonHover;
+
+	m_EventMap["ExitCancelButton"] = mapEventTypeFunction;
+	mapEventTypeFunction.clear();
+	//////////////////////////EVENTS/////////////////////////////////
+
+	////////////////////////////////////////////*Captions ANFANG*////////////////////////////////////////////
+
+	p_c_etyDialogExitMenu->get_DialogitemByCustomID<ety::CButton*>( "ExitYesButton" )
+					 ->create_CaptionLabel(
+					 ety::Color( 8.f, 201.f, 206.f ), p_c_etyLuaScript->get_TableString( "ExitYesButtonCaption", strLanguage ), 25.f, ety::Color( 85.f, 85.f, 85.f )
+					 );
+
+	p_c_etyDialogExitMenu->get_DialogitemByCustomID<ety::CButton*>( "ExitCancelButton" )
+					 ->create_CaptionLabel(
+					 ety::Color( 8.f, 201.f, 206.f ), p_c_etyLuaScript->get_TableString( "ExitCancelButtonCaption", strLanguage ), 25.f, ety::Color( 85.f, 85.f, 85.f )
+					 );
+
+	////////////////////////////////////////////*Captions ENDE*////////////////////////////////////////////
+	////////////////////////////////////////////*Buttons ENDE*////////////////////////////////////////////
+		
+	////////////////////////////////////////////*Labels ANFANG*////////////////////////////////////////////
+
+	p_c_etyDialogExitMenu->createDialogitem_Label(	
+		"ExitTitleLabel",p_c_etyLuaScript->get_TableString("ExitTitleLabel",strLanguage), 25.f, sf::Color(255,255,255,200), sf::Vector2f(0,60)
+		);
+
+	p_c_etyDialogExitMenu->get_DialogitemByCustomID<CLabel*>("ExitTitleLabel")->set_Anchor(Anchor::enMID);
+	p_c_etyDialogExitMenu->get_DialogitemByCustomID<CLabel*>("ExitTitleLabel")->set_AnchorCentered(true);
+
+	////////////////////////////////////////////*Labels ENDE*////////////////////////////////////////////
+
+	////////////////////////////////////////////*ExitMenu ENDE*////////////////////////////////////////////
+
+	p_c_etyLuaScript->close_Lua();
+}
+
+void														ety::CMenuState::update_GameState				( const sf::Uint32& uiFrameTime )
+{
+	CDialogGameState::update_GameState( uiFrameTime );
+
+	if(m_en_etyGameStateStatus	==	GamestateStatus::enACTIVE)
+	{
+		sf::Event sfEventDisplayFix;
+		sfEventDisplayFix.type = sfEventDisplayFix.MouseMoved;
+		mp_c_etyDialogManager->get_ParentGameState()->handle_GameStateEvents(sfEventDisplayFix);
+
+		if( mp_c_etyDialogManager != NULL )
+		{
+			if(m_bColorfilterChanged == true )
+			{
+				m_bColorfilterChanged = false;
+
+				mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->modificate_ColorFilter(sf::Vector3f(1.3333333f,1.3333333f,1.3333333f));
+				mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuBackground")->modificate_ColorFilter(sf::Vector3f(1.3333333f,1.3333333f,1.3333333f));
+
+				CButton* p_c_etyButtonTmpPointer = mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID< ety::CButton* >(m_strModificatedButtonID);
+
+				sf::IntRect c_sfIntRectTmp = p_c_etyButtonTmpPointer->get_Background_SubRect();
+				p_c_etyButtonTmpPointer->set_Background_SubRect(p_c_etyButtonTmpPointer->get_HoverSprite_SubRect(), false);
+				p_c_etyButtonTmpPointer->set_HoverSprite_SubRect(c_sfIntRectTmp, false);
+
+				if(p_c_etyButtonTmpPointer->get_CaptionHighlighted() == false)
+				{
+					p_c_etyButtonTmpPointer->swap_HighlightInformation();
+				}
+							
+				p_c_etyButtonTmpPointer->set_AnimatedCaption(true);
+
+				m_strModificatedButtonID = "";
+			}
+		}
+	}
+}
+
+const ety::GameStateRunning::en_etyGameStateRunning			ety::CMenuState::handle_GameStateEvents			( const sf::Event& sfEventLastEvent )
+{
+	CDialogitem* p_c_etyDialogitemEvent = mp_c_etyDialogManager->get_MouseEventDialogitem();
+
+	if(sfEventLastEvent.type == sf::Event::KeyReleased)
+	{
+		if(sfEventLastEvent.key.code == sf::Keyboard::Escape)
+		{
+			if(mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuExitMenu")->get_Visibility() == true)
+			{
+				//Schließen des Exit-Menüs
+				mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuExitMenu")->set_Visibility(false);
+				mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuExitMenu")->set_Modal(false,sf::Vector3f(1.3333333f,1.3333333f,1.3333333f));		
+			}
+			else if(mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuExitMenu")->get_Visibility() == false && mp_c_etyDialogManager->get_ModalDialog() == false)
+			{
+				//Öffnen des Exit-Menüs
+				CDialog* p_c_etyDialogTmp = mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuExitMenu");
+				sf::IntRect c_sfIntRectSubRect = p_c_etyDialogTmp->get_SubRect();
+				c_sfIntRectSubRect.left = 0;
+				c_sfIntRectSubRect.top = 0;
+				p_c_etyDialogTmp->set_SubRect(c_sfIntRectSubRect,true);
+
+				mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuExitMenu")->set_Visibility(true);
+				mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuExitMenu")->set_Modal(true,sf::Vector3f(0.75f,0.75f,0.75f));
+
+
+				if(mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuExitMenu")->get_DialogitemByCustomID<CButton*>("ExitYesButton")->check_MouseCoordinates() == true)
+				{
+					event_exitButtonHover(2, mp_c_etyDialogManager, new int(350));
+				}
+				else if(mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuExitMenu")->get_DialogitemByCustomID<CButton*>("ExitCancelButton")->check_MouseCoordinates() == true)
+				{
+					event_exitButtonHover(2, mp_c_etyDialogManager, new int(700));
+				}
+			}
+		}
+	}
+	else if(sfEventLastEvent.type == sf::Event::MouseMoved && p_c_etyDialogitemEvent == NULL)
+	{
+		if( m_bUpdateMouseHoverEvents == true )
+		{
+			if(mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuExitMenu")->get_Modal() == true)
+			{
+				CDialog* p_c_etyDialogTmp = mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuExitMenu");
+				sf::IntRect c_sfIntRectSubRect = p_c_etyDialogTmp->get_SubRect();
+				c_sfIntRectSubRect.left = 0;
+				c_sfIntRectSubRect.top = 0;
+				p_c_etyDialogTmp->set_SubRect(c_sfIntRectSubRect,true);
+				m_bUpdateMouseHoverEvents = false;
+			}
+			else
+			{
+				ety::CPictureControl* p_c_etyPictureControlEventEntity = mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionStartButton");
+				p_c_etyPictureControlEventEntity->set_Visibility(false);
+				p_c_etyPictureControlEventEntity = mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionOptionsButton");
+				p_c_etyPictureControlEventEntity->set_Visibility(false);
+				p_c_etyPictureControlEventEntity = mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionProfilesButton");
+				p_c_etyPictureControlEventEntity->set_Visibility(false);
+				p_c_etyPictureControlEventEntity = mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionCreditsButton");
+				p_c_etyPictureControlEventEntity->set_Visibility(false);
+				p_c_etyPictureControlEventEntity = mp_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionExitButton");
+				p_c_etyPictureControlEventEntity->set_Visibility(false);
+
+				m_bUpdateMouseHoverEvents = false;
+			}
+		}
+	}	
+
+
+	sf::Event c_sfEvent = sfEventLastEvent;
+	mp_c_etyDialogManager->handle_Events(c_sfEvent);
+	
+	if(p_c_etyDialogitemEvent != NULL)
+	{
+		p_Function p_FunctionEvent = get_EventFunction(p_c_etyDialogitemEvent->get_CustomID(), c_sfEvent);
+		std::string strCustomID = p_c_etyDialogitemEvent->get_CustomID();
+
+		if(p_FunctionEvent != NULL)
+		{
+			if(strCustomID == "ExitYesButton" && c_sfEvent.type == sf::Event::MouseMoved)
+			{
+				return p_FunctionEvent(2, mp_c_etyDialogManager, new int(350));
+			}
+			else if(strCustomID == "ExitCancelButton" && c_sfEvent.type == sf::Event::MouseMoved)
+			{
+				return p_FunctionEvent(2, mp_c_etyDialogManager, new int(700));
+			}
+			else
+			{
+				return p_FunctionEvent(1, mp_c_etyDialogManager);
+			}
+		}
+	}
+	
+
+	return ety::GameStateRunning::enTRUE;
+}
+
+
+void														ety::CMenuState::set_UpdateMouseHoverEvent		( bool bMouseHoverEvent )
+{
+	m_bUpdateMouseHoverEvents	=	bMouseHoverEvent;
+}
+void														ety::CMenuState::set_ColorfilterChanged			( bool bColorfilterChanged )
+{
+	m_bColorfilterChanged		=	bColorfilterChanged;
+}
+void														ety::CMenuState::set_ModificatedButtonID		( std::string strButtonID )
+{
+	m_strModificatedButtonID	=	strButtonID;
+}
+
+bool														ety::CMenuState::get_UpdateMouseHoverEvent		( void )
+{
+	return m_bUpdateMouseHoverEvents;
+}
+bool														ety::CMenuState::get_ColorfilterChanged			( void )
+{
+	return m_bColorfilterChanged;
+}
+std::string													ety::CMenuState::get_ModificatedButtonID		( void )
+{
+	return m_strModificatedButtonID;
+}
+
+
+ety::GameStateRunning::en_etyGameStateRunning				ety::CMenuState::event_startGame				( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+
+    CDialogManager* p_c_etyDialogManager = static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*));   						
+	p_c_etyDialogManager->get_ParentGameState()->get_GameStatemanager()->pushback_GameState( "SpaceStationState" );
+
+	va_CloseArgumentList(va_ALParameter);
+
+	return ety::GameStateRunning::enFALSE;
+}
+ety::GameStateRunning::en_etyGameStateRunning				ety::CMenuState::event_enterOptionsMenu			( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+
+    CDialogManager* p_c_etyDialogManager	=	static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*)); 
+	CMenuState*		p_c_etyMenuState		=	static_cast<CMenuState*>(p_c_etyDialogManager->get_ParentGameState()); 
+	va_CloseArgumentList(va_ALParameter);
+
+	p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->modificate_ColorFilter(sf::Vector3f(0.75f,0.75f,0.75f));
+	p_c_etyDialogManager->get_DialogbyCustomID("MainMenuBackground")->modificate_ColorFilter(sf::Vector3f(0.75f,0.75f,0.75f));
+
+	p_c_etyMenuState->set_ColorfilterChanged( true );
+	p_c_etyMenuState->set_ModificatedButtonID( "PadOptionsButton" );
+
+	//An dieser Stelle wird der Button so modfiziert, dass er so angezeigt wird, als wäre er mit der Maus ausgewählt
+	CButton* p_c_etyButtonTmpPointer = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID< ety::CButton* >("PadOptionsButton");
+	sf::IntRect c_sfIntRectTmp = p_c_etyButtonTmpPointer->get_Background_SubRect();
+	p_c_etyButtonTmpPointer->set_Background_SubRect(p_c_etyButtonTmpPointer->get_HoverSprite_SubRect(), false);
+	p_c_etyButtonTmpPointer->set_HoverSprite_SubRect(c_sfIntRectTmp, false);
+
+	if(p_c_etyButtonTmpPointer->get_CaptionHighlighted() == false)
+	{
+		p_c_etyButtonTmpPointer->swap_HighlightInformation();
+	}
+							
+	p_c_etyButtonTmpPointer->set_AnimatedCaption(false);
+
+	p_c_etyMenuState->get_GameStatemanager()->pushback_GameState( "OptionState", ety::GamestateStatus::enBACKGROUND );	
+
+	return ety::GameStateRunning::enFALSE;
+}
+ety::GameStateRunning::en_etyGameStateRunning				ety::CMenuState::event_enterProfileMenu			( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+
+    CDialogManager* p_c_etyDialogManager	=	static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*)); 
+	CMenuState*		p_c_etyMenuState		=	static_cast<CMenuState*>(p_c_etyDialogManager->get_ParentGameState()); 
+
+	p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->modificate_ColorFilter(sf::Vector3f(0.75f,0.75f,0.75f));
+	p_c_etyDialogManager->get_DialogbyCustomID("MainMenuBackground")->modificate_ColorFilter(sf::Vector3f(0.75f,0.75f,0.75f));
+
+	p_c_etyMenuState->set_ColorfilterChanged( true );
+	p_c_etyMenuState->set_ModificatedButtonID( "PadProfilesButton" );
+
+	//An dieser Stelle wird der Button so modfiziert, dass er so angezeigt wird, als wäre er mit der Maus ausgewählt
+	CButton* p_c_etyButtonTmpPointer = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID< ety::CButton* >("PadProfilesButton");
+	sf::IntRect c_sfIntRectTmp = p_c_etyButtonTmpPointer->get_Background_SubRect();
+	p_c_etyButtonTmpPointer->set_Background_SubRect(p_c_etyButtonTmpPointer->get_HoverSprite_SubRect(), false);
+	p_c_etyButtonTmpPointer->set_HoverSprite_SubRect(c_sfIntRectTmp, false);
+
+	if(p_c_etyButtonTmpPointer->get_CaptionHighlighted() == false)
+	{
+		p_c_etyButtonTmpPointer->swap_HighlightInformation();
+	}
+							
+	p_c_etyButtonTmpPointer->set_AnimatedCaption(false);
+
+	p_c_etyMenuState->get_GameStatemanager()->pushback_GameState( "ProfileState", ety::GamestateStatus::enBACKGROUND );
+
+	va_CloseArgumentList(va_ALParameter);
+
+	return ety::GameStateRunning::enFALSE;
+}
+ety::GameStateRunning::en_etyGameStateRunning				ety::CMenuState::event_enterCreditsMenu			( int iAmount, ... )
+{
+	return ety::GameStateRunning::enTRUE;
+}
+ety::GameStateRunning::en_etyGameStateRunning				ety::CMenuState::event_exitGame					( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+
+    CDialogManager* p_c_etyDialogManager = static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*));   
+	va_CloseArgumentList(va_ALParameter);
+
+	CButton* p_c_etyButtonEventButton	=	static_cast< CButton* >(p_c_etyDialogManager->get_MouseEventDialogitem());
+
+	if( p_c_etyButtonEventButton->get_EventSound(ety::SoundType::enCLICK) != NULL)
+	{
+		while( p_c_etyButtonEventButton->get_EventSound(ety::SoundType::enCLICK)->getStatus() == sf::Sound::Playing )
+		{
+		}
+	}
+								
+	p_c_etyDialogManager->get_ParentGameState()->get_GameStatemanager()->popback_GameState();
+
+	
+
+	return ety::GameStateRunning::enFALSE;
+}
+ety::GameStateRunning::en_etyGameStateRunning				ety::CMenuState::event_cancelExitGame			( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+
+    CDialogManager* p_c_etyDialogManager = static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*));   
+	p_c_etyDialogManager->get_DialogbyCustomID("MainMenuExitMenu")->set_Visibility(false);
+	p_c_etyDialogManager->get_DialogbyCustomID("MainMenuExitMenu")->set_Modal(false,sf::Vector3f(1.3333333f,1.3333333f,1.3333333f));
+
+	va_CloseArgumentList(va_ALParameter);
+
+	return ety::GameStateRunning::enTRUE;
+}
+ety::GameStateRunning::en_etyGameStateRunning				ety::CMenuState::event_PadStartButtonHover		( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+
+    CDialogManager* p_c_etyDialogManager	=	static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*)); 
+	CMenuState*		p_c_etyMenuState		=	static_cast<CMenuState*>(p_c_etyDialogManager->get_ParentGameState()); 
+	va_CloseArgumentList(va_ALParameter);
+
+	ety::CPictureControl* p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionStartButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(true);
+
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionOptionsButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionProfilesButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionCreditsButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionExitButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+
+	p_c_etyMenuState->set_UpdateMouseHoverEvent(true);
+
+	return ety::GameStateRunning::enTRUE;
+}
+ety::GameStateRunning::en_etyGameStateRunning				ety::CMenuState::event_PadOptionsButtonHover	( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+
+	CDialogManager* p_c_etyDialogManager	=	static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*)); 
+	CMenuState*		p_c_etyMenuState		=	static_cast<CMenuState*>(p_c_etyDialogManager->get_ParentGameState());
+	va_CloseArgumentList(va_ALParameter);
+
+	ety::CPictureControl* p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionStartButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionOptionsButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(true);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionProfilesButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionCreditsButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionExitButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+
+	p_c_etyMenuState->set_UpdateMouseHoverEvent(true);
+
+	return ety::GameStateRunning::enTRUE;
+}
+ety::GameStateRunning::en_etyGameStateRunning				ety::CMenuState::event_PadProfileButtonHover	( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+
+    CDialogManager* p_c_etyDialogManager	=	static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*)); 
+	CMenuState*		p_c_etyMenuState		=	static_cast<CMenuState*>(p_c_etyDialogManager->get_ParentGameState());
+	va_CloseArgumentList(va_ALParameter);
+
+	ety::CPictureControl* p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionStartButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionOptionsButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionProfilesButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(true);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionCreditsButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionExitButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+
+	p_c_etyMenuState->set_UpdateMouseHoverEvent(true);
+
+	return ety::GameStateRunning::enTRUE;
+}
+ety::GameStateRunning::en_etyGameStateRunning				ety::CMenuState::event_PadCreditsButtonHover	( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+
+    CDialogManager* p_c_etyDialogManager	=	static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*)); 
+	CMenuState*		p_c_etyMenuState		=	static_cast<CMenuState*>(p_c_etyDialogManager->get_ParentGameState());
+	va_CloseArgumentList(va_ALParameter);
+
+	ety::CPictureControl* p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionStartButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionOptionsButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionProfilesButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionCreditsButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(true);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionExitButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+
+	p_c_etyMenuState->set_UpdateMouseHoverEvent(true);
+
+	return ety::GameStateRunning::enTRUE;
+}
+ety::GameStateRunning::en_etyGameStateRunning				ety::CMenuState::event_PadExitButtonHover		( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+
+	CDialogManager* p_c_etyDialogManager	=	static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*)); 
+	CMenuState*		p_c_etyMenuState		=	static_cast<CMenuState*>(p_c_etyDialogManager->get_ParentGameState());
+	va_CloseArgumentList(va_ALParameter);
+
+	ety::CPictureControl* p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionStartButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionOptionsButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionProfilesButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionCreditsButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(false);
+	p_c_etyPictureControlEventEntity = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuPad")->get_DialogitemByCustomID<ety::CPictureControl*>("PadReflectionExitButton");
+	p_c_etyPictureControlEventEntity->set_Visibility(true);
+
+	p_c_etyMenuState->set_UpdateMouseHoverEvent(true);
+
+	return ety::GameStateRunning::enTRUE;
+}
+ety::GameStateRunning::en_etyGameStateRunning				ety::CMenuState::event_exitButtonHover			( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+
+    CDialogManager* p_c_etyDialogManager	=	static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*)); 
+	CMenuState*		p_c_etyMenuState		=	static_cast<CMenuState*>(p_c_etyDialogManager->get_ParentGameState());
+	
+
+	CDialog* p_c_etyDialogTmp = p_c_etyDialogManager->get_DialogbyCustomID("MainMenuExitMenu");
+	sf::IntRect c_sfIntRectSubRect = p_c_etyDialogTmp->get_SubRect();
+	c_sfIntRectSubRect.left = 0;
+	c_sfIntRectSubRect.top = *static_cast<int*>(va_getArgument(va_ALParameter, void*)); ;
+	p_c_etyDialogTmp->set_SubRect(c_sfIntRectSubRect,true);
+	va_CloseArgumentList(va_ALParameter);
+
+	p_c_etyMenuState->set_UpdateMouseHoverEvent(true);
+
+	return ety::GameStateRunning::enTRUE;
+}

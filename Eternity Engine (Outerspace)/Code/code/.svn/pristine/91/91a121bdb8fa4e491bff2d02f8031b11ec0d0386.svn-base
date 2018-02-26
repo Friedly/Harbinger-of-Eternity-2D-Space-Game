@@ -1,0 +1,69 @@
+#include "CMission.hpp"
+#include "CTask.hpp"
+
+
+							ety::CMission::CMission						(void)
+							:m_strMissionID								("")
+							,m_bMainMission								(false)
+							,m_bMissionDiscovered						(false)
+							,m_bMissionCompleted						(false)
+							,m_bActive									(false)
+{
+}
+
+
+							ety::CMission::~CMission					(void)
+{
+	std::list<CTask*>::iterator itTask	=	m_listTasks.begin();
+
+	for(itTask ; itTask != m_listTasks.end() ; itTask++)
+	{
+		if((*itTask) != NULL)
+		{
+			delete (*itTask);
+			(*itTask) = NULL;
+		}
+	}
+
+	m_listTasks.clear();
+}
+
+							ety::CMission::CMission						( std::string strMissionID, bool bMainMission, bool bActive, bool bMissionDiscovered)
+							:m_strMissionID								(strMissionID)
+							,m_bMainMission								(bMainMission)
+							,m_bMissionDiscovered						(bMissionDiscovered)
+							,m_bMissionCompleted						(false)
+							,m_bActive									(bActive)
+{
+}
+
+		void				ety::CMission::add_Task						( CTask* const p_c_etyTask )
+{
+	m_listTasks.push_back(p_c_etyTask);
+}
+			
+		void				ety::CMission::set_MissionCompleted			( bool bMissionCompleted )
+{
+	m_bMissionCompleted		=	bMissionCompleted;
+}
+		void				ety::CMission::set_MissionDiscovered		( bool bMissionDiscovered )
+{
+	m_bMissionDiscovered	=	bMissionDiscovered;
+}
+
+const	bool&				ety::CMission::get_MainMission				( void )
+{
+	return m_bMainMission;
+}
+const	bool&				ety::CMission::get_MissionCompleted			( void )
+{
+	return m_bMissionCompleted;
+}
+const	bool&				ety::CMission::get_MissionDiscovered		( void )
+{
+	return m_bMissionDiscovered;
+}
+const	std::string&		ety::CMission::get_MissionID				( void )
+{
+	return m_strMissionID;
+}

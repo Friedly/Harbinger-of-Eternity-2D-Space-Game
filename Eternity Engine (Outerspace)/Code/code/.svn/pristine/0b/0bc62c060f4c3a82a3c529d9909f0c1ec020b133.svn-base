@@ -1,0 +1,87 @@
+#include "CShield.hpp"
+#include "CIniFile.hpp"
+
+
+						ety::CShield::CShield								( const std::string& strDirectory, const std::string& strItemname, ety::CRessourceManager* const p_c_etyCurrentRessourceManager )
+							:CItem( strDirectory, strItemname, p_c_etyCurrentRessourceManager )
+						{
+							m_en_etyModuleType = ety::ModuleType::enSHIELD;
+
+							ety::CIniFile c_etyFile;
+							c_etyFile.set_IniFileDirectory( strDirectory );
+
+							m_fEnergyReservation			= c_etyFile.read_Float		( strItemname, "fEnergyReservation"			, 0.f );
+							m_fCooldown						= c_etyFile.read_Float		( strItemname, "fCooldown"					, 0.f );
+							m_fRechargedEnergyPerSecond		= c_etyFile.read_Float		( strItemname, "fRechargedEnergyPerSecond"	, 0.f );
+							m_fMaximalAbsorbedDamage		= c_etyFile.read_Float		( strItemname, "fMaximalAbsorbedDamage"		, 0.f );
+							m_fCurrentAbsorbedDamage		= 0.f;
+						}
+						ety::CShield::~CShield								( void )
+						{
+						}
+
+		void			ety::CShield::update_Item							( const sf::Uint32& uiFrameTime )
+		{
+		}
+
+//Set-Methoden
+		void			ety::CShield::set_CurrentAbsorbedDamage				( const float fCurrentAbsorbedDamage )
+{
+	if(fCurrentAbsorbedDamage <= m_fMaximalAbsorbedDamage)
+	{
+		m_fCurrentAbsorbedDamage	=	fCurrentAbsorbedDamage;
+	}
+	else
+	{
+		m_fCurrentAbsorbedDamage = 0;
+	}
+}
+//Get-Methoden
+const	float			ety::CShield::get_EnergyReservation					( void )
+{
+	return m_fEnergyReservation;
+}
+const	float			ety::CShield::get_Cooldown							( void )
+{
+	return m_fCooldown;
+}
+const	float			ety::CShield::get_RechargedEnergyPerSecond			( void )
+{
+	return m_fRechargedEnergyPerSecond;
+}
+const	float			ety::CShield::get_CurrentAbsorbedDamage				( void )
+{
+	return m_fCurrentAbsorbedDamage;
+}
+const	float			ety::CShield::get_MaximalAbsorbedDamage				( void )
+{
+	return m_fMaximalAbsorbedDamage;
+}
+const	float			ety::CShield::get_ShieldStatus						( void )
+{
+	return m_fMaximalAbsorbedDamage - m_fCurrentAbsorbedDamage;
+}
+const	std::string		ety::CShield::get_SpecificInformation				( void )
+{
+	std::stringstream ssStream;
+	//String noch ändern
+	std::string strInformation;/* = m_strName + "\n\n\nKlasse: ";
+	ssStream << m_uiClass;
+	strInformation += ssStream.str() + "\n\nMasse: ";
+	ssStream.str("");
+	ssStream << m_fMass;
+	strInformation += ssStream.str() + " ME\n\nPrice: ";
+	ssStream.str("");
+	ssStream << m_fPrice;
+	strInformation += ssStream.str() + "$\n\nTotal Armor: ";
+	ssStream.str("");
+	ssStream << m_fTotalArmor;
+	strInformation += ssStream.str() + "\n\nDmgRedctn.: ";
+	ssStream.str("");
+	ssStream << m_fDamageReductionPerShot;
+	strInformation += ssStream.str();
+	ssStream.str("");*/
+
+	return strInformation;
+}
+

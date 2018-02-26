@@ -1,0 +1,79 @@
+#include "CUnitEvent.hpp"
+#include "CTrigger.hpp"
+#include "CEntity.hpp"
+#include "CAttributeComponent.hpp"
+
+
+														ety::CUnitEvent::CUnitEvent				(void)
+														//:m_strEntityID							("")
+														//,m_bSpecificUnitEvent					(false)
+{
+}
+
+	
+														ety::CUnitEvent::~CUnitEvent			(void)
+{
+}
+
+
+														ety::CUnitEvent::CUnitEvent				(enum UnitEventType::en_etyUnitEventType en_etyUnitEventType, std::string strEntityID, 
+																								bool bActive, CTrigger* p_c_etyTriggerParent)
+														//:m_strEntityID							(strEntityID)
+														//,m_en_etyUnitEventType					(en_etyUnitEventType)
+														//,m_bSpecificUnitEvent					(false)
+{
+	m_bActive					=	bActive;
+	mp_c_etyTriggerParent		=	p_c_etyTriggerParent;
+	m_en_etyTriggerEventType	=	TriggerEventType::enUNITEVENT;
+
+	if(strEntityID == "")
+	{
+		m_bSpecificUnitEvent = false;
+	}
+}
+	
+
+bool													ety::CUnitEvent::update_Event			( const sf::Uint32& uiFrameTime )
+{
+	std::vector<ety::CEntity*>::iterator	itEntities	=	m_vectorEntityIDs.begin();
+	std::vector<enum ety::UnitEventType::en_etyUnitEventType>	m_vectorUnitEvents;
+	std::vector<enum ety::UnitEventType::en_etyUnitEventType>::iterator	itUnitEvents;
+
+	for(itEntities ; itEntities != m_vectorEntityIDs.end() ; itEntities++)
+	{
+		if(m_en_etyUnitEventType == UnitEventType::enDIES)
+		{
+			if(*(*itEntities)->get_Component<ety::CAttributeComponent>("AttributeComponent")->m_c_etyAttributes.get_Attribute<float>("fStructureStability") <= 0.f)
+			{
+				return true;
+			}
+		}
+		else
+		{
+
+		}
+
+		/*p_c_etyMessageComponent = (*itEntities)->get_Component<ety::CMessageComponent>("MessageComponent");
+
+		if(p_c_etyMessageComponent != NULL)
+		{
+			if(p_c_etyMessageComponent->find_UnitEvent(m_en_etyUnitEventType) == true)
+			{
+				//Eine Entity hat das Event gesendet, dadurch wird nun der Trigger ausgeführt
+				return true;
+			}
+		}*/
+	}
+
+	return false;
+}
+
+										
+const	bool&											ety::CUnitEvent::get_SpecificUnitEvent	(void)
+{
+	return m_bSpecificUnitEvent;
+}
+const	enum ety::UnitEventType::en_etyUnitEventType&	ety::CUnitEvent::get_UnitEventType		(void)
+{
+	return m_en_etyUnitEventType;
+}

@@ -1,0 +1,172 @@
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////																															   ///////////
+///////////														CMouse.cpp															   ///////////
+///////////																									                           ///////////
+///////////			Diese Klasse dient als Erweiterung zur Klasse sf::Mouse, welche ebenso nur aus static Methoden besteht.            ///////////
+///////////			Die Erweiterungen bestehen aus einem sf::Sprite(Bild) um den Mauszeiger für das Spiel zu ändern.				   ///////////
+///////////			Ebenso wird in Vollbildmodus nicht mehr möglich sein, wenn man einen anderen Bildschirm angeschlossen hat,	       ///////////
+///////////         die Maus auf den anderen Bildschirm zu bewegen, diese Störung wird behoben.							               ///////////
+///////////																									                           ///////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Includes der Eternity-Engine 
+#include "CMouse.hpp"					
+
+//Standard Konstruktor und Destruktor.
+						ety::CMouse::CMouse						( void )
+{
+}
+						ety::CMouse::~CMouse					( void )
+{
+}
+
+//Diese statische Methode wird benötigt um das Bild des Mauszeigers zu skalieren.
+//Mit Hilfe dieser Methode wird das Bild des Mauzeigers für jede Auflösung des Spiels
+//angepasst.
+void					ety::CMouse::scale_Size					( const float fScaleX, const float fScaleY )
+{
+	//Mit dieser Methode der Klasse sf::Sprite wird das Bild des Mauszeigers
+	//um die Breite und um die Höhe skaliert.
+	m_c_SpriteCustomCursor.setScale( fScaleX, fScaleY );
+}
+
+//Diese statische Methode setzt ein Bild fest anstelle des Windows-Mauszeigers.
+void					ety::CMouse::set_CustomCursorSprite		( const sf::Texture& c_sfTextureCustomCursor, const bool bCenter )
+{
+	//Das Bild für den Mauszeiger wird gesetzt.
+	m_c_SpriteCustomCursor.setTexture( c_sfTextureCustomCursor, true );
+
+	if( bCenter )
+	{
+		m_c_SpriteCustomCursor.setOrigin( c_sfTextureCustomCursor.getSize().x/2.f, c_sfTextureCustomCursor.getSize().y/2.f );
+		m_c_SpriteCustomCursor.setColor( sf::Color( 255, 0, 0 ) );
+	}
+	else
+	{
+		m_c_SpriteCustomCursor.setOrigin( 0.f, 0.f );
+		m_c_SpriteCustomCursor.setColor( sf::Color( 255, 255, 255 ) );
+	}
+}
+//Diese statische Methode setzt das aktuelle Fenster fest.
+void					ety::CMouse::set_RenderWindow			( sf::RenderWindow* const p_c_sfRenderWindowStandard )
+{
+	//Das aktuelle Fenster wird über Zeiger zugewiesen.
+	mp_c_sfRenderWindow = p_c_sfRenderWindowStandard;
+}
+//Diese statische Methode legt fest, ob das Fenster im Vollbildmodus ist.
+void					ety::CMouse::set_Fullscreen				( const bool bFullscreen )
+{
+	//Setzt fest, ob das Fenster gerade im Vollbildmodus ist.
+	m_bFullscreen = bFullscreen;
+}
+//Diese statische Methode setzt die Position des Mauszeigers.
+void					ety::CMouse::set_Position				( const sf::Vector2i& c_sfVectorMousePosition )
+{
+	if( mp_c_sfRenderWindow != NULL )
+	{
+		//Wenn ein aktuelles Fenster angegeben ist, wird die Position des Mauszeigers
+		//im Bezug zum Fenster gesetzt.
+		sf::Mouse::setPosition( c_sfVectorMousePosition, (*mp_c_sfRenderWindow) );
+	}
+	else
+	{
+		//Wenn ein aktuelles Fenster nicht angegeben ist, wird die Position des Mauszeigers
+		//im Bezug zum Bildschirm gesetzt.
+		sf::Mouse::setPosition( c_sfVectorMousePosition );
+	}
+}
+//Diese statische Methode legt fest, ob das Fenster im Fokus liegt.
+void					ety::CMouse::set_WindowFocus			( const bool bWindowFocus )
+{
+	//Setzt fest, ob das Fenster gerade im Fokus liegt.
+	m_bWindowFocus = bWindowFocus;
+}
+
+//Diese statische Methode gibt die aktuelle Position des Mauszeigers zurück.
+const sf::Vector2i		ety::CMouse::get_Position				( void )
+{
+	if( mp_c_sfRenderWindow != NULL )
+	{
+		//Wenn ein aktuelles Fenster angegeben ist, wird die Position
+		//des Mauszeigers im Bezug zum Fenster zurück gegeben.
+		return sf::Mouse::getPosition( (*mp_c_sfRenderWindow) );
+	}
+	
+	//Ansonsten wir die Position des Mauszeigers
+	//im Bezug zum Bildschirm zurück geggeben.
+	return sf::Mouse::getPosition();
+}
+const sf::Vector2i		ety::CMouse::get_Position				( const sf::View& c_sfView )
+{
+	if( mp_c_sfRenderWindow != NULL )
+	{
+		return sf::Vector2i( mp_c_sfRenderWindow->convertCoords( ety::CMouse::get_Position(), c_sfView ).x, mp_c_sfRenderWindow->convertCoords( ety::CMouse::get_Position(), c_sfView ).y );
+	}
+
+	return sf::Vector2i();
+}
+//Diese statische Methode gibt das Bild des Mauszeigers zurück.
+//Sie wird gebraucht um den neuen Mauszeiger zu zeichnen,
+//wenn der Windows-Mauszeiger ausgeschaltet ist.
+const sf::Sprite&		ety::CMouse::get_CustomCursorSprite		( void )
+{
+	//Wenn ein Fenster angegeben ist...
+	if( mp_c_sfRenderWindow != NULL )
+	{
+		//Die Größe des Fensters wird gespeichert.
+		sf::Vector2u vecScreen( mp_c_sfRenderWindow->getSize() );
+
+		//Die Positin der Maus relativ zum Fenster.
+		sf::Vector2i vecMouse = sf::Vector2i( sf::Mouse::getPosition( *(mp_c_sfRenderWindow) ) );
+
+		//Wenn Vollbildmodus an ist und das Fenster im Focus wird die Maus-Bewegung
+		//auf das Fenster begrenzt.
+		if( m_bFullscreen == true && m_bWindowFocus == true )
+		{
+			if( vecMouse.x <= 0 )
+			{
+				vecMouse.x = 5;
+				sf::Mouse::setPosition( vecMouse, (*mp_c_sfRenderWindow) );
+			}
+			else if( vecMouse.x >= static_cast<int>(vecScreen.x) )
+			{
+				vecMouse.x = vecScreen.x-5;
+				sf::Mouse::setPosition( vecMouse, (*mp_c_sfRenderWindow) ); 
+			}
+			else if( vecMouse.y <= 0 ) 
+			{
+				vecMouse.y = 5;
+				sf::Mouse::setPosition( vecMouse, (*mp_c_sfRenderWindow) ); 
+			}
+			else if( vecMouse.y >= static_cast<int>(vecScreen.y) )
+			{
+				vecMouse.y = vecScreen.y-5;
+				sf::Mouse::setPosition( vecMouse, (*mp_c_sfRenderWindow) ); 
+			}
+		}
+
+		//Neue Position des Sprites der Maus setzen.
+		m_c_SpriteCustomCursor.setPosition( sf::Vector2f( vecMouse ) );
+	
+		//Sprite zurück geben.
+		return m_c_SpriteCustomCursor;
+	}
+
+	//Die Positin der Maus relativ zum Desktop.
+	sf::Vector2i vecMouse = sf::Vector2i( sf::Mouse::getPosition() );
+
+	//Neue Position des Sprites der Maus setzen.
+	m_c_SpriteCustomCursor.setPosition( sf::Vector2f( vecMouse ) );
+	
+	//Sprite zurück geben.
+	return m_c_SpriteCustomCursor;
+}
+
+
+//Die nötigen Deklarationen für die statischen Member-Variablen
+sf::Sprite				ety::CMouse::m_c_SpriteCustomCursor;
+
+sf::RenderWindow*		ety::CMouse::mp_c_sfRenderWindow = NULL;
+
+bool					ety::CMouse::m_bFullscreen;
+bool					ety::CMouse::m_bWindowFocus = true;

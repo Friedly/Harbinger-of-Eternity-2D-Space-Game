@@ -1,0 +1,14 @@
+Es wird eine Scrollbar benötigt!
+Sie soll aus einer Schiene (Background) und einem Schieber/Slider bestehen.
+Guckt euch einfach meine selbst gebastelte Scrollbar im GraphicOptionsMenü
+in der Auflösungs-ComboBox an.
+So in der Art soll die Scrollbar aufgebaut sein. Gestaltung/Design ist natürlich
+euch überlassen!
+
+Die Scrollbar soll in das ComboBoxSet eingefügt werden ungefähr so wie in dem 
+beigelegtem Set. Die Elemente bitte auch in der Anordnung.
+Die Buttons werden nicht benötigt, also braucht ihr auch keine zeichnen.
+
+Gut wäre wenn die Maße der Scrollbar im Set ca. 300x60 wären!
+
+Desweiteren brauche ich noch eine Scrollbar fürs Profilmenü, entweder die Gleiche oder eine neue!

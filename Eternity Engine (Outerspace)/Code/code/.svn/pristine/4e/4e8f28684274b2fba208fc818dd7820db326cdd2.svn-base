@@ -1,0 +1,87 @@
+#include "CIngameState.hpp"
+#include "CGameStateManager.hpp"
+#include "CUserInterface.hpp"
+
+#include "CDialogitem.hpp"
+
+#include <string>
+#include "CProfile.hpp"
+
+															ety::CIngameState::CIngameState					( const std::string& strStateName )
+																: CDialogGameState		( strStateName )
+															{
+															}
+															ety::CIngameState::~CIngameState				( void )
+															{
+															}
+
+		void												ety::CIngameState::on_Enter						( ety::CRessourceManager* const p_c_etyCurrentRessourceManager, ety::CGamesettings* const p_c_etyCurrentGamesettingManager )
+		{
+			ety::CMouse::set_CustomCursorSprite( p_c_etyCurrentRessourceManager->get_Texture( "Crosshair.png" ),true );
+
+			gp_c_etyWorld->set_ItemManagement	( get_GameStatemanager()->m_c_etyAttributes.get_Attribute<ety::CItemManagement>("p_c_etyCurrentItemManagement") )
+						 ->set_Gamesettings		( p_c_etyCurrentGamesettingManager )
+						 ->set_RessourceManager	( p_c_etyCurrentRessourceManager );
+
+			gp_c_etyWorld->load_World( *get_GameStatemanager()->m_c_etyAttributes.get_Attribute<ety::CETYProfile>("p_c_etyCurrentProfile")->m_c_etyAttributes.get_Attribute<std::string>("strCurrentWorld") , "Initialisation/Worlds/" );
+
+			CLua* const p_c_etyLuaScript = get_GameStatemanager()->get_LuaScript();
+
+			p_c_etyLuaScript->init_Lua();
+
+			ety::CWorld::register_ClassToLuabind( p_c_etyLuaScript );
+
+							luabind::globals( p_c_etyLuaScript->get_LuaState() )["c_etyWorld"]	= gp_c_etyWorld;
+				luabind::globals( p_c_etyLuaScript->get_LuaState() )["c_etyEntitymanager"]		= gp_c_etyWorld->get_Entitymanager();
+
+			p_c_etyLuaScript->start_Script( "Initialisation/Worlds/" + gp_c_etyWorld->get_Name() + ".lua" );
+
+			p_c_etyLuaScript->close_Lua();
+
+			mp_c_etyUserInterface	=	new CUserInterface(this);
+			mp_c_etyUserInterface->init_UserInterface(p_c_etyCurrentRessourceManager, p_c_etyCurrentGamesettingManager);
+		}
+		void												ety::CIngameState::on_Exit						( ety::CRessourceManager* const p_c_etyCurrentRessourceManager, ety::CGamesettings* const p_c_etyCurrentGamesettingManager )
+		{
+			ety::CMouse::set_CustomCursorSprite( p_c_etyCurrentRessourceManager->get_Texture( "Cursor.png" ), false );
+
+			gp_c_etyWorld->delete_Singleton();
+		}
+
+		void												ety::CIngameState::init_GameState				( ety::CRessourceManager* const p_c_etyCurrentRessourceManager, ety::CGamesettings* const p_c_etyCurrentGamesettingManager )
+		{
+		}
+
+		void												ety::CIngameState::update_GameState				( const sf::Uint32& uiFrameTime )
+		{
+			CDialogGameState::update_GameState( uiFrameTime );
+
+			gp_c_etyWorld->update_World( uiFrameTime );
+		}
+
+		void												ety::CIngameState::render_GameState				( sf::RenderTexture* const p_c_sfRenderTextureGameScene )
+		{
+			gp_c_etyWorld->render_World( p_c_sfRenderTextureGameScene );
+
+			CDialogGameState::render_GameState( p_c_sfRenderTextureGameScene );
+		}
+
+const	ety::GameStateRunning::en_etyGameStateRunning		ety::CIngameState::handle_GameStateEvents		( const sf::Event& sfEventLastEvent  )
+		{
+			if( sfEventLastEvent.type == sf::Event::KeyReleased && sfEventLastEvent.key.code == sf::Keyboard::Escape )
+			{
+				get_GameStatemanager()->pushback_GameState( "SpaceStationState" );
+				get_GameStatemanager()->pushback_GameState( "SpaceStationHangarState", ety::GamestateStatus::enBACKGROUND );
+
+				return ety::GameStateRunning::enFALSE;
+			}
+
+			//Die Anzahl der Bilder in der Sekunde anzeigen an-/ausschalten.
+			if( sfEventLastEvent.type == sf::Event::KeyReleased && sfEventLastEvent.key.code == sf::Keyboard::F2 )
+			{
+				gp_c_etyWorld->set_CollisionRenderStatus( !gp_c_etyWorld->get_CollisionRenderStatus() );
+			}
+
+			return ety::GameStateRunning::enTRUE;
+		}
+

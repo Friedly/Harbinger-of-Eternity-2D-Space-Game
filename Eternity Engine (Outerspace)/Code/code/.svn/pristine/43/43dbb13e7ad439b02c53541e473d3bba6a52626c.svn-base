@@ -1,0 +1,194 @@
+#include "CItemModulesComponent.hpp"
+#include "CEntity.hpp"
+#include "CAttributeComponent.hpp"
+#include "CLua.hpp"
+
+#include "CAmmunitionDump.hpp"
+#include "CShield.hpp"
+#include "CEngine.hpp"
+#include "CArmor.hpp"
+#include "CGenerator.hpp"
+#include "CProjectileWeapon.hpp"
+#include "CRocketLauncher.hpp"
+#include "CLaserWeapon.hpp"
+
+
+																	ety::CItemModulesComponent::CItemModulesComponent		( const std::string& c_stdStringEntityKey )
+																	{
+																		ety::CLua c_etyLuaScript;
+
+																		c_etyLuaScript.init_Lua();
+																			
+																		luabind::module( c_etyLuaScript.get_LuaState() )
+																		[ 
+																			luabind::class_<ety::CItemModulesComponent>("CItemModulesComponent")
+																			.def( "create_Module", &ety::CItemModulesComponent::create_Module	)
+																		];
+																			
+																		c_etyLuaScript.start_Script("Initialisation/Entities/Entities.lua");
+																			
+																		luabind::globals( c_etyLuaScript.get_LuaState() )["c_etyItemModulesComponent"]	= this;
+
+																		if( c_etyLuaScript.call_Function( c_stdStringEntityKey, 0, 0 ) == false )
+																		{
+																		}
+																			
+																		c_etyLuaScript.close_Lua();
+																	}
+																	ety::CItemModulesComponent::~CItemModulesComponent		( void )
+																		{
+																		}
+
+const		bool													ety::CItemModulesComponent::call_ItemScript				( const std::string& c_stdStringTemplate, ety::CItemManagement* const p_c_etyItemManagement )
+			{
+				ety::CLua c_etyLuaScript;
+
+				c_etyLuaScript.init_Lua();
+																			
+				luabind::module( c_etyLuaScript.get_LuaState() )
+				[ 
+					luabind::class_<ety::CItemModulesComponent>("CItemModulesComponent")
+					.def( "create_Module"	, &ety::CItemModulesComponent::create_Module	)
+					.def( "set_ItemToModule", &ety::CItemModulesComponent::set_ItemToModule ),
+
+					luabind::class_<ety::CItemManagement>("CItemManagement")
+					.def( "get_Item", &ety::CItemManagement::get_Item ),
+
+					luabind::class_<ety::CItem>("CItem")
+				];
+																																	
+				luabind::globals( c_etyLuaScript.get_LuaState() )["c_etyItemModulesComponent"]	= this;
+				luabind::globals( c_etyLuaScript.get_LuaState() )["c_etyItemManagement"]		= p_c_etyItemManagement;
+
+				if( c_etyLuaScript.start_Script("Initialisation/Entities/Templates.lua") == false )
+				{
+					return false;
+				}
+
+				if( c_etyLuaScript.call_Function( c_stdStringTemplate, 0, 0 ) == false )
+				{
+					return false;
+				}
+																			
+				c_etyLuaScript.close_Lua();
+				
+				return true;
+			}
+
+const		bool													ety::CItemModulesComponent::create_Module				( const std::string& c_stdStringModuleID, const sf::Vector2f& c_sfVectorPosition, const sf::Vector2i& c_sfVectorClassRange, const ety::ModuleType::en_etyModuleType en_etyModuleType )
+			{
+				std::map< std::string, boost::shared_ptr<ety::CModule> >	::iterator itModuleByModuleID =	m_c_stdMapModuleByModuleID.find( c_stdStringModuleID );
+
+				if( itModuleByModuleID != m_c_stdMapModuleByModuleID.end() )
+				{
+					return false;
+				}
+
+				m_c_stdMapModuleByModuleID[ c_stdStringModuleID ] = boost::shared_ptr<ety::CModule>( new ety::CModule( en_etyModuleType, c_sfVectorClassRange, c_sfVectorPosition ) );
+
+				return true;
+			}
+
+			void													ety::CItemModulesComponent::update_Component			( const sf::Uint32& uiFrameTime )
+			{
+			}
+
+			void													ety::CItemModulesComponent::render_Component			( sf::RenderTexture* const p_c_sfRenderTextureGameScene )
+			{
+			}
+
+const		bool													ety::CItemModulesComponent::set_ItemToModule			( const std::string& c_stdStringModuleID, ety::CItem* const p_c_etyItem )
+			{
+				if( p_c_etyItem != NULL )
+				{ 
+					std::map< std::string, boost::shared_ptr<ety::CModule> >	::iterator itModuleByModuleID =	m_c_stdMapModuleByModuleID.find( c_stdStringModuleID );
+
+					if( itModuleByModuleID != m_c_stdMapModuleByModuleID.end() )
+					{
+						if( itModuleByModuleID->second->set_Item( p_c_etyItem ) == true )
+						{
+							ety::CAttributeComponent* p_c_etyAttributeComponent = get_Owner()->get_Component<ety::CAttributeComponent>("AttributeComponent");
+
+							if( p_c_etyAttributeComponent != NULL )
+							{
+								const float fNewMass = *p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<float>( "fMass" ) + p_c_etyItem->get_Mass();
+								
+								p_c_etyAttributeComponent->m_c_etyAttributes.change_Attribute<float>( "fMass", new float( fNewMass ) , true );
+
+								if( p_c_etyItem->get_ItemType() == ety::ModuleType::enAMMUNITIONDUMP )
+								{
+								}
+								else if( p_c_etyItem->get_ItemType() == ety::ModuleType::enARMOR )
+								{
+								}
+								else if( p_c_etyItem->get_ItemType() == ety::ModuleType::enENGINE )
+								{
+									const float	fNewThrust				= *p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<float>( "fThrust")			+ static_cast<ety::CEngine*>(p_c_etyItem)->get_Thrust();
+									const float	fNewEnergyPerSecond		= *p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<float>( "fEnergyPerSecond")	+ static_cast<ety::CEngine*>(p_c_etyItem)->get_EnergyPerSecond();
+									const float	fNewMaximalVelocity		= *p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<float>( "fMaximalVelocity")	+ static_cast<ety::CEngine*>(p_c_etyItem)->get_MaximalVelocity();
+
+									p_c_etyAttributeComponent->m_c_etyAttributes.change_Attribute<float>("fThrust"			, new float( fNewThrust )			, true );
+									p_c_etyAttributeComponent->m_c_etyAttributes.change_Attribute<float>("fMaximalVelocity"	, new float( fNewMaximalVelocity)	, true );
+									p_c_etyAttributeComponent->m_c_etyAttributes.change_Attribute<float>("fEnergyPerSecond"	, new float( fNewEnergyPerSecond )	, true );
+								}
+								else if( p_c_etyItem->get_ItemType() == ety::ModuleType::enGENERATOR )
+								{
+								}
+								else if( p_c_etyItem->get_ItemType() == ety::ModuleType::enLASERWEAPON )
+								{
+								}
+								else if( p_c_etyItem->get_ItemType() == ety::ModuleType::enPROJECTILEWEAPON )
+								{
+								}
+								else if( p_c_etyItem->get_ItemType() == ety::ModuleType::enROCKETLAUNCHER )
+								{
+								}
+								else if( p_c_etyItem->get_ItemType() == ety::ModuleType::enSHIELD )
+								{
+								}
+
+								const float fThrust = *p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<float>( "fThrust");
+								const float fNewAcceleration = fThrust / *p_c_etyAttributeComponent->m_c_etyAttributes.get_Attribute<float>( "fMass" );
+
+								p_c_etyAttributeComponent->m_c_etyAttributes.change_Attribute<float>( "fAcceleration", new float( fNewAcceleration ), true );
+							}
+						}
+
+						return true;
+					}
+				}
+
+				return false;
+			}
+								
+			ety::CItem*								const			ety::CItemModulesComponent::get_ItemFromModule			( const std::string& c_stdStringModuleID )
+			{
+				std::map< std::string, boost::shared_ptr<ety::CModule> >	::iterator itModuleByModuleID =	m_c_stdMapModuleByModuleID.find( c_stdStringModuleID );
+
+				if( itModuleByModuleID != m_c_stdMapModuleByModuleID.end() )
+				{
+					return itModuleByModuleID->second->get_Item();
+				}
+
+				return NULL;
+			}
+			boost::weak_ptr<ety::CModule>							ety::CItemModulesComponent::get_Module					( const std::string& c_stdStringModuleID )
+			{
+				std::map< std::string, boost::shared_ptr<ety::CModule> >	::iterator itModuleByModuleID =	m_c_stdMapModuleByModuleID.find( c_stdStringModuleID );
+
+				if( itModuleByModuleID != m_c_stdMapModuleByModuleID.end() )
+				{
+					return itModuleByModuleID->second;
+				}
+
+				return boost::weak_ptr<ety::CModule>();
+			}
+
+const		std::string												ety::CItemModulesComponent::get_FamilyID				( void )
+			{
+				return "ItemModulesComponent";
+			}
+const		std::string												ety::CItemModulesComponent::get_ComponentID				( void )
+			{
+				return "ItemModulesComponent";
+			}

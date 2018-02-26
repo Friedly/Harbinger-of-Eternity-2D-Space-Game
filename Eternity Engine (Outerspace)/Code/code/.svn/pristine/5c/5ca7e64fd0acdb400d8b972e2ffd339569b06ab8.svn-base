@@ -1,0 +1,1055 @@
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////								CDIALOG.CPP									///////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+#pragma once
+
+//Eternity Includes
+#include "CDialog.hpp"
+#include "CDialogitem.hpp"
+#include "CButton.hpp"
+#include "CCheckbox.hpp"
+#include "CComboBox.hpp"
+#include "CEditControl.hpp"
+#include "CLabel.hpp"
+#include "CPictureControl.hpp"
+#include "CScrollbar.hpp"
+#include "CSlideControl.hpp"
+#include "CTextBox.hpp"
+
+
+
+
+
+
+
+								ety::CDialog::CDialog							( void )
+								:m_bVisibility									(false)
+								,m_bActive										(false)
+								,m_strDialogID									("")
+								,m_fHeight										(0)
+								,m_fWidth										(0)
+								,m_c_sfSpriteBackgroundSprite					()
+								,mp_c_etyDialogManager							(NULL)
+								,mp_c_etyButtonTooltip							(NULL)
+{
+	m_c_sfVector2fPosition = sf::Vector2f(0,0);
+	m_c_sfVector2fRealPosition = sf::Vector2f(0,0);
+}
+
+								ety::CDialog::~CDialog							( void )
+{
+
+	//Bevor die Klasse gelöscht wird, müssen erst alle Dialogitems des Dialogs ordnungsgemäß gelöscht werden, da er diese nur als Zeiger verwaltet
+	for(std::list<CDialogitem*>::iterator itDialogitem = m_listDialogitems.begin(); itDialogitem != m_listDialogitems.end(); itDialogitem = m_listDialogitems.begin())
+	{
+		if((*itDialogitem) != NULL)
+		{
+			delete (*itDialogitem);
+			(*itDialogitem) = NULL;
+		}
+
+		m_listDialogitems.pop_front();
+	}
+
+	m_listDialogitems.clear();
+}
+
+
+								ety::CDialog::CDialog							( std::string strCustomID, const sf::Texture& c_sfTextureBackgroundSprite, float fWidth, float fHeight, 
+																				  sf::Vector2f c_sfVector2fPosition, sf::IntRect c_sfIntRectSubRect, CDialogManager* p_c_etyDialogManager, 
+																				  const sf::VideoMode& c_sfCurrentVideoMode
+																				)
+								:m_bVisibility									(true)
+								,m_bActive										(true)
+								,m_bAnchorCentered								(false)
+								,m_en_etyAnchor									(Anchor::enTOPLEFT)
+								,m_strDialogID									(strCustomID)	
+								,m_c_sfIntRectSubRect							(c_sfIntRectSubRect)
+								,m_c_sfVector2fPosition							(c_sfVector2fPosition)
+								,m_uiDrawPosition								(0)
+								,m_en_etyAffinity								(Affinity::enSTANDARD)
+								,mp_c_etyDialogManager							(NULL)
+								,mp_c_etyButtonTooltip							(NULL)
+{
+	m_c_sfVideoMode					=	c_sfCurrentVideoMode;
+
+	m_fWidth						=	m_c_sfVideoMode.width*float(fWidth/1680.f);
+	m_fHeight						=	m_c_sfVideoMode.height*float(fHeight/1050.f);
+
+	m_c_sfVector2fPosition.x = m_c_sfVideoMode.width*float(c_sfVector2fPosition.x/1680.f);
+	m_c_sfVector2fPosition.y = m_c_sfVideoMode.height*float(c_sfVector2fPosition.y/1050.f);
+
+	m_c_sfSpriteBackgroundSprite.setTexture(c_sfTextureBackgroundSprite);
+
+	m_c_sfSpriteBackgroundSprite.setTextureRect(c_sfIntRectSubRect);
+	m_c_sfSpriteBackgroundSprite.setScale(m_fWidth/m_c_sfSpriteBackgroundSprite.getLocalBounds().width,m_fHeight/m_c_sfSpriteBackgroundSprite.getLocalBounds().height);
+
+	set_Dialogmanager(p_c_etyDialogManager);
+
+	m_bModal = false;
+}
+							
+
+
+bool							ety::CDialog::add_ChildrenDialogitem			( CDialogitem* const p_c_etyDialogitemChildren)
+{
+	if(p_c_etyDialogitemChildren->get_AttachedType() == AttachedType::enCHILDREN 
+		&& p_c_etyDialogitemChildren->get_ParentDialogitem()->get_ParentDialog() == this)
+	{
+		add_Dialogitem(p_c_etyDialogitemChildren, true);
+	}
+
+	return false;
+}
+
+bool							ety::CDialog::add_Dialogitem					( CDialogitem* const p_c_DialogitemNewDialogitem, bool bNewDialogitem )
+{
+	//Die Dialogitems sind in der List so sortiert, wie sie später gezeichnet werden sollen.
+	//Die Dialogitems die zuerst gezeichnet werden, also dann im "Hintergrund" liegen, sind ganz zu Beginn der Liste.
+	//Wenn man alle Dialogitems über einander zeichnen würde, wäre das letzte Dialogitem in der Liste, das was zu letzt gezeichnet wird und sichtbar ist!
+	//Es wird nach folgendem Muster sortiert:
+	//Die Dialogitems mit der Affinität enBACKGROUND sind ganz vorne in der Liste, aufsteigend geordnet nach ihrer DrawPosition.
+	//Danach folgen die Dialogitems mit der Affinität enSTANDARD, auch wieder aufsteigend geordnet nach ihrer DrawPosition.
+	//Ganz hinten in der Liste sind die Dialogitems mit der Affinität enFOREGROUND, welche nach ihrer DrawPosition absteigend geordnet sind.
+
+	//Sollte nur die DrawPosition oder die Affinity geändert worden sein, muss darauf geachtet werden, dass das Dialogitem nicht doppelt in die Liste geschrieben wird!
+	if(bNewDialogitem == false)
+	{
+		//Um zu verhindern, dass Children-Dialogitems oder Dialogitems, welche nicht zu dem Dialog gehören dem Dialog hinzugefügt werden, erfolgt noch diese Abfrage.
+		if(p_c_DialogitemNewDialogitem->get_ParentDialog() != this || p_c_DialogitemNewDialogitem->get_AttachedType() == AttachedType::enCHILDREN)
+		{
+			return false;
+		}
+
+		std::list<CDialogitem*>::iterator itDialogitems = m_listDialogitems.begin();
+
+		//An dieser Stelle wird das Dialogitem herausgefiltert und aus der Liste entfernt, damit es beim erneuten Einfügen nicht doppelt in der Liste steht
+		for(itDialogitems ; itDialogitems != m_listDialogitems.end() ; itDialogitems++)
+		{
+			if((*itDialogitems) == p_c_DialogitemNewDialogitem)
+			{
+				m_listDialogitems.erase(itDialogitems);
+				break;
+			}
+		}
+	}
+
+
+	//Bei einer leeren Liste kann das Dialogitem sofort eingefügt werden
+	if(m_listDialogitems.empty() == true)
+	{
+		
+		m_listDialogitems.push_front(p_c_DialogitemNewDialogitem);
+		return true;
+	}
+
+
+	//Einfügen in den Backgroundbereich
+	if(p_c_DialogitemNewDialogitem->get_Affinity() == Affinity::enBACKGROUND)
+	{
+		std::list<CDialogitem*>::iterator itDialogitems = m_listDialogitems.begin();
+
+		for(itDialogitems ; itDialogitems != m_listDialogitems.end() ; itDialogitems++)
+		{
+			if((*itDialogitems)->get_Affinity() == Affinity::enBACKGROUND && (*itDialogitems)->get_DrawPosition() >= p_c_DialogitemNewDialogitem->get_DrawPosition())
+			{
+				m_listDialogitems.insert(itDialogitems,p_c_DialogitemNewDialogitem);
+				return true;
+			}
+			else if((*itDialogitems)->get_Affinity() != Affinity::enBACKGROUND)
+			{
+				m_listDialogitems.insert(itDialogitems,p_c_DialogitemNewDialogitem);
+				return true;
+			}
+		}
+
+		m_listDialogitems.push_back(p_c_DialogitemNewDialogitem);
+		return true;
+	}
+	//Einfügen in den Foregroundbereich
+	else if(p_c_DialogitemNewDialogitem->get_Affinity() == Affinity::enFOREGROUND)
+	{
+		std::list<CDialogitem*>::iterator itDialogitems = m_listDialogitems.end();
+
+		while(1)
+		{
+			itDialogitems--;
+
+			if((*itDialogitems)->get_Affinity() == Affinity::enFOREGROUND && (*itDialogitems)->get_DrawPosition() > p_c_DialogitemNewDialogitem->get_DrawPosition())
+			{
+				itDialogitems++;
+				if(itDialogitems != m_listDialogitems.end())
+				{
+					m_listDialogitems.insert(itDialogitems,p_c_DialogitemNewDialogitem);
+					return true;
+				}
+				else
+				{
+					m_listDialogitems.push_back(p_c_DialogitemNewDialogitem);
+					return true;
+				}		
+			}
+			else if((*itDialogitems)->get_Affinity() != Affinity::enFOREGROUND)
+			{
+				itDialogitems++;
+				if(itDialogitems != m_listDialogitems.end())
+				{
+					m_listDialogitems.insert(itDialogitems,p_c_DialogitemNewDialogitem);
+					return true;
+				}
+				else
+				{
+					m_listDialogitems.push_back(p_c_DialogitemNewDialogitem);
+					return true;
+				}
+			}
+
+			if(itDialogitems == m_listDialogitems.begin())
+			{
+				m_listDialogitems.push_front(p_c_DialogitemNewDialogitem);
+				return true;
+			}
+		}
+	}
+	//Einfügen in den Standardbereich
+	else if(p_c_DialogitemNewDialogitem->get_Affinity() == Affinity::enSTANDARD)
+	{
+		std::list<CDialogitem*>::iterator itDialogitems = m_listDialogitems.begin();
+
+		while((*itDialogitems)->get_Affinity() == Affinity::enBACKGROUND)
+		{
+			itDialogitems++;
+			if(itDialogitems == m_listDialogitems.end())
+			{
+				m_listDialogitems.push_back(p_c_DialogitemNewDialogitem);
+				return true;
+			}
+		}
+
+		while((*itDialogitems)->get_DrawPosition() < p_c_DialogitemNewDialogitem->get_DrawPosition() && (*itDialogitems)->get_Affinity() != Affinity::enFOREGROUND)
+		{
+			itDialogitems++;
+			if(itDialogitems == m_listDialogitems.end())
+			{
+				m_listDialogitems.push_back(p_c_DialogitemNewDialogitem);
+				return true;
+			}
+		}
+
+		m_listDialogitems.insert(itDialogitems,p_c_DialogitemNewDialogitem);
+		return true;
+	}
+
+	return false;
+}
+
+void							ety::CDialog::adjust_SizeToResolution			( const sf::VideoMode& c_sfVideoModeNewSettings )
+{
+	m_fWidth	=	m_fWidth * (float(c_sfVideoModeNewSettings.width)/float(m_c_sfVideoMode.width));
+	m_fHeight	=	m_fHeight * (float(c_sfVideoModeNewSettings.height)/float(m_c_sfVideoMode.height));
+
+	m_c_sfVector2fPosition.x	=	m_c_sfVector2fPosition.x * (float(c_sfVideoModeNewSettings.width)/float(m_c_sfVideoMode.width));
+	m_c_sfVector2fPosition.y	=	m_c_sfVector2fPosition.y * (float(c_sfVideoModeNewSettings.height)/float(m_c_sfVideoMode.height));
+
+	std::list<CDialogitem*>::iterator itDialogitems = m_listDialogitems.begin();
+
+	for(itDialogitems ; itDialogitems != m_listDialogitems.end() ; itDialogitems++)
+	{
+		(*itDialogitems)->adjust_SizeToResolution(c_sfVideoModeNewSettings, m_c_sfVideoMode);
+	}
+
+	m_c_sfVideoMode				=	c_sfVideoModeNewSettings;
+
+	update_Dialog(0);
+}
+
+bool							ety::CDialog::check_MouseCoordinates			(void)
+{
+	if(m_bVisibility == true)
+	{
+		sf::Vector2i c_sfVector2iMouseCoordinates = ety::CMouse::get_Position();
+
+		if(c_sfVector2iMouseCoordinates.x >= m_c_sfVector2fRealPosition.x && c_sfVector2iMouseCoordinates.x <= m_c_sfVector2fRealPosition.x + m_fWidth && c_sfVector2iMouseCoordinates.y >= m_c_sfVector2fRealPosition.y && c_sfVector2iMouseCoordinates.y <= m_c_sfVector2fRealPosition.y + m_fHeight)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void							ety::CDialog::createDialogitem_Button			( 
+																				  std::string strCustomID, const sf::Texture& c_sfTextureButtonSet, 
+																				  float fWidth, float fHeight, sf::Vector2f c_sfVector2fPosition, 
+																				  sf::IntRect c_sfIntRectButtonSubRect
+																				)
+{
+	//Ein neuer Button wird angelegt
+	CButton* p_c_etyNewButton					= NULL;
+	p_c_etyNewButton							= new CButton (strCustomID, c_sfTextureButtonSet, fWidth, fHeight, c_sfVector2fPosition, c_sfIntRectButtonSubRect, NULL, this);
+	
+	//Und dem Dialog hinzugefügt
+	add_Dialogitem(p_c_etyNewButton, true);
+}
+
+void							ety::CDialog::createDialogitem_Checkbox			( 
+																				  std::string strCustomID, const sf::Texture& c_sfTextureCheckboxSet, bool bStatus_checked, float fWidth, 
+																				  float fHeight, sf::Vector2f c_sfVector2fPosition, sf::IntRect c_sfIntRectCheckbocSubRect
+																				)
+{
+	//Eine neue Checkbox wird angelegt
+	CCheckbox* p_c_etyNewCheckbox				= NULL;
+	p_c_etyNewCheckbox							= new CCheckbox( strCustomID, c_sfTextureCheckboxSet, bStatus_checked, fWidth, fHeight, c_sfVector2fPosition, c_sfIntRectCheckbocSubRect, 
+																  NULL, this);
+
+	//Und dem Dialog hinzugefügt
+	add_Dialogitem(p_c_etyNewCheckbox, true);
+}
+
+void							ety::CDialog::createDialogitem_ComboBox			( 
+																				  std::string strCustomID, const sf::Texture& c_sfTextureComboBoxTexture, float fWidth, float fHeight, 
+																				  sf::Vector2f c_sfVector2fPosition, sf::IntRect c_sfIntRectComboBoxSubRect, ety::Color c_etyColorTextcolor, 
+																				  ety::Color c_etyColorTextcolor_Highlighted, unsigned int uiTextCharactersize, 
+																				  float fScrollbarSizePercent
+																				)
+{
+	//Eine neue ComboBox wird angelegt
+	CComboBox* p_c_etyNewComboBox				= NULL;
+	p_c_etyNewComboBox							= new CComboBox( true, strCustomID, c_sfTextureComboBoxTexture, fWidth, fHeight, c_sfVector2fPosition, c_sfIntRectComboBoxSubRect, 
+																 c_etyColorTextcolor, c_etyColorTextcolor_Highlighted, uiTextCharactersize, NULL, this, fScrollbarSizePercent);
+
+	//Und dem Dialog hinzugefügt
+	add_Dialogitem(p_c_etyNewComboBox, true);
+}
+
+void							ety::CDialog::createDialogitem_EditControl		( 
+																				  std::string strCustomID, const sf::Texture& c_sfTextureBackgroundSprite, 
+																				  bool bDeleteContentbyFirstFocus, float fWidth, float fHeight, sf::Vector2f c_sfVector2fPosition, 
+																				  sf::IntRect c_sfIntRectSubRect, std::string strContent, float fCharactersize, 
+																				  ety::Color c_etyColorTextcolor
+																				)
+{
+	//Ein neues EditControl wird angelegt
+	CEditControl* p_c_etyNewEditControl			= NULL;
+	p_c_etyNewEditControl						= new CEditControl (strCustomID, c_sfTextureBackgroundSprite, bDeleteContentbyFirstFocus, fWidth, fHeight, c_sfVector2fPosition, 
+																	c_sfIntRectSubRect, strContent, fCharactersize, c_etyColorTextcolor, NULL, this);
+
+
+	//Und dem Dialog hinzugefügt
+	add_Dialogitem(p_c_etyNewEditControl, true);
+}
+
+void							ety::CDialog::createDialogitem_Label			( 
+																				  std::string strCustomID, std::string strContent, float fCharactersize, 
+																				  ety::Color c_etyColorTextcolor, sf::Vector2f c_sfVector2fPosition 
+																				)
+{
+	//Eine neues Label wird angelegt
+	CLabel* p_c_etyNewLabel						= NULL;
+	p_c_etyNewLabel								= new CLabel(strCustomID, strContent, fCharactersize, c_etyColorTextcolor, 
+															 c_sfVector2fPosition, NULL, this );
+
+	//Und dem Dialog hinzugefügt
+	add_Dialogitem(p_c_etyNewLabel, true);
+}
+
+
+void							ety::CDialog::createDialogitem_ListBox			( 
+																				  std::string strCustomID, const sf::Texture& c_sfTextureComboBoxTexture, float fWidth, float fHeight, 
+																				  sf::Vector2f c_sfVector2fPosition, sf::IntRect c_sfIntRectComboBoxSubRect, ety::Color c_etyColorTextcolor,
+																				  ety::Color c_etyColorTextcolor_Highlighted, unsigned int uiTextCharactersize, 
+																				  float fScrollbarSizePercent, unsigned int uiListBoxEntrySubRectSize
+																				)
+{
+	//Eine neue ComboBox wird angelegt
+	CComboBox* p_c_etyNewComboBox				= NULL;
+	p_c_etyNewComboBox							= new CComboBox( false, strCustomID, c_sfTextureComboBoxTexture, fWidth, fHeight, c_sfVector2fPosition, c_sfIntRectComboBoxSubRect, 
+																 c_etyColorTextcolor, c_etyColorTextcolor_Highlighted, uiTextCharactersize, NULL, this,
+																 fScrollbarSizePercent, uiListBoxEntrySubRectSize);
+
+	//Und dem Dialog hinzugefügt
+	add_Dialogitem(p_c_etyNewComboBox, true);
+}
+
+void							ety::CDialog::createDialogitem_PictureControl	( std::string strCustomID, const sf::Texture& c_sfTexturePictureSprite,  float fWidth, float fHeight, 
+																				  sf::Vector2f c_sfVector2fPosition, sf::IntRect c_sfIntRectPictureSubRect
+																				)
+{
+	//Ein neues PictureControl wird angelegt
+	CPictureControl* p_c_etyNewPictureControl	= NULL;
+	p_c_etyNewPictureControl					= new CPictureControl( strCustomID, c_sfTexturePictureSprite, fWidth, fHeight, 
+																		c_sfVector2fPosition, c_sfIntRectPictureSubRect, NULL, this);
+
+	//Und dem Dialog hinzugefügt
+	add_Dialogitem(p_c_etyNewPictureControl, true);
+}
+
+void							ety::CDialog::createDialogitem_Scrollbar		(  
+																				  std::string strCustomID, const sf::Texture& p_c_sfTextureScrollbarSprite, float fWidth, 
+																				  float fHeight, sf::Vector2f c_sfVector2fPosition, sf::IntRect c_sfIntRectScrollbarSubRect,
+																				  CDialogitem* p_c_etyDialogitemParent, CDialog* p_c_etyDialogParentDialog
+																				)
+{
+	//Eine neue Scrollbar wird angelegt
+	CScrollbar* p_c_etyNewScrollbar				= NULL;
+	p_c_etyNewScrollbar							= new CScrollbar ( strCustomID, p_c_sfTextureScrollbarSprite, fWidth, fHeight, c_sfVector2fPosition, c_sfIntRectScrollbarSubRect,
+																   NULL, this);
+	
+	//Und dem Dialog hinzugefügt
+	add_Dialogitem(p_c_etyNewScrollbar, true);
+}
+
+void							ety::CDialog::createDialogitem_SlideControl		( 
+																				  std::string strCustomID, const sf::Texture& c_sfTextureBackgroundTexture, float fWidth, 
+																				  float fHeight, sf::Vector2f c_sfVector2fPosition,sf::Vector2f c_sfVector2fValueRange, 
+																				  float fStartValue, sf::IntRect c_sfIntRectBackgroundSubRect
+																				)
+{
+	//Ein neues SlideControl wird angelegt
+	CSlideControl* p_c_etyNewSlideControl	= NULL;
+	p_c_etyNewSlideControl					= new CSlideControl(
+																 strCustomID, c_sfTextureBackgroundTexture, fWidth, fHeight, c_sfVector2fPosition, c_sfVector2fValueRange, 
+																 fStartValue, c_sfIntRectBackgroundSubRect, NULL, this
+															   );
+
+	//Und dem Dialog hinzugefügt
+	add_Dialogitem(p_c_etyNewSlideControl, true);
+}
+
+
+void							ety::CDialog::createDialogitem_TextBox		    ( 
+																				  std::string strCustomID
+																				)
+{
+	//Eine neue TextBox wird angelegt
+	CTextBox* p_c_etyNewTextBox	= NULL;
+	p_c_etyNewTextBox					= new CTextBox			(
+																 
+															    );
+	//und dem Dialog hinzugefügt
+	add_Dialogitem(p_c_etyNewTextBox, true);
+}
+
+void							ety::CDialog::createDialogitem_TextButton		( 
+																				  std::string strCustomID, sf::Vector2f c_sfVector2fPosition, std::string strContent, float fCharactersize, 
+																				  ety::Color c_etyColorTextcolor, ety::Color c_etyColorCaptionColor_highlighted
+																				)
+{
+	//Ein neuer Button wird angelegt
+	CButton* p_c_etyNewButton					= NULL;
+	p_c_etyNewButton							= new CButton (strCustomID, c_sfVector2fPosition, strContent, fCharactersize, c_etyColorTextcolor, c_etyColorCaptionColor_highlighted, NULL, 
+															   this);
+	
+	//Und dem Dialog hinzugefügt
+	add_Dialogitem(p_c_etyNewButton, true);
+}
+
+
+bool							ety::CDialog::delete_Dialogitem					( CDialogitem* p_c_etyDialogitemToDelete)
+{
+	std::list<CDialogitem*>::iterator itDialogitem = m_listDialogitems.begin();
+
+	for(itDialogitem ; itDialogitem != m_listDialogitems.end() ; itDialogitem++)
+	{
+		if((*itDialogitem) == p_c_etyDialogitemToDelete)
+		{
+			CDialogitem* p_c_etyDialogitemDeletePointer = (*itDialogitem);
+			m_listDialogitems.erase(itDialogitem);
+
+			p_c_etyDialogitemDeletePointer->set_Focus(false);
+
+			delete p_c_etyDialogitemDeletePointer;
+			p_c_etyDialogitemDeletePointer = NULL;
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool							ety::CDialog::delete_DialogitemByCustomID		( std::string strCustomID )
+{
+	//Es wird das gewünschte Dialogitem über seine CustomID heraus gesucht und von der Liste entfernt und das Objekt gelöscht
+	for(std::list<CDialogitem*>::iterator itDialogitem = m_listDialogitems.begin() ; itDialogitem != m_listDialogitems.end() ; itDialogitem++)
+	{
+		if((*itDialogitem)->get_CustomID()	==	strCustomID)
+		{
+			if((*itDialogitem) != NULL)
+			{
+				(*itDialogitem)->set_Focus(false);
+
+				delete (*itDialogitem);
+				(*itDialogitem) = NULL;
+			}
+
+			m_listDialogitems.erase(itDialogitem);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void							ety::CDialog::draw_Dialogitems					( sf::RenderTexture* p_c_sfRenderTextureBuffer )
+{
+	for(std::list<CDialogitem*>::iterator itDialogitem = m_listDialogitems.begin(); itDialogitem != m_listDialogitems.end(); itDialogitem++)
+	{
+		(*itDialogitem)->draw_Dialogitem(p_c_sfRenderTextureBuffer);
+	}
+
+	if(mp_c_etyButtonTooltip != NULL)
+	{
+		CPictureControl*	p_c_etyPictureControlBackground	=	mp_c_etyButtonTooltip->get_TooltipBackground();
+		CLabel*				p_c_etyLabelText				=	mp_c_etyButtonTooltip->get_TooltipLabel();
+
+		if(p_c_etyPictureControlBackground != NULL && p_c_etyLabelText != NULL)
+		{
+			sf::Vector2f	c_sfVectorfPositionEdit		=	sf::Vector2f(CMouse::get_CustomCursorSprite().getGlobalBounds().width, CMouse::get_CustomCursorSprite().getGlobalBounds().height);
+			sf::Vector2f	c_sfVector2fMousePosition	=	sf::Vector2f(CMouse::get_Position().x, CMouse::get_Position().y + c_sfVectorfPositionEdit.y);
+
+			p_c_etyPictureControlBackground->set_RealPosition(c_sfVector2fMousePosition);
+			p_c_etyLabelText->update_Dialogitem(0);
+
+			p_c_etyPictureControlBackground->draw_Dialogitem(p_c_sfRenderTextureBuffer);
+			p_c_etyLabelText->draw_Dialogitem(p_c_sfRenderTextureBuffer);
+		}
+
+		mp_c_etyButtonTooltip = NULL;
+	}
+}
+
+
+void							ety::CDialog::modificate_ColorFilter			( sf::Vector3f c_sfVector3fFactors )
+{
+	m_c_etyColorBackgroundColors.r	*= c_sfVector3fFactors.x;
+	m_c_etyColorBackgroundColors.g	*= c_sfVector3fFactors.y;
+	m_c_etyColorBackgroundColors.b	*= c_sfVector3fFactors.z;
+
+	std::list<CDialogitem*>::iterator itDialogitems;
+	for(itDialogitems = m_listDialogitems.begin() ; itDialogitems != m_listDialogitems.end() ; itDialogitems++)
+	{
+		(*itDialogitems)->modificate_Colorfilter(c_sfVector3fFactors);
+	}
+
+	update_Dialog(0);
+}
+
+
+void							ety::CDialog::reset_Modal						( void )
+{
+	m_bModal	=	false;
+}
+
+
+ety::CDialogitem* const			ety::CDialog::update_Dialog						( const sf::Uint32& uiFrameTime )
+{
+	m_bInMouseFocus	=	check_MouseCoordinates();
+
+	//Updatet das Sprite des Dialogs
+	m_c_sfSpriteBackgroundSprite.setColor(m_c_etyColorBackgroundColors.get_sfColor());
+	m_c_sfSpriteBackgroundSprite.setScale(m_fWidth/m_c_sfSpriteBackgroundSprite.getLocalBounds().width,m_fHeight/m_c_sfSpriteBackgroundSprite.getLocalBounds().height);
+	
+	sf::Vector2f	c_sfVector2fAnchor	=	get_Anchor(m_en_etyAnchor,true);
+	m_c_sfVector2fRealPosition.x		= (c_sfVector2fAnchor.x) +  m_c_sfVector2fPosition.x;
+	m_c_sfVector2fRealPosition.y		= (c_sfVector2fAnchor.y) +  m_c_sfVector2fPosition.y;
+
+	
+	if(m_en_etyAnchor == Anchor::enALIGNEDMIDTOP)
+	{
+		m_c_sfVector2fRealPosition.x = m_c_sfVector2fRealPosition.x - (m_fWidth / 2);
+	}
+	else if(m_en_etyAnchor == Anchor::enALIGNEDLEFT)
+	{
+		m_c_sfVector2fRealPosition.y = m_c_sfVector2fRealPosition.y - (m_fHeight / 2);
+	}
+	else if(m_bAnchorCentered == true)
+	{
+		m_c_sfVector2fRealPosition.x		=	m_c_sfVector2fRealPosition.x - (m_fWidth / 2);
+		m_c_sfVector2fRealPosition.y		=	m_c_sfVector2fRealPosition.y - (m_fHeight / 2);
+	}
+
+	m_c_sfSpriteBackgroundSprite.setPosition(m_c_sfVector2fRealPosition);
+
+	CDialogitem* p_c_etyDialogitemEvent = NULL;
+
+	//Ruft alle Update-Funktionen der Dialogitems auf
+	for(std::list<CDialogitem*>::iterator itDialogitem = m_listDialogitems.begin(); itDialogitem != m_listDialogitems.end(); itDialogitem++)
+	{
+		(*itDialogitem)->update_Dialogitem(uiFrameTime);
+
+		if((*itDialogitem)->check_MouseCoordinates() == true && (*itDialogitem)->get_Active() == true)
+		{
+			p_c_etyDialogitemEvent = (*itDialogitem);
+		}
+	}
+
+	return p_c_etyDialogitemEvent;
+}
+
+void							ety::CDialog::update_Language					( const std::string& strActualLanguage, ety::CLua* const p_c_luaScript )
+{
+	p_c_luaScript->init_Lua();
+
+	if( p_c_luaScript->start_Script("Initialisation/Gamestates/Language.lua") == false )
+	{
+	}
+
+
+	if(m_listDialogitems.size() == 0)
+	{
+		return ;
+	}
+
+	std::list<CDialogitem*>::iterator itDialogitems = m_listDialogitems.end();
+
+	while(1)
+	{
+		itDialogitems--;
+
+		if((*itDialogitems)->get_DialogitemType() == DialogitemType::enBUTTON)
+		{
+			if((*itDialogitems)->get_AttachedType() == AttachedType::enCHILDREN && (*itDialogitems)->get_ParentDialogitem()->get_DialogitemType() == DialogitemType::enCOMBOBOX
+				|| (*itDialogitems)->get_AttachedType() == AttachedType::enCHILDREN && (*itDialogitems)->get_ParentDialogitem()->get_DialogitemType() == DialogitemType::enLISTBOX)
+			{
+				CComboBox* p_c_etyComboBox = static_cast<CComboBox*>((*itDialogitems)->get_ParentDialogitem());
+
+				if(p_c_etyComboBox->get_Localization() == false)
+				{
+					continue;
+				}
+			}
+
+			CButton* p_c_etyButton = static_cast<CButton*>((*itDialogitems));
+
+			if(p_c_etyButton->get_CaptionLabel() != NULL)
+			{
+				p_c_etyButton->get_CaptionLabel()->set_Content(p_c_luaScript->get_TableString(p_c_etyButton->get_CaptionLabel()->get_CustomID(), strActualLanguage));
+			}
+
+			if(p_c_etyButton->get_TooltipLabel() != NULL)
+			{
+				p_c_etyButton->get_TooltipLabel()->set_Content(p_c_luaScript->get_TableString(p_c_etyButton->get_CustomID() + "Tooltip", strActualLanguage));
+				p_c_etyButton->get_TooltipLabel()->update_Dialogitem(0);
+
+				p_c_etyButton->get_TooltipBackground()->set_Width(p_c_etyButton->get_TooltipLabel()->get_Width() * 1.05);
+				p_c_etyButton->get_TooltipBackground()->set_Height(p_c_etyButton->get_TooltipLabel()->get_Height() * 1.2);
+			}
+
+			p_c_etyButton->update_Dialogitem(0);
+		}
+		else if((*itDialogitems)->get_DialogitemType() == DialogitemType::enLABEL)
+		{
+			CLabel* p_c_etyLabel = static_cast<CLabel*>((*itDialogitems));
+
+			p_c_etyLabel->set_Content(p_c_luaScript->get_TableString(p_c_etyLabel->get_CustomID(), strActualLanguage));
+
+			p_c_etyLabel->update_Dialogitem(0);
+		}
+		else if((*itDialogitems)->get_DialogitemType() == DialogitemType::enCOMBOBOX)
+		{
+			CComboBox* p_c_etyComboBox = static_cast<CComboBox*>((*itDialogitems));
+
+			p_c_etyComboBox->set_CurrentSelectedEntry(p_c_etyComboBox->get_CurrentSelectedEntrie(), false);
+			p_c_etyComboBox->get_ListEntryButton(p_c_etyComboBox->get_CurrentSelectedEntrie());
+			CButton* p_c_etyButton = p_c_etyComboBox->get_HeaderBox();
+			if(p_c_etyButton != NULL && p_c_etyComboBox->get_Localization() == true)
+			{
+				if(p_c_etyButton->get_CaptionLabel() != NULL)
+				{
+					p_c_etyButton->get_CaptionLabel()->set_Content(p_c_luaScript->get_TableString(
+						p_c_etyComboBox->get_ListEntryButton(p_c_etyComboBox->get_CurrentSelectedEntrie())->get_CaptionLabel()->get_CustomID(), strActualLanguage));
+				}
+			}
+
+			p_c_etyComboBox->update_Dialogitem(0);
+		}
+
+		if(itDialogitems == m_listDialogitems.begin())
+		{	
+			break;
+		}
+	}
+	
+	p_c_luaScript->close_Lua();
+}
+
+
+
+//Set-Methoden
+void							ety::CDialog::set_Dialogmanager					( ety::CDialogManager* const p_c_etyDialogmanager )
+{
+	if( mp_c_etyDialogManager != NULL )
+	{
+		mp_c_etyDialogManager->delete_Dialog( this );
+		mp_c_etyDialogManager = p_c_etyDialogmanager;
+	}
+	else
+	{
+		mp_c_etyDialogManager = p_c_etyDialogmanager;
+	}
+
+	if( p_c_etyDialogmanager->get_DialogbyCustomID( m_strDialogID ) == NULL )
+	{
+		mp_c_etyDialogManager->add_Dialog( this );
+	}
+}
+void							ety::CDialog::set_Active						( bool bActive)
+{
+	m_bActive = bActive;
+}
+void							ety::CDialog::set_InMouseFocus					( bool bInMouseFocus )
+{
+	m_bInMouseFocus	=	bInMouseFocus;
+}
+void							ety::CDialog::set_Modal							( bool bModal, sf::Vector3f c_sfVector3fFactors )
+{
+	m_bModal	=	bModal;
+
+	mp_c_etyDialogManager->change_ModalDialog(bModal, this, c_sfVector3fFactors);	
+}
+void							ety::CDialog::set_Visibility					( bool bVisibility )
+{
+	m_bVisibility	=	bVisibility;
+}
+void							ety::CDialog::set_Height						( float fHeight, bool bCollectiveUpdate )
+{
+	if(bCollectiveUpdate == true)
+	{
+		for(std::list<CDialogitem*>::iterator itDialogitem = m_listDialogitems.begin() ; itDialogitem != m_listDialogitems.end() ; itDialogitem++)
+		{
+			CDialogitem* p_c_etyDialogitemTmpPointer = static_cast< CDialogitem* >((*itDialogitem));
+
+			p_c_etyDialogitemTmpPointer->set_Height(p_c_etyDialogitemTmpPointer->get_Height()*(m_fHeight/fHeight));
+		}
+	}
+
+	m_fHeight		=	fHeight;
+	m_c_sfSpriteBackgroundSprite.setScale(m_fWidth/m_c_sfSpriteBackgroundSprite.getLocalBounds().width,m_fHeight/m_c_sfSpriteBackgroundSprite.getLocalBounds().height);
+}
+void							ety::CDialog::set_Width							( float fWidth, bool bCollectiveUpdate )
+{
+	if(bCollectiveUpdate == true)
+	{
+		for(std::list<CDialogitem*>::iterator itDialogitem = m_listDialogitems.begin() ; itDialogitem != m_listDialogitems.end() ; itDialogitem++)
+		{
+			CDialogitem* p_c_etyDialogitemTmpPointer = static_cast< CDialogitem* >((*itDialogitem));
+
+			p_c_etyDialogitemTmpPointer->set_Width(p_c_etyDialogitemTmpPointer->get_Width()*(m_fWidth/fWidth));
+		}
+	}
+
+	m_fWidth		=	fWidth;
+	m_c_sfSpriteBackgroundSprite.setScale(m_fWidth/m_c_sfSpriteBackgroundSprite.getLocalBounds().width,m_fHeight/m_c_sfSpriteBackgroundSprite.getLocalBounds().height);
+}
+void							ety::CDialog::set_DrawPosition					(unsigned int uiDrawPosition)
+{
+	m_uiDrawPosition	=	uiDrawPosition;
+
+	//Da das Ändern der DrawPosition genau den selben Code benutzt, wie das Einfügen eines neuen Dialogs, wird die add_Dialog-Funktion hierfür verwendet.
+	mp_c_etyDialogManager->add_Dialog(this);
+}
+void							ety::CDialog::set_Transperancy					( sf::Uint8 sfUint8Transperancy )
+{
+	m_c_etyColorBackgroundColors.a	=	sfUint8Transperancy;
+	m_c_sfSpriteBackgroundSprite.setColor(m_c_etyColorBackgroundColors.get_sfColor());
+}
+void							ety::CDialog::set_BackgroundColors				( ety::Color c_etyColorBackgroundColors, bool bCollectiveUpdate )
+{
+
+	if(bCollectiveUpdate == true)
+	{
+		for(std::list<CDialogitem*>::iterator itDialogitem = m_listDialogitems.begin() ; itDialogitem != m_listDialogitems.end() ; itDialogitem++)
+		{
+			if((*itDialogitem)->get_DialogitemType() == DialogitemType::enBUTTON)
+			{
+				CButton* p_c_etyDialogitemButton = static_cast< CButton* >((*itDialogitem));
+
+				p_c_etyDialogitemButton->set_BackgroundColors(c_etyColorBackgroundColors);
+				p_c_etyDialogitemButton->set_HoverSpriteColors(c_etyColorBackgroundColors);
+
+			}
+			else if((*itDialogitem)->get_DialogitemType() == DialogitemType::enPICTURECONTROL)
+			{
+				CPictureControl* p_c_etyDialogitemPictureControl = static_cast< CPictureControl* >((*itDialogitem));
+
+				p_c_etyDialogitemPictureControl->set_ColorFilter(c_etyColorBackgroundColors);
+			}
+			else if((*itDialogitem)->get_DialogitemType() == DialogitemType::enCHECKBOX)
+			{
+				CPictureControl* p_c_etyDialogitemPictureControl = static_cast< CPictureControl* >((*itDialogitem));
+
+				p_c_etyDialogitemPictureControl->set_ColorFilter(c_etyColorBackgroundColors);
+			}
+		}
+	}
+
+	m_c_etyColorBackgroundColors	=	c_etyColorBackgroundColors;
+	m_c_sfSpriteBackgroundSprite.setColor(c_etyColorBackgroundColors.get_sfColor());
+}	
+void							ety::CDialog::set_BackgroundSprite				( const sf::Sprite& c_sfSpriteBackgroundSprite, bool bUpdateSubRect )
+{
+	m_c_sfSpriteBackgroundSprite	=	c_sfSpriteBackgroundSprite;
+
+	if(bUpdateSubRect == true)
+	{
+		m_c_sfSpriteBackgroundSprite.setTextureRect(m_c_sfIntRectSubRect);
+		m_c_sfSpriteBackgroundSprite.setScale(m_fWidth/m_c_sfSpriteBackgroundSprite.getLocalBounds().width,m_fHeight/m_c_sfSpriteBackgroundSprite.getLocalBounds().height);
+	}
+}
+void							ety::CDialog::set_BackgroundSprite				( const sf::Texture& c_sfTextureBackgroundSprite, bool bUpdateSubRect )
+{
+	m_c_sfSpriteBackgroundSprite.setTexture(c_sfTextureBackgroundSprite);
+
+	if(bUpdateSubRect == true)
+	{
+		m_c_sfSpriteBackgroundSprite.setTextureRect(m_c_sfIntRectSubRect);
+		m_c_sfSpriteBackgroundSprite.setScale(m_fWidth/m_c_sfSpriteBackgroundSprite.getLocalBounds().width,m_fHeight/m_c_sfSpriteBackgroundSprite.getLocalBounds().height);
+	}
+}
+void							ety::CDialog::set_Position						( sf::Vector2f c_sfVector2fPosition_XY )
+{
+	m_c_sfVector2fPosition	=	c_sfVector2fPosition_XY;
+}
+void							ety::CDialog::set_SubRect						(sf::IntRect c_sfIntRectSubRect, bool bUpdateSprite)
+{
+	m_c_sfIntRectSubRect		=	c_sfIntRectSubRect;
+	
+	if(bUpdateSprite == true)
+	{
+		m_c_sfSpriteBackgroundSprite.setTextureRect(m_c_sfIntRectSubRect);
+		m_c_sfSpriteBackgroundSprite.setScale(m_fWidth/m_c_sfSpriteBackgroundSprite.getLocalBounds().width,m_fHeight/m_c_sfSpriteBackgroundSprite.getLocalBounds().height);
+	}
+}
+void							ety::CDialog::set_Affinity						(enum Affinity::en_etyAffinity en_etyAffinity)
+{
+	m_en_etyAffinity	=	en_etyAffinity;
+
+	//Da das Ändern der Affinity genau den selben Code benutzt, wie das Einfügen eines neuen Dialogs, wird die add_Dialog-Funktion hierfür verwendet.
+	mp_c_etyDialogManager->add_Dialog(this);
+}
+void							ety::CDialog::set_Anchor						(enum Anchor::en_etyAnchor en_etyAnchor)
+{
+	m_en_etyAnchor	=	en_etyAnchor;
+}
+void							ety::CDialog::set_AnchorCentered				( bool bAnchorCentered)
+{
+	m_bAnchorCentered	=	bAnchorCentered;
+}
+void							ety::CDialog::set_TooltipButton					(CButton* const p_c_etyButtonTooltip)
+{
+	mp_c_etyButtonTooltip	=	p_c_etyButtonTooltip;
+}
+
+
+
+//Get-Methoden
+bool							ety::CDialog::get_Active						( void )
+{
+	return m_bActive;
+}
+bool							ety::CDialog::get_InMouseFocus					( void )
+{
+	return m_bInMouseFocus;
+}
+bool							ety::CDialog::get_Modal							( void )
+{
+	return	m_bModal;
+}
+bool							ety::CDialog::get_Visibility					( void )
+{	
+	return m_bVisibility;
+}
+std::string						ety::CDialog::get_DialogID						( void )
+{
+	
+	return m_strDialogID;
+}
+float							ety::CDialog::get_Height						( void )
+{
+	return m_fHeight;
+}
+float							ety::CDialog::get_Width							( void )
+{
+	return m_fWidth;
+}
+unsigned int					ety::CDialog::get_DrawPosition					( void )
+{
+	return m_uiDrawPosition;
+}
+sf::Uint8						ety::CDialog::get_Transperancy					( void )
+{
+	return sf::Uint8(m_c_etyColorBackgroundColors.a);
+}
+const ety::Color&				ety::CDialog::get_BackgroundColors				( void )
+{
+	return m_c_etyColorBackgroundColors;
+}
+const sf::Sprite&				ety::CDialog::get_BackgroundSprite				( void )
+{
+	return m_c_sfSpriteBackgroundSprite;
+}
+sf::Vector2f					ety::CDialog::get_Anchor						( Anchor::en_etyAnchor en_etyAnchor, const bool bAbsolute )
+{
+	//Berechnung der Position, die sich hinter dem Ankerpunkt verbirgt
+	sf::Vector2f	c_sfVector2fPosition(0.f,0.f);
+	float			fWidth		= 0.f;
+	float			fHeight		= 0.f;
+
+	if(bAbsolute == true)
+	{
+		fWidth					=	float(m_c_sfVideoMode.width);
+		fHeight					=	float(m_c_sfVideoMode.height);
+	}
+	else
+	{
+		fWidth					=	m_fWidth;
+		fHeight					=	m_fHeight;
+		c_sfVector2fPosition	=	m_c_sfVector2fRealPosition;
+	}
+
+	sf::Vector2f c_sfVector2fAnchor;
+
+	if(en_etyAnchor == Anchor::enTOPLEFT)
+	{
+		c_sfVector2fAnchor	=	c_sfVector2fPosition;
+	}
+	else if(en_etyAnchor == Anchor::enTOP || en_etyAnchor == Anchor::enALIGNEDMIDTOP)
+	{
+		c_sfVector2fAnchor.y	=	c_sfVector2fPosition.y;
+		c_sfVector2fAnchor.x	=	c_sfVector2fPosition.x + fWidth / 2;
+	}
+	else if(en_etyAnchor == Anchor::enTOPRIGHT)
+	{
+		c_sfVector2fAnchor.y	=	c_sfVector2fPosition.y;
+		c_sfVector2fAnchor.x	=	c_sfVector2fPosition.x + fWidth;
+	}
+	else if(en_etyAnchor == Anchor::enLEFT || en_etyAnchor == Anchor::enALIGNEDLEFT)
+	{
+		c_sfVector2fAnchor.y	=	c_sfVector2fPosition.y + fHeight / 2;
+		c_sfVector2fAnchor.x	=	c_sfVector2fPosition.x;
+	}
+	else if(en_etyAnchor == Anchor::enMID)
+	{
+		c_sfVector2fAnchor.x	=	(c_sfVector2fPosition.x) + (fWidth / 2);
+		c_sfVector2fAnchor.y	=	(c_sfVector2fPosition.y) + (fHeight / 2);
+	}
+	else if(en_etyAnchor == Anchor::enRIGHT)
+	{
+		c_sfVector2fAnchor.y	=	c_sfVector2fPosition.y + fHeight / 2;
+		c_sfVector2fAnchor.x	=	c_sfVector2fPosition.x + fWidth;
+	}
+	else if(en_etyAnchor == Anchor::enBOTTOMLEFT)
+	{
+		c_sfVector2fAnchor.y	=	c_sfVector2fPosition.y + fHeight;
+		c_sfVector2fAnchor.x	=	c_sfVector2fPosition.x;
+	}
+	else if(en_etyAnchor == Anchor::enBOTTOM)
+	{
+		c_sfVector2fAnchor.y	=	c_sfVector2fPosition.y + fHeight;
+		c_sfVector2fAnchor.x	=	c_sfVector2fPosition.x + fWidth / 2;
+	}
+	else if(en_etyAnchor == Anchor::enBOTTOMRIGHT)
+	{
+		c_sfVector2fAnchor.y	=	c_sfVector2fPosition.y + fHeight;
+		c_sfVector2fAnchor.x	=	c_sfVector2fPosition.x + fWidth;
+	}
+	else if(en_etyAnchor == Anchor::enALIGNEDBOTTOMLEFT)
+	{
+		if(bAbsolute == true)
+		{
+			c_sfVector2fAnchor.y	=	fHeight - m_fHeight;
+			c_sfVector2fAnchor.x	=	0.f;
+		}
+	}
+	else if(en_etyAnchor == Anchor::enALIGNEDBOTTOMRIGHT)
+	{
+		if(bAbsolute == true)
+		{
+			c_sfVector2fAnchor.y	=	fHeight - m_fHeight;
+			c_sfVector2fAnchor.x	=	fWidth - m_fWidth;
+		}
+	}
+	else if(en_etyAnchor == Anchor::enALIGNEDTOPLEFT)
+	{
+		if(bAbsolute == true)
+		{
+			c_sfVector2fAnchor.y	=	0.f;
+			c_sfVector2fAnchor.x	=	0.f;
+		}
+	}
+	else if(en_etyAnchor == Anchor::enALIGNEDTOPRIGHT)
+	{
+		if(bAbsolute == true)
+		{
+			c_sfVector2fAnchor.y	=	0.f;
+			c_sfVector2fAnchor.x	=	fWidth - m_fWidth;
+		}
+	}
+
+	return c_sfVector2fAnchor;
+
+}
+const sf::Vector2f&				ety::CDialog::get_Position						( void )
+{
+	return m_c_sfVector2fPosition;
+}
+const sf::Vector2f&				ety::CDialog::get_RealPosition					( void )
+{
+	return m_c_sfVector2fRealPosition;
+}
+const sf::IntRect&				ety::CDialog::get_SubRect						( void )
+{
+	return m_c_sfIntRectSubRect;
+}
+const sf::VideoMode				ety::CDialog::get_VideoMode						( void )
+{
+	return m_c_sfVideoMode;
+}
+std::list<std::string>			ety::CDialog::get_AllDialogitemCustomIDs		( void )
+{
+	std::list<std::string> listCustomIDs;
+
+	for(std::list<CDialogitem*>::iterator itDialogitems = m_listDialogitems.begin() ; itDialogitems != m_listDialogitems.end() ; itDialogitems++)
+	{
+		listCustomIDs.push_back((*itDialogitems)->get_CustomID());
+	}
+
+	return	listCustomIDs;
+}
+std::list<ety::CDialogitem*> 	ety::CDialog::get_Dialogitems					( DialogitemType::en_etyDialogitemType en_etyDialogitemType )
+{
+	if(en_etyDialogitemType == DialogitemType::enALL)
+	{
+		return m_listDialogitems;
+	}
+
+	std::list<CDialogitem*> listDialogitems;
+
+	std::list<CDialogitem*>::iterator itDialogitem;
+
+	for(itDialogitem = m_listDialogitems.begin(); itDialogitem != m_listDialogitems.end(); itDialogitem++)
+	{
+		if((*itDialogitem)->get_DialogitemType() == en_etyDialogitemType)
+		{
+			(listDialogitems).push_back((*itDialogitem));
+		}
+	}
+
+	return listDialogitems;
+}
+ety::Affinity::en_etyAffinity	ety::CDialog::get_Affinity						( void )
+{
+	return m_en_etyAffinity;
+}
+ety::CDialogManager* const		ety::CDialog::get_DialogManager					( void )
+{
+	return mp_c_etyDialogManager;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////								CDIALOG.CPP									///////////
+///////////////////////////////////////////////////////////////////////////////////////////////

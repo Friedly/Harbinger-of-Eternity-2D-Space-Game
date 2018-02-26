@@ -1,0 +1,445 @@
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////								CDIALOG.HPP									///////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+#include "CDialogManager.hpp"
+
+
+//Namespace der Eternity-Engine
+namespace ety
+{
+	class CDialogManager;
+	class CDialogitem;
+
+
+	//Die Klasse beschreibt einen Dialog, ein Dialog wird durch ein Bild dargestellt und ist vergleichbar mit einem Menü oder einem Fenster.
+	//Doch er kann beliebig vielfältig gestaltet werden und somit alle möglichen Varianten von UI-Elementen annehmen. Dies wird besonders durch die Verwaltung von Dialogitems,
+	//welche für den Dialog erstellt werden können, realisiert. Jeder Dialog verwaltet seine eigenen Dialogitems und diese gehören immer nur zu dem Dialog für den sie erstellt wurden.
+	//Zu beachten ist, dass die Dialogitems auf bzw. innerhalb der Dialog liegen müssen um korrekt angesprochen werden zu können!
+	//Der Dialog ist letztlich die Verwaltungs-Schnittstelle zwischen den States und den GUI-Elementen.
+	class CDialog
+	{
+	private:
+
+		//Es soll die Möglichkeit gelassen werden, dass man andere Klassen von diesem Dialogitem ableiten kann
+
+
+	protected:
+
+												//Dieses Attribut sagt an ob der Dialog und seine Dialogitems auf Events reagieren sollen
+				bool							m_bActive;
+												//Gibt an ob der Dialog auf dem Ankerpunkt zentriert sein soll, da sonst nur die linke obere Ecke auf dem Ankerpunkt
+												//liegen würde, ist AnchorCentered true, dann liegt er zentriert darauf. (Die Position wird natrülich auch noch miteingerechnet!)
+				bool							m_bAnchorCentered;
+												//Gibt an ob der Dialog im letzten Update-Durchlauf im Focus der Maus lag
+				bool							m_bInMouseFocus;
+												//Dieses Attribut gibt an ob der Dialog modal ist, das heißt das nur mit ihm 
+												//interagiert werden kann sofern er sichtbar ist
+				bool							m_bModal;
+												//Dieses Attribut sagt, ob der Dialog gezeichnet werden soll / bzw. sichtbar ist
+				bool							m_bVisibility;
+												//Gibt die Affinität des Dialogs an (näheres im Affinitäts-System)
+		enum	Affinity::en_etyAffinity		m_en_etyAffinity;
+												//Ankerpunkt des Dialogs
+		enum	Anchor::en_etyAnchor			m_en_etyAnchor;
+												//Dieses Attribut steht für die Höhe des Dialogs
+				float							m_fHeight;
+												//Dieses Attribut steht für die Breite des Dialogs
+				float							m_fWidth;
+												//Gibt die Position in der Zeichenreihenfolge der Dialoge an.
+				unsigned int					m_uiDrawPosition;
+												//Dieses Atribut ist für den Farbfilter des Backgroundsprites
+				ety::Color						m_c_etyColorBackgroundColors;
+												//Dieses Attribut definiert den Dialog selbst, dieses Sprite ist das was man letztenende auch vom Dialog sieht
+				sf::Sprite						m_c_sfSpriteBackgroundSprite;
+												//Dieses Attribut beinhaltet die relative Position des Dialogs
+				sf::Vector2f					m_c_sfVector2fPosition;
+												//Dieses Attribut beinhaltet die absolute Position des Dialogs
+				sf::Vector2f					m_c_sfVector2fRealPosition;
+												//
+				sf::IntRect						m_c_sfIntRectSubRect;
+												//In dieser Variable steht der letzte und damit aktuelle Videomode drin
+												//Da Dialogitems bei ihrer Erstellung den aktuellen Videomode übergeben brauchen
+												//damit ihre Größe richtig auf die Auflösung angepasst wird
+				sf::VideoMode					m_c_sfVideoMode;
+												//In dieser Liste werden alle Dialogitems des Dialogs gespeichert
+				std::list<CDialogitem*>			m_listDialogitems;
+												//Dieses Attribut ist die ID des Dialogs
+				std::string						m_strDialogID;
+												//Dies ist ein Zeiger auf den Dialogmanager der den Dialog verwaltet
+				ety::CDialogManager*			mp_c_etyDialogManager;
+												//Dies ist ein Zeiger auf den State zu dem der Dialog gehört
+
+
+	public:
+												//Standart Kon- und Destruktor
+												CDialog								( void );
+												~CDialog							( void );
+
+
+												//Überladener Konstruktor. Dieser sollte immer zum Erstellen eines Dialogs aufgerufen werden!
+												CDialog								( 
+																					  std::string strCustomID, const sf::Texture& c_sfTextureBackgroundSprite, 
+																					  float fWidth, float fHeight, sf::Vector2f c_sfVector2fPosition, 
+																					  sf::IntRect c_sfIntRectSubRect, CDialogManager* p_c_etyDialogManager, 
+																					  const sf::VideoMode& c_sfCurrentVideoMode
+																					);		
+
+
+																					  
+
+				
+				
+				bool							add_ChildrenDialogitem				( CDialogitem* const p_c_etyDialogitemChildren);
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Fügt ein Dialogitem der Dialogitemliste hinzu.
+				///					///
+				///				
+				/// \parameter	CDialogitem* p_c_DialogitemNewDialogitem, bool bNewDialogitem
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+				bool							add_Dialogitem						( CDialogitem* const p_c_DialogitemNewDialogitem, bool bNewDialogitem );
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Passt die Größe des Dialogs und seiner Dialogitems an die "neue" Auflösung an!
+				///
+				/// \parameter	const sf::VideoMode& c_sfCurrentVideoMode -> Der Video Modus mit der aktuellen Auflösung
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+				void							adjust_SizeToResolution				( const sf::VideoMode& c_sfVideoModeNewSettings );
+
+
+				void							calculate_Positions					( void );
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Überprüft ob die Maus auf/in dem Dialog liegt
+				///
+				/// \parameter	/
+				///
+				/// \rückgabe	bool -> true wenn die Maus auf/in dem Dialog liegt
+				///////////////////////////////////////////////////////////////////////////////////
+				bool							check_MouseCoordinates				( void );
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Erstellt einen Button für den Dialog.
+				///
+				/// \parameter	[...]
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+					void						createDialogitem_Button				( 
+																					  std::string strCustomID, const sf::Texture& c_sfTextureButtonSet, 
+																					  float fWidth, float fHeight, sf::Vector2f c_sfVector2fPosition, 
+																					  sf::IntRect c_sfIntRectButtonSubRect
+																					);
+
+																					  
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Erstellt eine Checkbox für den Dialog.
+				///
+				/// \parameter	[...]
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+					void						createDialogitem_Checkbox			( 
+																					  std::string strCustomID, const sf::Texture& c_sfTextureCheckboxSet,  
+																					  bool bStatus_checked, float fWidth, float fHeight, sf::Vector2f c_sfVector2fPosition, 
+																					  sf::IntRect c_sfIntRectCheckbocSubRect
+																					);
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Erstellt eine ComboBox für den Dialog.
+				///
+				/// \parameter	[...]
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+					void						createDialogitem_ComboBox			( 
+																					  std::string strCustomID, const sf::Texture& c_sfTextureComboBoxTexture, float fWidth, 
+																					  float fHeight, sf::Vector2f c_sfVector2fPosition, sf::IntRect c_sfIntRectComboBoxSubRect, 
+																					  ety::Color c_etyColorTextcolor, ety::Color c_etyColorTextcolor_Highlighted, 
+																					  unsigned int uiTextCharactersize, float fScrollbarSizePercent = 0.f
+																					);
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Erstellt ein EditControl/Eingabefeld für den Dialog
+				///
+				/// \parameter	[...]
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+					void						createDialogitem_EditControl		( 
+																					  std::string strCustomID, const sf::Texture& c_sfTextureBackgroundSprite, 
+																					  bool bDeleteContentbyFirstFocus, float fWidth, float fHeight, 
+																					  sf::Vector2f c_sfVector2fPosition, sf::IntRect c_sfIntRectSubRect, std::string strContent, 
+																					  float fCharactersize, ety::Color c_etyColorTextcolor
+																					);
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Erstellt ein Label/Textfeld für den Dialog
+				///
+				/// \parameter	[...]
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+					void						createDialogitem_Label				( 
+																					  std::string strCustomID, std::string strContent, float fCharactersize, 
+																					  ety::Color c_etyColorTextcolor, sf::Vector2f c_sfVector2fPosition 
+																					);
+
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Erstellt eine ListBox für den Dialog.
+				///
+				/// \parameter	[...]
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+					void						createDialogitem_ListBox			( 
+																					  std::string strCustomID, const sf::Texture& c_sfTextureComboBoxTexture, 
+																					  float fWidth, float fHeight, sf::Vector2f c_sfVector2fPosition, 
+																					  sf::IntRect c_sfIntRectComboBoxSubRect, ety::Color c_etyColorTextcolor, 
+																					  ety::Color c_etyColorTextcolor_Highlighted, unsigned int uiTextCharactersize, 
+																					  float fScrollbarSizePercent = 0.f, unsigned int uiListBoxEntrySubRectSize = 0
+																					);
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Erstellt ein "Bild" für den Dialog
+				///
+				/// \parameter	[...]
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+					void						createDialogitem_PictureControl		( 
+																					  std::string strCustomID, const sf::Texture& c_sfTexturePictureSprite,  float fWidth, 
+																					  float fHeight, sf::Vector2f c_sfVector2fPosition, sf::IntRect c_sfIntRectPictureSubRect
+																					);
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Erstellt eine Scrollbar für den Dialog
+				///
+				/// \parameter	[...]
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+				void							createDialogitem_Scrollbar			( 
+																					  std::string strCustomID, const sf::Texture& p_c_sfTextureScrollbarSprite, float fWidth, 
+																					  float fHeight, sf::Vector2f c_sfVector2fPosition, sf::IntRect c_sfIntRectScrollbarSubRect,
+																					  CDialogitem* p_c_etyDialogitemParent, CDialog* p_c_etyDialogParentDialog
+																					);
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Erstellt ein SlideControl (Schieberegler) für den Dialog!
+				///
+				/// \parameter	[...]
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+				void							createDialogitem_SlideControl		( 
+																					  std::string strCustomID, const sf::Texture& c_sfTextureBackgroundTexture, float fWidth, 
+																					  float fHeight, sf::Vector2f c_sfVector2fPosition,sf::Vector2f c_sfVector2fValueRange, 
+																					  float fStartValue, sf::IntRect c_sfIntRectBackgroundSubRect
+																					);
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Erstellt eine Textbox für den Dialog!
+				///
+				/// \parameter	[...]
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+				void							createDialogitem_TextBox		    ( 
+																					  std::string strCustomID
+																					);
+
+				void							createDialogitem_TextButton		    ( 
+																					  std::string strCustomID, sf::Vector2f c_sfVector2fPosition, std::string strContent, 
+																					  float fCharactersize, ety::Color c_etyColorTextcolor, ety::Color c_etyColorCaptionColor_highlighted
+																					);
+
+				
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Löcht das angegebene Dialogitem aus dem Dialog
+				///
+				/// \parameter	CDialogitem* p_c_etyDialogitemToDelete -> Das zu löschende Dialogitem
+				///
+				/// \rückgabe	bool -> ob das Löschen geklappt hat
+				///////////////////////////////////////////////////////////////////////////////////
+				bool							delete_Dialogitem					( CDialogitem* p_c_etyDialogitemToDelete);
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Löscht ein Dialogitem aus der Dialogitemliste, über die CustomID
+				///
+				/// \parameter	std::string strCustomID
+				///
+				/// \rückgabe	bool -> ob das angegebene Objekt gelöscht wurde
+				///////////////////////////////////////////////////////////////////////////////////
+				bool							delete_DialogitemByCustomID			( std::string strCustomID );
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// "Zeichnet" alle Dialogitems eines Dialogs in das RenderTexture, welches später
+				/// auf dem Bildschrim angezeigt wird
+				///
+				/// \parameter	sf::RenderTexture* p_c_sfRenderTextureScene
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+				void							draw_Dialogitems					( sf::RenderTexture* p_c_sfRenderTextureScene );
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Diese Funktion modifiziert den Farbfilter aller Dialogitems und des Dialogs,
+				/// womit aber nur möglich ist den Dialog aufzuhellen oder zuverdunkeln!
+				///
+				/// \parameter	sf::Int8 sfInt8ColorFilterModificator -> wie sehr der Farbfilter verändert werden solll
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+				void							modificate_ColorFilter				( sf::Vector3f c_sfVector3fFactors );
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Setzt die Modalität des Dialogs auf false
+				///
+				/// \parameter	void
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+				void							reset_Modal							( void );
+
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Updatet den Dialog sowie alle seine Dialogitems. Was konkreter heißt, dass ihre Größe
+				/// korrekt an ihre z.B. Sprites weiter gegeben werden, sowie ihre Position neu berechnet
+				/// und gesetzt werden usw.
+				///
+				/// \parameter	const sf::Uint32&& uiFrameTime -> gibt die vergangene FrameTime seit dem letzten Update wieder
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+				CDialogitem* const				update_Dialog						( const sf::Uint32& uiFrameTime );
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Updatet die Sprache aller Texte des Dialog, also die der Dialogitems
+				///
+				/// \parameter	const std::string& strActualLanguage -> String mit der aktuellen Sprache
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+				void							update_Language						( const std::string& strActualLanguage, ety::CLua* const p_c_luaScript );
+
+
+				
+
+				//Set-Methoden
+				void							set_Dialogmanager					( ety::CDialogManager* const p_c_etyDialogmanager );
+				void							set_Active							( bool bActive);
+				void							set_AnchorCentered					( bool bAnchorCentered);
+				void							set_InMouseFocus					( bool bInMouseFocus );
+				void							set_Modal							( bool bModal, sf::Vector3f c_sfVector3fFactors );
+				void							set_Visibility						( bool bVisibility );
+				//Durch das Prinzip der Kollektivierung ist es möglich, dass alle Dialoggegenstände eines Dialogs
+				//ebenfalls angepasst werden, wenn gewisse Attribute des Dialogs geändert wurden.
+				//Wurde z.B. die Größe des Dialog geändert, kann man die Dialoggegenstände ganz einfach mit skalieren lassen
+				void							set_Height							( float fHeight, bool bCollectiveUpdate );
+				void							set_Width							( float fWidth, bool bCollectiveUpdate );
+				void							set_DrawPosition					(unsigned int uiDrawPosition);
+				void							set_Transperancy					( sf::Uint8 sfUint8Transperancy );
+				void							set_BackgroundColors				( ety::Color c_etyColorBackgroundColors, bool bCollectiveUpdate );
+				void							set_BackgroundSprite				( const sf::Sprite& c_sfSpriteBackgroundSprite, bool bUpdateSubRect );
+				void							set_BackgroundSprite				( const sf::Texture& c_sfTextureBackgroundSprite, bool bUpdateSubRect );
+				void							set_Position						( sf::Vector2f c_sfVectorPosition );
+				void							set_SubRect							( sf::IntRect c_sfIntRectSubRect, bool bUpdateSprite );
+				void							set_Affinity						(enum Affinity::en_etyAffinity en_etyAffinity);
+				void							set_Anchor							(enum Anchor::en_etyAnchor en_etyAnchor);
+				
+				
+
+				//Get-Methoden
+				bool							get_Active							( void );
+				bool							get_InMouseFocus					( void );
+				bool							get_Modal							( void );
+				bool							get_Visibility						( void );
+				float							get_Height							( void );
+				float							get_Width							( void );
+				unsigned int					get_DrawPosition					( void );
+				sf::Uint8						get_Transperancy					( void );
+				const ety::Color&				get_BackgroundColors				( void );
+				const sf::Sprite&				get_BackgroundSprite				( void );
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Diese Funktion berechnet den Vector für den übergebenden Anchor und gibt diesen Zurück
+				///
+				/// \parameter	en_etyAnchor en_etyAnchor
+				///
+				/// \rückgabe	sf::Vector2f	-> Die Position auf dem Dialog
+				///////////////////////////////////////////////////////////////////////////////////
+				sf::Vector2f					get_Anchor							( const Anchor::en_etyAnchor en_etyAnchor, const bool bAbsolute );
+				const sf::Vector2f&				get_Position						( void );
+				const sf::Vector2f&				get_RealPosition					( void );
+				const sf::IntRect&				get_SubRect							( void );
+				const sf::VideoMode				get_VideoMode						( void );
+				std::list<std::string>			get_AllDialogitemCustomIDs			( void );
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Gibt eine Liste aller Dialogitems des angeforderten Typs zurück.
+				///
+				/// \parameter	const DialogitemType::en_etyDialogitemType en_etyDialogitemType
+				///
+				/// \rückgabe	std::list<CDialogitem*>	-> Eine Liste mit Zeiger auf die
+				///	Dialogitems des angeforderten Typs
+				/////////////////////////////////////////////////////////////////////////////////// 
+				std::list<CDialogitem*>			get_Dialogitems						( const DialogitemType::en_etyDialogitemType en_etyDialogitemType );
+				std::string						get_DialogID						( void );
+				enum Affinity::en_etyAffinity	get_Affinity						( void );
+				ety::CDialogManager* const		get_DialogManager					( void );
+
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Diese Funktion gibt einen Zeiger auf das angefordete Dialogitemzurück, dieser Zeiger
+				/// ist gleich in den richtigen Datentyp konvertiert.
+				///
+				/// \parameter	std::string strCustomID -> CustomID des Dialogitems
+				///
+				/// \rückgabe	typename typeDialogitemType -> gibt den angegeben type zurück
+				///////////////////////////////////////////////////////////////////////////////////
+				template						<typename typeDialogitemType>	
+				typeDialogitemType 				get_DialogitemByCustomID			( const std::string& strCustomID)
+				{
+					for(std::list<CDialogitem*>::iterator itDialogitem = m_listDialogitems.begin(); itDialogitem != m_listDialogitems.end(); itDialogitem++)
+					{
+						//Es wird die CustomID des Dialogitems überprüft und wenn sie überein stimmt wird das Dialogitem zurückgegeben
+						if((*itDialogitem)->get_CustomID() == strCustomID)
+						{
+							typeDialogitemType typeDialogitemTypeRequestedDialogitem = reinterpret_cast<typeDialogitemType>((*itDialogitem));
+							return typeDialogitemTypeRequestedDialogitem;
+						}
+					}
+					return NULL;
+				}
+	};
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////								CDIALOG.HPP									///////////
+///////////////////////////////////////////////////////////////////////////////////////////////

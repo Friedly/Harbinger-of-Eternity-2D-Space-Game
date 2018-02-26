@@ -1,0 +1,14 @@
+#pragma once
+#include "CTask.hpp"
+
+namespace ety
+{
+	class CAttributeTask :	public CTask
+	{
+	private:
+	protected:
+	public:
+		CAttributeTask(void);
+		~CAttributeTask(void);
+	};
+}

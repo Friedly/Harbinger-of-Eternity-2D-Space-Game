@@ -1,0 +1,30 @@
+#pragma once
+#include <map>
+#include <string>
+
+namespace ety
+{
+	class CDialog;
+	class CDialogGameState;
+	class CRessourceManager;
+	class CGamesettings;
+
+	class CUserInterface
+	{
+	private:
+	protected:
+				std::map<std::string, CDialog*>		m_mapDialogs;
+				CDialogGameState*					mp_c_etyDialogGameState;
+	public:
+													CUserInterface			( void );
+													~CUserInterface			( void );
+
+													CUserInterface			( CDialogGameState* const p_c_etyDialogGameState );
+
+				void								add_Dialog				( CDialog* const p_c_etyDialog );
+				void								init_UserInterface		( ety::CRessourceManager* const p_c_etyCurrentRessourceManager, 
+																			  ety::CGamesettings* const p_c_etyCurrentGamesettingManager );
+				
+				CDialog*	const					get_DialogByID			( std::string strDialogID );
+	};
+}

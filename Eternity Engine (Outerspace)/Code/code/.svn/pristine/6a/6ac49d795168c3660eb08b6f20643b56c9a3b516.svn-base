@@ -1,0 +1,30 @@
+--[Events]
+function Events()
+end
+--[Events]
+
+--[Actions]
+function Actions()
+	
+	TriggeringUnit	=	c_etyWorld:get_TriggerByID("AIChaseRoutine"):get_TriggeringUnit();
+
+	if TriggeringUnit ~= "NULL" then
+		c_etyWorld:get_TriggerByID("AIChaseRoutine"):get_TriggeringEvent():set_Active(false);
+		MovableNPCComponent 					= 	c_etyEntitymanager:get_Entity(TriggeringUnit:get_UniqueID()):get_MoveableNPCComponent("MovableComponent");
+		MovableNPCComponent:start_Chase(sfVector2f(200, 250), "Player");
+	end
+	
+end
+--[Actions]
+
+--[Conditions]
+function Conditions()
+	if true then
+		Actions()
+		return true;
+	else
+		return false;
+	end
+end
+--[Conditions]
+

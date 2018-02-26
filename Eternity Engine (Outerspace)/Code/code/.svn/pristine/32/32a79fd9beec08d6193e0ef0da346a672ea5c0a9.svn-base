@@ -1,0 +1,206 @@
+#include "CRenderComponent.hpp"
+#include "CMathConvertClasses.hpp"
+#include "CEntity.hpp"
+
+//#########################################################################################################//
+//#########################################################################################################//
+//#########################################################################################################//
+
+
+										ety::CRenderComponent::CRenderComponent											( const float fLayer, const float fAngle )
+									: m_fLayer ( fLayer )
+									, m_fAngle ( fAngle )
+								{
+								}
+										ety::CRenderComponent::~CRenderComponent										( void )
+								{
+								}
+
+		void							ety::CRenderComponent::set_Direction											( const sf::Vector2f& c_sfVectorDirection )
+		{
+			m_c_sfVectorDirection = c_sfVectorDirection;
+
+			/*Anpassung des Winkels*/
+		}
+		void							ety::CRenderComponent::set_Angle												( const float fAngle )
+		{
+			m_fAngle = fAngle;
+
+			m_c_sfVectorDirection.x = sin_d( m_fAngle );
+			m_c_sfVectorDirection.y = -1*cos_d( m_fAngle );
+
+			m_c_sfVectorDirection = ety::CMath::normalize_Vector<float>( m_c_sfVectorDirection );
+		}
+
+const	float							ety::CRenderComponent::get_Angle												( void )
+		{
+			return m_fAngle;
+		}
+const	float							ety::CRenderComponent::get_Layer												( void )
+		{
+			return m_fLayer;
+		}
+const	sf::Vector2f&					ety::CRenderComponent::get_Direction											( void )
+		{
+			return m_c_sfVectorDirection;
+		}
+
+const	std::string						ety::CRenderComponent::get_FamilyID												( void )
+		{
+			return "RenderComponent";
+		}
+
+//#########################################################################################################//
+//#########################################################################################################//
+//#########################################################################################################//
+
+										ety::CAnimationRenderComponent::CAnimationRenderComponent						( const sf::Texture& c_sfTextureAppearance, const sf::Vector2f& c_sfVectorPosition, const sf::Vector2f& c_sfVectorLayerscaling, const sf::VideoMode& c_sfVideomode, const bool bCentered, const float fLayer, const float fAngle )
+									: CRenderComponent( fLayer, fAngle )
+								{
+								}
+										ety::CAnimationRenderComponent::~CAnimationRenderComponent						( void )
+								{
+								}
+
+		void							ety::CAnimationRenderComponent::update_Component								( const sf::Uint32& uiFrameTime )
+		{
+		}
+		void							ety::CAnimationRenderComponent::render_Component								( sf::RenderTexture* const p_c_sfRenderTextureGameScene )
+		{
+			p_c_sfRenderTextureGameScene->draw( m_c_etyAnimatedSpriteAppearence );
+		}
+
+		void							ety::CAnimationRenderComponent::set_Angle										( const float fAngle )
+		{
+			CRenderComponent::set_Angle( fAngle );
+
+			m_c_etyAnimatedSpriteAppearence.setRotation( m_fAngle );
+		}
+
+const	sf::Vector2f&					ety::CAnimationRenderComponent::get_Position									( void )
+		{
+			return m_c_etyAnimatedSpriteAppearence.getPosition();
+		}
+		sf::Sprite*		const			ety::CAnimationRenderComponent::get_Appearance									( void )
+		{
+			return &m_c_etyAnimatedSpriteAppearence;
+		}
+	
+const	std::string						ety::CAnimationRenderComponent::get_ComponentID									( void )
+		{
+			return "AnimationRenderComponent";
+		}
+
+//#########################################################################################################//
+//#########################################################################################################//
+//#########################################################################################################//
+
+										ety::CStaticRenderComponent::CStaticRenderComponent								( const sf::Texture& c_sfTextureAppearance, const sf::Vector2f& c_sfVectorPosition, const sf::Vector2f& c_sfVectorLayerscaling, const sf::VideoMode& c_sfVideomode, const bool bCentered, const float fLayer, const float fAngle, const bool bSetNewDirection )
+											: CRenderComponent( fLayer, fAngle )
+										{
+											sf::Vector2f c_sfVectorScale		( float( c_sfVideomode.width / 1680.f ), float( c_sfVideomode.height / 1050.f ) );
+
+											if( m_fLayer < 0 )
+											{
+												float fMinus = ( c_sfVectorLayerscaling.x * 100.f ) * abs( m_fLayer );
+												unsigned int uiColor = static_cast<unsigned int>(255.f - fMinus);
+
+												m_c_sfSpriteAppearance.setColor( sf::Color( uiColor, uiColor, uiColor ) );
+											}
+
+											m_c_sfSpriteAppearance.setTexture	( c_sfTextureAppearance											);
+											m_c_sfSpriteAppearance.scale			( c_sfVectorScale													);
+											scale_SpriteWithLayer						( c_sfVectorLayerscaling, &m_c_sfSpriteAppearance	);
+
+											if( bCentered == true )
+											{
+												m_c_sfSpriteAppearance.setOrigin( c_sfTextureAppearance.getSize().x/2.f, c_sfTextureAppearance.getSize().y/2.f );
+											}
+
+											m_c_sfSpriteAppearance.setPosition( c_sfVectorPosition	);
+														
+											set_Angle( m_fAngle );
+										}
+										ety::CStaticRenderComponent::~CStaticRenderComponent							( void )
+								{
+								}
+								
+		void							ety::CStaticRenderComponent::update_Component									( const sf::Uint32& uiFrameTime )
+		{
+		}
+		void							ety::CStaticRenderComponent::render_Component									( sf::RenderTexture* const p_c_sfRenderTextureGameScene )
+		{
+			p_c_sfRenderTextureGameScene->draw( m_c_sfSpriteAppearance );
+		}
+
+		void							ety::CStaticRenderComponent::set_Angle											( const float fAngle )
+		{
+			CRenderComponent::set_Angle( fAngle );
+
+			m_c_sfSpriteAppearance.setRotation( m_fAngle );
+		}
+
+const	sf::Vector2f&					ety::CStaticRenderComponent::get_Position										( void )
+		{
+			return m_c_sfSpriteAppearance.getPosition();
+		}
+		sf::Sprite*		const			ety::CStaticRenderComponent::get_Appearance										( void )
+		{
+			return &m_c_sfSpriteAppearance;
+		}
+
+const	std::string						ety::CStaticRenderComponent::get_ComponentID									( void )
+		{
+			return "StaticRenderComponent";
+		}
+
+//#########################################################################################################//
+//#########################################################################################################//
+//#########################################################################################################//
+
+										ety::CStaticBackgroundRenderComponent::CStaticBackgroundRenderComponent			( const sf::Texture& c_sfTextureAppearance, const sf::VideoMode& c_sfVideomode, const float fLayer )
+											: CRenderComponent( fLayer, 0.f )
+										{
+											sf::Vector2f c_sfVectorScale	( static_cast<float>( c_sfVideomode.width ) / static_cast<float>(  c_sfTextureAppearance.getSize().x ), static_cast<float>(  c_sfVideomode.height ) / static_cast<float>( c_sfTextureAppearance.getSize().y ) );
+
+											m_c_sfSpriteAppearance.setTexture		( c_sfTextureAppearance	 );
+											m_c_sfSpriteAppearance.scale				( c_sfVectorScale );
+											m_c_sfSpriteAppearance.setPosition		( 0.f, 0.f	);
+										}
+										ety::CStaticBackgroundRenderComponent::~CStaticBackgroundRenderComponent		( void )
+										{
+										}
+						
+			void						ety::CStaticBackgroundRenderComponent::update_Component							( const sf::Uint32& uiFrameTime )
+			{
+			}
+			void						ety::CStaticBackgroundRenderComponent::render_Component							( sf::RenderTexture* const p_c_sfRenderTextureGameScene )
+			{
+				p_c_sfRenderTextureGameScene->draw( m_c_sfSpriteAppearance );
+			}
+
+			void						ety::CStaticBackgroundRenderComponent::set_Angle								( const float fAngle )
+			{
+				CRenderComponent::set_Angle( fAngle );
+
+				m_c_sfSpriteAppearance.setRotation( m_fAngle );
+			}
+
+const		sf::Vector2f&				ety::CStaticBackgroundRenderComponent::get_Position								( void )
+			{
+				return m_c_sfSpriteAppearance.getPosition();
+			}
+			sf::Sprite*		const		ety::CStaticBackgroundRenderComponent::get_Appearance							( void )
+			{
+				return &m_c_sfSpriteAppearance;
+			}
+
+const		std::string					ety::CStaticBackgroundRenderComponent::get_ComponentID							( void )
+			{
+				return "StaticBackgroundRenderComponent";
+			}
+
+
+//#########################################################################################################//
+//#########################################################################################################//
+//#########################################################################################################//

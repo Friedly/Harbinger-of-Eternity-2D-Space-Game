@@ -1,0 +1,32 @@
+--[Events]
+function Events()
+	c_etyTrigger:add_TimeEvent( 0, 0.0, true);
+end
+--[Events]
+
+--[Actions]
+function Actions()
+
+	testMainMission = c_etyWorld:create_Mission("testMainMission", true, true, true);
+	testMainMission:add_Task(c_etyWorld:create_KillTask("testKillTask", true, 5));
+	
+	testOptionalMission = c_etyWorld:create_Mission("testOptionalMission", false, true, true);
+	testOptionalMission:add_Task(c_etyWorld:create_AttributeTask("testAttributeTask", true));
+	testOptionalMission:get_AttributeTaskByID("testAttributeTask"):get_Attribute():add_UnsignedIntAttribute("uiStructureStability", 0, true);
+	
+end
+--[Actions]
+
+--[Conditions]
+function Conditions()
+
+	if true then
+		Actions()
+		return true;
+	else
+		return false;
+	end
+	
+end
+--[Conditions]
+

@@ -1,0 +1,37 @@
+#pragma once
+#include <string>
+#include <list>
+
+namespace ety
+{
+	class CTask;
+
+	class CMission
+	{
+	private:
+	protected:
+				bool				m_bActive;
+				bool				m_bMainMission;
+				bool				m_bMissionCompleted;
+				bool				m_bMissionDiscovered;
+				std::list<CTask*>	m_listTasks;
+				std::string			m_strMissionID;
+	public:
+									CMission					( void );
+									~CMission					( void );
+
+									CMission					( std::string strMissionID, bool bMainMission, bool bActive, bool bMissionDiscovered);
+
+				void				add_Task					( CTask* const p_c_etyTask );
+
+				void				set_MissionCompleted		( bool bMissionCompleted );
+				void				set_MissionDiscovered		( bool bMissionDiscovered );
+
+		const	bool&				get_MainMission				( void );
+		const	bool&				get_MissionCompleted		( void );
+		const	bool&				get_MissionDiscovered		( void );
+		const	std::string&		get_MissionID				( void );
+				CTask*	const		get_TaskByID				( std::string strTaskID );
+	};
+}
+

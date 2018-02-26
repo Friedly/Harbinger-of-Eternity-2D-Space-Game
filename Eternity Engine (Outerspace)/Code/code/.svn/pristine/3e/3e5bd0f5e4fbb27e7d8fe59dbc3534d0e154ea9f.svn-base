@@ -1,0 +1,25 @@
+--[Events]
+function Events()
+
+	c_etyTrigger:add_UnitEvent( 0, "Player", true);
+	c_etyTrigger:add_TimeEvent( 0, 10.0, true);
+	
+end
+
+--[Actions]
+function Actions()
+	
+end
+
+--[Conditions]
+function Conditions()
+
+	if true then
+		Actions()
+		return true;
+	else
+		return false;
+	end
+	
+end
+

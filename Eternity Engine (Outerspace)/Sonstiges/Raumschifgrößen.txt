@@ -1,0 +1,8 @@
+ 60x60  Drohnen
+100x100 light
+150x150 medium
+200x200 heavy
+400x400 Station
+
+Bei einer Kamaraauflösung von 1920x1200.
+Im Bildverhältniss von 19:10.

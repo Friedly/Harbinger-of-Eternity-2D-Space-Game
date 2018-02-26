@@ -1,0 +1,30 @@
+Pad:	
+	-Es müssen Reiter/Buttons für:
+		-Hangar
+		-Lager
+		-Shop
+		-Missionen
+		-Logbuch
+		-Sternenkarte
+		-Zurück-Button
+	vorhanden sein!
+	-Desweiteren würde es sich anbieten, wenn das Pad ziemlich groß ist, denke aber wenn es ungefähr
+	 so groß ist wie ich es jetzt Testweise gemacht habe ist es okay!
+
+Bar(Hintergrund):
+	-Es muss genug Platz auf Stühlen etc. für genug Quest-NPC gelassen werden und die Sitzgelegenheiten
+	 müssen so gezeichnet werden, dass man dort Personen "draufsetzen" kann (Also ein Bild mit einer
+	 Person drüberlegen kann.)
+	
+	-Es sollte am Besten auch einen "Button" für das Verlassen der Raumstation geben, z.B. dass man auf
+	 ein Fenster oder so klickt, dann die RaumStation verlässt und wieder ins Hauptmenü kommt.
+
+	-Desweiteren soll es eine Art Tisch oder so mit einer Sternenkarte drauf geben, den man anklickt und
+	 dann öffnet sich die Sternenkarte.
+	
+
+Hangar:
+	-Eine ComboBox in der man nach Klassen sortieren kann (Versteh ich nicht)
+	-Wenn du anfängst da was zu zeichnen, müssen wir uns dringend nochmal zusammen setzen, denn
+	 der Aufbau und die Größen der einzelnen Teile (Raumschiff/Modul-Anzeige, Vergleich-Anzeige und
+	 Shop/Lager-Anzeige) müssen von ihrer Größe gut abgestimmt werden!!

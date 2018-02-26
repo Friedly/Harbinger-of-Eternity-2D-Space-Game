@@ -1,0 +1,88 @@
+#include "CUserInterface.hpp"
+#include "CDialogitem.hpp"
+#include "CDialogManager.hpp"
+#include "CIngameState.hpp"
+#include "CGamesettings.hpp"
+#include "CWorld.hpp"
+#include "CSlideControl.hpp"
+#include "CLabel.hpp"
+
+
+									ety::CUserInterface::CUserInterface				(void)
+									:mp_c_etyIngameState							(NULL)
+									,mp_c_etyEntityPlayer							(NULL)
+{
+}
+
+
+									ety::CUserInterface::~CUserInterface			(void)
+{
+}
+
+									ety::CUserInterface::CUserInterface				( CIngameState* const p_c_etyIngameState )
+									:mp_c_etyIngameState							( p_c_etyIngameState )
+{
+	mp_c_etyEntityPlayer =	gp_c_etyWorld->get_Entitymanager()->get_Entity("Player");
+}
+
+void								ety::CUserInterface::add_Dialog					( CDialog* const p_c_etyDialog )
+{
+	m_mapDialogs[p_c_etyDialog->get_DialogID()]	=	p_c_etyDialog;
+}
+void								ety::CUserInterface::init_UserInterface			( ety::CRessourceManager* const p_c_etyCurrentRessourceManager, 
+																					  ety::CGamesettings* const p_c_etyCurrentGamesettingManager )
+{	
+	sf::VideoMode	c_sfCurrentVideomode	=	p_c_etyCurrentGamesettingManager->get_Videomode();
+	CDialogManager* p_c_etyDialogManager	=	mp_c_etyIngameState->get_DialogManager();
+
+	CDialog* p_c_etyDialogShipStatus	=	new CDialog(
+		"ShipStatus", p_c_etyCurrentRessourceManager->get_Texture( "ShipStatus.png" ), 435.f, 75.f,
+		sf::Vector2f( 0, 400 ), sf::IntRect( 0, 0, 400, 130 ), p_c_etyDialogManager, c_sfCurrentVideomode);
+
+	p_c_etyDialogShipStatus->set_Affinity(Affinity::enFOREGROUND);
+	p_c_etyDialogShipStatus->set_Anchor(Anchor::enMID);
+	p_c_etyDialogShipStatus->set_AnchorCentered(true);
+
+	p_c_etyDialogShipStatus->createDialogitem_SlideControl( 
+		"ShipStatusStructureStability", p_c_etyCurrentRessourceManager->get_Texture( "SlideControl.png" ), 425.f, 30.f, sf::Vector2f( 0.f, -20.f ), sf::Vector2f( 0.f, 1000.f ),
+		float( 1000.f ), sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 619, 52 ))
+		);
+
+	CSlideControl* p_c_etySlideControlTmp = p_c_etyDialogShipStatus->get_DialogitemByCustomID<CSlideControl*>("ShipStatusStructureStability");
+	p_c_etySlideControlTmp->set_Anchor(Anchor::enTOP);
+	p_c_etySlideControlTmp->set_AnchorCentered(true);
+	p_c_etySlideControlTmp->set_ColorFilter(ety::Color(255,255,255,65.f));
+
+	p_c_etySlideControlTmp->create_ValueDisplay(false, false, 20.f, ety::Color( 255.f, 255.f, 255.f ), Anchor::enMID, true, sf::Vector2f( 0.f, 5.f ));
+
+	p_c_etyDialogShipStatus->createDialogitem_SlideControl( 
+		"ShipStatusShield", p_c_etyCurrentRessourceManager->get_Texture( "SlideControl.png" ), 425.f, 30.f, sf::Vector2f( 0.f, 20.f ), sf::Vector2f( 0.f, 1000.f ),
+		float( 1000.f ), sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 619, 52 ))
+		);
+
+	p_c_etySlideControlTmp = p_c_etyDialogShipStatus->get_DialogitemByCustomID<CSlideControl*>("ShipStatusShield");
+	p_c_etySlideControlTmp->set_Anchor(Anchor::enBOTTOM);
+	p_c_etySlideControlTmp->set_AnchorCentered(true);
+	p_c_etySlideControlTmp->set_ColorFilter(ety::Color(255,255,255,65.f));
+	p_c_etySlideControlTmp->create_ValueDisplay(true, false, 20.f, ety::Color( 255.f, 255.f, 255.f ), Anchor::enMID, true, sf::Vector2f( 0.f, 5.f ));
+
+	m_mapDialogs["ShipStatus"]	=	p_c_etyDialogShipStatus;
+}
+void								ety::CUserInterface::update_UserInterface		( const sf::Uint32& uiFrameTime )
+{
+	m_mapDialogs["ShipStatus"]->get_DialogitemByCustomID<CSlideControl*>("ShipStatusStructureStability")
+		->set_CurrentValue(float(*mp_c_etyEntityPlayer->get_Component<CAttributeComponent>("AttributeComponent")->m_c_etyAttributes.get_Attribute<unsigned int>("uiStructureStability")));
+
+	//m_mapDialogs["ShipStatus"]->get_DialogitemByCustomID<CSlideControl*>("ShipStatusShield")
+		//->set_CurrentValue(*mp_c_etyEntityPlayer->get_Component<CAttributeComponent>("AttributeComponent")->m_c_etyAttributes.get_Attribute<float>("fShield"));
+}
+				
+ety::CDialog*	const				ety::CUserInterface::get_DialogByID				( std::string strDialogID )
+{
+	if(m_mapDialogs.find(strDialogID) != m_mapDialogs.end())
+	{
+		return	m_mapDialogs[strDialogID];
+	}
+	
+	return NULL;
+}

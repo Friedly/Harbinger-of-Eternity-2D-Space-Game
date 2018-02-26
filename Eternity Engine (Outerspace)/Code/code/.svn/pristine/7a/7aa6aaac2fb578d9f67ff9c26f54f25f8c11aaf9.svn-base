@@ -1,0 +1,250 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SourceCode\CAttributeTask.hpp" />
+    <ClInclude Include="SourceCode\CExploreTask.hpp" />
+    <ClInclude Include="SourceCode\CKillTask.hpp" />
+    <ClInclude Include="SourceCode\CMathConvertClasses.hpp" />
+    <ClInclude Include="SourceCode\CAmmunitionDump.hpp" />
+    <ClInclude Include="SourceCode\CAnimatedSprite.hpp" />
+    <ClInclude Include="SourceCode\CApplication.hpp" />
+    <ClInclude Include="SourceCode\CArmor.hpp" />
+    <ClInclude Include="SourceCode\CAttribute.hpp" />
+    <ClInclude Include="SourceCode\CAttributeComponent.hpp" />
+    <ClInclude Include="SourceCode\CAudioOptionState.hpp" />
+    <ClInclude Include="SourceCode\CButton.hpp" />
+    <ClInclude Include="SourceCode\CCameraComponent.hpp" />
+    <ClInclude Include="SourceCode\CCheckbox.hpp" />
+    <ClInclude Include="SourceCode\CCollision.hpp" />
+    <ClInclude Include="SourceCode\CCollisionComponent.hpp" />
+    <ClInclude Include="SourceCode\CCollisionComponentsystem.hpp" />
+    <ClInclude Include="SourceCode\CColor.hpp" />
+    <ClInclude Include="SourceCode\CComboBox.hpp" />
+    <ClInclude Include="SourceCode\CComponent.hpp" />
+    <ClInclude Include="SourceCode\CComponentsystem.hpp" />
+    <ClInclude Include="SourceCode\CCreditsState.hpp" />
+    <ClInclude Include="SourceCode\CDialogGameState.hpp" />
+    <ClInclude Include="SourceCode\CEntity.hpp" />
+    <ClInclude Include="SourceCode\CEntitymanager.hpp" />
+    <ClInclude Include="SourceCode\CGraphicOptionState.hpp" />
+    <ClInclude Include="SourceCode\CIngameState.hpp" />
+    <ClInclude Include="SourceCode\CIntroState.hpp" />
+    <ClInclude Include="SourceCode\CItem.hpp" />
+    <ClInclude Include="SourceCode\CDialog.hpp" />
+    <ClInclude Include="SourceCode\CDialogitem.hpp" />
+    <ClInclude Include="SourceCode\CDialogManager.hpp" />
+    <ClInclude Include="SourceCode\CEditControl.hpp" />
+    <ClInclude Include="SourceCode\CEngine.hpp" />
+    <ClInclude Include="SourceCode\CEternityEngine.hpp" />
+    <ClInclude Include="SourceCode\CFilemanagement.hpp" />
+    <ClInclude Include="SourceCode\CGamesettings.hpp" />
+    <ClInclude Include="SourceCode\CGameState.hpp" />
+    <ClInclude Include="SourceCode\CGameStateManager.hpp" />
+    <ClInclude Include="SourceCode\CGenerator.hpp" />
+    <ClInclude Include="SourceCode\CIniFile.hpp" />
+    <ClInclude Include="SourceCode\CItemManagement.hpp" />
+    <ClInclude Include="SourceCode\CItemModulesComponent.hpp" />
+    <ClInclude Include="SourceCode\CLaserWeapon.hpp" />
+    <ClInclude Include="SourceCode\CMission.hpp" />
+    <ClInclude Include="SourceCode\CModule.hpp" />
+    <ClInclude Include="SourceCode\CMovableComponent.hpp" />
+    <ClInclude Include="SourceCode\CMovableComponentsystem.hpp" />
+    <ClInclude Include="SourceCode\COptionState.hpp" />
+    <ClInclude Include="SourceCode\CProfile.hpp" />
+    <ClInclude Include="SourceCode\CIniLoader.hpp" />
+    <ClInclude Include="SourceCode\CProfileState.hpp" />
+    <ClInclude Include="SourceCode\CProjectileWeapon.hpp" />
+    <ClInclude Include="SourceCode\CRadioButtonBox.hpp" />
+    <ClInclude Include="SourceCode\CRenderComponent.hpp" />
+    <ClInclude Include="SourceCode\CRenderComponentsystem.hpp" />
+    <ClInclude Include="SourceCode\CRessourceManager.hpp" />
+    <ClInclude Include="SourceCode\CLabel.hpp" />
+    <ClInclude Include="SourceCode\CLoadingState.hpp" />
+    <ClInclude Include="SourceCode\CLogfile.hpp" />
+    <ClInclude Include="SourceCode\CLua.hpp" />
+    <ClInclude Include="SourceCode\CMenuState.hpp" />
+    <ClInclude Include="SourceCode\CMouse.hpp" />
+    <ClInclude Include="SourceCode\CPictureControl.hpp" />
+    <ClInclude Include="SourceCode\CRocketLauncher.hpp" />
+    <ClInclude Include="SourceCode\CScrollbar.hpp" />
+    <ClInclude Include="SourceCode\CShield.hpp" />
+    <ClInclude Include="SourceCode\CSingleton.hpp" />
+    <ClInclude Include="SourceCode\CSlideControl.hpp" />
+    <ClInclude Include="SourceCode\CSpaceStationHangarState.hpp" />
+    <ClInclude Include="SourceCode\CSpaceStationState.hpp" />
+    <ClInclude Include="SourceCode\CTask.hpp" />
+    <ClInclude Include="SourceCode\CTextBox.hpp" />
+    <ClInclude Include="SourceCode\CTimeEvent.hpp" />
+    <ClInclude Include="SourceCode\CTrigger.hpp" />
+    <ClInclude Include="SourceCode\CTriggerEvent.hpp" />
+    <ClInclude Include="SourceCode\CUnitEvent.hpp" />
+    <ClInclude Include="SourceCode\CUserInterface.hpp" />
+    <ClInclude Include="SourceCode\CWeapon.hpp" />
+    <ClInclude Include="SourceCode\CWorld.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SourceCode\CAmmunitionDump.cpp" />
+    <ClCompile Include="SourceCode\CAnimatedSprite.cpp" />
+    <ClCompile Include="SourceCode\CApplication.cpp" />
+    <ClCompile Include="SourceCode\CArmor.cpp" />
+    <ClCompile Include="SourceCode\CAttributeComponent.cpp" />
+    <ClCompile Include="SourceCode\CAttributeTask.cpp" />
+    <ClCompile Include="SourceCode\CAudioOptionState.cpp" />
+    <ClCompile Include="SourceCode\CButton.cpp" />
+    <ClCompile Include="SourceCode\CCameraComponent.cpp" />
+    <ClCompile Include="SourceCode\CCheckbox.cpp" />
+    <ClCompile Include="SourceCode\CCollision.cpp" />
+    <ClCompile Include="SourceCode\CCollisionComponent.cpp" />
+    <ClCompile Include="SourceCode\CCollisionComponentsystem.cpp" />
+    <ClCompile Include="SourceCode\CColor.cpp" />
+    <ClCompile Include="SourceCode\CComboBox.cpp" />
+    <ClCompile Include="SourceCode\CComponent.cpp" />
+    <ClCompile Include="SourceCode\CComponentsystem.cpp" />
+    <ClCompile Include="SourceCode\CCreditsState.cpp" />
+    <ClCompile Include="SourceCode\CDialogGameState.cpp" />
+    <ClCompile Include="SourceCode\CEntity.cpp" />
+    <ClCompile Include="SourceCode\CEntitymanager.cpp" />
+    <ClCompile Include="SourceCode\CExploreTask.cpp" />
+    <ClCompile Include="SourceCode\CGraphicOptionState.cpp" />
+    <ClCompile Include="SourceCode\CIngameState.cpp" />
+    <ClCompile Include="SourceCode\CIntroState.cpp" />
+    <ClCompile Include="SourceCode\CItem.cpp" />
+    <ClCompile Include="SourceCode\CDialog.cpp" />
+    <ClCompile Include="SourceCode\CDialogitem.cpp" />
+    <ClCompile Include="SourceCode\CDialogManager.cpp" />
+    <ClCompile Include="SourceCode\CEditControl.cpp" />
+    <ClCompile Include="SourceCode\CEngine.cpp" />
+    <ClCompile Include="SourceCode\CEternityEngine.cpp" />
+    <ClCompile Include="SourceCode\CFilemanagement.cpp" />
+    <ClCompile Include="SourceCode\CGamesettings.cpp" />
+    <ClCompile Include="SourceCode\CGameState.cpp" />
+    <ClCompile Include="SourceCode\CGameStateManager.cpp" />
+    <ClCompile Include="SourceCode\CGenerator.cpp" />
+    <ClCompile Include="SourceCode\CIniFile.cpp" />
+    <ClCompile Include="SourceCode\CItemManagement.cpp" />
+    <ClCompile Include="SourceCode\CItemModulesComponent.cpp" />
+    <ClCompile Include="SourceCode\CKillTask.cpp" />
+    <ClCompile Include="SourceCode\CLaserWeapon.cpp" />
+    <ClCompile Include="SourceCode\CMission.cpp" />
+    <ClCompile Include="SourceCode\CModule.cpp" />
+    <ClCompile Include="SourceCode\CMovableComponent.cpp" />
+    <ClCompile Include="SourceCode\CMovableComponentsystem.cpp" />
+    <ClCompile Include="SourceCode\COptionState.cpp" />
+    <ClCompile Include="SourceCode\CProfile.cpp" />
+    <ClCompile Include="SourceCode\CProfileState.cpp" />
+    <ClCompile Include="SourceCode\CProjectileWeapon.cpp" />
+    <ClCompile Include="SourceCode\CRadioButtonBox.cpp" />
+    <ClCompile Include="SourceCode\CRenderComponent.cpp" />
+    <ClCompile Include="SourceCode\CRenderComponentsystem.cpp" />
+    <ClCompile Include="SourceCode\CRessourceManager.cpp" />
+    <ClCompile Include="SourceCode\CLabel.cpp" />
+    <ClCompile Include="SourceCode\CLoadingState.cpp" />
+    <ClCompile Include="SourceCode\CLogfile.cpp" />
+    <ClCompile Include="SourceCode\CLua.cpp" />
+    <ClCompile Include="SourceCode\CMenuState.cpp" />
+    <ClCompile Include="SourceCode\CMouse.cpp" />
+    <ClCompile Include="SourceCode\CPictureControl.cpp" />
+    <ClCompile Include="SourceCode\CRocketLauncher.cpp" />
+    <ClCompile Include="SourceCode\CScrollbar.cpp" />
+    <ClCompile Include="SourceCode\CShield.cpp" />
+    <ClCompile Include="SourceCode\CSingleton.cpp" />
+    <ClCompile Include="SourceCode\CSlideControl.cpp" />
+    <ClCompile Include="SourceCode\CSpaceStationHangarState.cpp" />
+    <ClCompile Include="SourceCode\CSpaceStationState.cpp" />
+    <ClCompile Include="SourceCode\CTask.cpp" />
+    <ClCompile Include="SourceCode\CTextBox.cpp" />
+    <ClCompile Include="SourceCode\CTimeEvent.cpp" />
+    <ClCompile Include="SourceCode\CTrigger.cpp" />
+    <ClCompile Include="SourceCode\CTriggerEvent.cpp" />
+    <ClCompile Include="SourceCode\CUnitEvent.cpp" />
+    <ClCompile Include="SourceCode\CUserInterface.cpp" />
+    <ClCompile Include="SourceCode\CWeapon.cpp" />
+    <ClCompile Include="SourceCode\CWorld.cpp" />
+    <ClCompile Include="SourceCode\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3025982C-4484-450A-8013-2C3CAD234DDF}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>ETYEngine</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>E:\Libraries\boost_1_52_0\boost_1_52_0;D:\Development\libaries\boost;$(IncludePath)</IncludePath>
+    <LibraryPath>E:\Libraries\boost_1_52_0\boost_1_52_0\stage\lib;D:\Development\libaries\boost\stage\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>D:\Development\libaries\boost;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Development\libaries\boost\stage\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>sfml-system-d.lib;sfml-window-d.lib;sfml-network-d.lib;sfml-graphics-d.lib;sfml-audio-d.lib;lua.$(ConfigurationName).lib;luabind.$(ConfigurationName).lib;sfml-main-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>sfml-system.lib;sfml-window.lib;sfml-network.lib;sfml-graphics.lib;sfml-audio.lib;lua.$(ConfigurationName).lib;luabind.$(ConfigurationName).lib;sfml-main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

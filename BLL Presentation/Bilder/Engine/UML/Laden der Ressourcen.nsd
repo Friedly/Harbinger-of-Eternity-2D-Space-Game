@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<root text="&#34;const bool CRessourceManager::load_Texture( const std::string&#38; strTexturename, const std::string&#38; strDirectoryKey ) - EXAMPLE&#34;" comment="" type="program" style="nice">
+ <children>
+
+<alternative text="&#34;Wurde die Textur schon geladen?&#34;" comment="" color="FFFFFF">
+ <qTrue>
+
+<instruction text="&#34;return true;&#34;" comment="" color="80FF80" rotated="0"></instruction>
+ </qTrue>
+ <qFalse>
+
+ </qFalse>
+</alternative>
+<alternative text="&#34;Wurde ein &#34;&#34;Ordner-Schlüssel&#34;&#34; ungleich &#34;&#34;NULL&#34;&#34; angegeben?&#34;" comment="&#34;Es wird versucht die Textur nur in den Pfaden zu laden, welche mit dem &#34;&#34;Ordner-Schlüssel&#34;&#34; überein stimmen.&#34;" color="FFFFFF">
+ <qTrue>
+
+<for text="&#34;Für alle Pfade....&#34;" comment="" color="FFFFFF">
+ <qFor>
+
+<alternative text="&#34;Enthält dieser Pfad den &#34;&#34;Ordner-Schlüssel&#34;&#34;?&#34;" comment="" color="FFFFFF">
+ <qTrue>
+
+<alternative text="&#34;Konnte die Textur im gefundenen Pfad geladen werden?&#34;" comment="" color="FFFFFF">
+ <qTrue>
+
+<instruction text="&#34;Speicher die neue Textur in die Verwaltung&#34;,,&#34;return true;&#34;" comment="" color="80FF80" rotated="0"></instruction>
+ </qTrue>
+ <qFalse>
+
+ </qFalse>
+</alternative>
+ </qTrue>
+ <qFalse>
+
+ </qFalse>
+</alternative>
+ </qFor>
+</for>
+ </qTrue>
+ <qFalse>
+
+ </qFalse>
+</alternative>
+<alternative text="&#34;Kann die Textur im Pfad der &#34;&#34;.exe&#34;&#34; geladen werden?&#34;" comment="&#34;Es wird versucht die Textur nur im Ausgangs-Ordner der .EXE zu laden.&#34;" color="FFFFFF">
+ <qTrue>
+
+<instruction text="&#34;Speicher die neue Textur in die Verwaltung&#34;,,&#34;return true;&#34;" comment="" color="80FF80" rotated="0"></instruction>
+ </qTrue>
+ <qFalse>
+
+ </qFalse>
+</alternative>
+<for text="&#34;Für alle Pfade...&#34;" comment="&#34;Es wird versucht die Textur in allen registrierten Pfaden zu laden.&#34;" color="FFFFFF">
+ <qFor>
+
+<alternative text="&#34;Konnte in diesem Pfad geladen werden?&#34;" comment="" color="FFFFFF">
+ <qTrue>
+
+<instruction text="&#34;Speicher die neue Textur in die Verwaltung&#34;,,&#34;return true;&#34;" comment="" color="80FF80" rotated="0"></instruction>
+ </qTrue>
+ <qFalse>
+
+ </qFalse>
+</alternative>
+ </qFor>
+</for>
+<instruction text="&#34;Textur konnte nicht geladen werden.&#34;,,&#34;return false;&#34;" comment="" color="FF8080" rotated="0"></instruction>
+ </children>
+</root>

@@ -1,0 +1,319 @@
+#include "COptionState.hpp"
+#include "CGameStateManager.hpp"
+
+#include "CButton.hpp"
+#include "CComboBox.hpp"
+#include "CLabel.hpp"
+
+															ety::COptionState::COptionState					( const std::string& strStateName )
+																: CDialogGameState( strStateName )
+{
+}
+															ety::COptionState::~COptionState				( void )
+{
+}
+
+void														ety::COptionState::on_Enter						( ety::CRessourceManager* const p_c_etyCurrentRessourceManager, ety::CGamesettings* const p_c_etyCurrentGamesettingManager )
+{
+}
+void														ety::COptionState::on_Exit						( ety::CRessourceManager* const p_c_etyCurrentRessourceManager, ety::CGamesettings* const p_c_etyCurrentGamesettingManager )
+{
+}
+
+void														ety::COptionState::init_GameState				( ety::CRessourceManager* const p_c_etyCurrentRessourceManager, ety::CGamesettings* const p_c_etyCurrentGamesettingManager )
+{
+	CLua* const p_c_etyLuaScript			= get_GameStatemanager()			->get_LuaScript();
+
+	unsigned int	uiScreen_Height			= p_c_etyCurrentGamesettingManager	->get_Videomode().height;
+	unsigned int	uiScreen_Width			= p_c_etyCurrentGamesettingManager	->get_Videomode().width;
+
+	sf::VideoMode	c_sfCurrentVideomode	= p_c_etyCurrentGamesettingManager	->get_Videomode();
+	sf::Font		c_sfCurrentFont			= p_c_etyCurrentRessourceManager	->get_Font("Standard.ttf");
+
+	mp_c_ActualGamesettingsManager			= p_c_etyCurrentGamesettingManager;
+	
+	m_strTempLanguage						= p_c_etyCurrentGamesettingManager->get_Language();
+
+	mp_c_etyDialogManager->set_GamesettingsManager	( p_c_etyCurrentGamesettingManager );
+	mp_c_etyDialogManager->set_StandardFont			( c_sfCurrentFont );
+
+	p_c_etyLuaScript->init_Lua();
+	p_c_etyLuaScript->start_Script("Initialisation/Gamestates/Language.lua");
+
+	enum EventType::en_etyEventType en_etyEventType = EventType::enNONE;
+	std::map<enum EventType::en_etyEventType, p_Function> mapEventTypeFunction;
+
+	////////////////////////////////////////////*OptionsMenu ANFANG*///////////////////////////////////////////
+
+	ety::CDialog* p_c_etyDialogOptionsMenu = new CDialog(
+		"OptionsMenu", p_c_etyCurrentRessourceManager->get_Texture( "OptionenBackgroundAlpha.png" ), 716.25, 711.f, sf::Vector2f( -43, -36 ), 
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 955, 948 )), mp_c_etyDialogManager, c_sfCurrentVideomode					
+		);		
+
+	////////////////////////////////////////////*Buttons ANFANG*////////////////////////////////////////////
+
+	p_c_etyDialogOptionsMenu->createDialogitem_Button(
+		"OptionsBackButton", p_c_etyCurrentRessourceManager->get_Texture( "Zurück.png" ), 35.25f, 36.75f, sf::Vector2f( 636.f, -579.75 ), 
+		sf::IntRect(sf::Vector2i( 100, 0 ), sf::Vector2i( 47, 49 ))
+		);
+
+	CButton* p_c_etyButtonTmp = p_c_etyDialogOptionsMenu->get_DialogitemByCustomID<CButton*>("OptionsBackButton");
+	p_c_etyButtonTmp->set_HoverSprite_Width(c_sfCurrentVideomode.width*float(75.f/1680.f));
+	p_c_etyButtonTmp->set_HoverSprite_Height(c_sfCurrentVideomode.height*float(75.f/1050.f));
+	p_c_etyButtonTmp->set_HoverSprite_SubRect(sf::IntRect(0, 0, 100, 100), true);
+
+	//////////////////////////EVENTS/////////////////////////////////
+	en_etyEventType = EventType::enMOUSELEFTRELEASED;
+	mapEventTypeFunction[en_etyEventType] = &event_exitOptionsMenu;
+
+	m_EventMap["OptionsBackButton"] = mapEventTypeFunction;
+	mapEventTypeFunction.clear();
+	//////////////////////////EVENTS/////////////////////////////////
+
+
+	p_c_etyDialogOptionsMenu->createDialogitem_Button(
+		"OptionsSaveButton", p_c_etyCurrentRessourceManager->get_Texture( "Diskette.png" ), 37.5f, 37.5f, sf::Vector2f( 580.5f, -631.f ), 
+		sf::IntRect(sf::Vector2i( 141 ,2 ), sf::Vector2i( 50, 50 ))
+		);
+
+	p_c_etyButtonTmp = p_c_etyDialogOptionsMenu->get_DialogitemByCustomID<CButton*>("OptionsSaveButton");
+	p_c_etyButtonTmp->set_HoverSprite_Width(c_sfCurrentVideomode.width*float(105.75f/1680.f));
+	p_c_etyButtonTmp->set_HoverSprite_Height(c_sfCurrentVideomode.height*float(106.f/1050.f));
+	p_c_etyButtonTmp->set_HoverSprite_SubRect(sf::IntRect(0, 0, 141, 141), true);
+
+	//////////////////////////EVENTS/////////////////////////////////
+	mapEventTypeFunction[en_etyEventType] = &event_changeLanguage;
+
+	m_EventMap["OptionsSaveButton"] = mapEventTypeFunction;
+	mapEventTypeFunction.clear();
+	//////////////////////////EVENTS/////////////////////////////////
+
+
+	p_c_etyDialogOptionsMenu->createDialogitem_TextButton(
+		"OptionsGraphicButton", sf::Vector2f( 387.75f, -260.f ), p_c_etyLuaScript->get_TableString( "OptionsGraphicButtonCaption", m_strTempLanguage ), 24.f, ety::Color( 85.f, 85.f, 85.f ),
+		ety::Color( 8.f, 201.f, 206.f )
+		);
+
+	p_c_etyButtonTmp = p_c_etyDialogOptionsMenu->get_DialogitemByCustomID<CButton*>("OptionsGraphicButton");
+	p_c_etyButtonTmp->set_AnchorCentered(true);
+
+	//////////////////////////EVENTS/////////////////////////////////
+	mapEventTypeFunction[en_etyEventType] = &event_changeGameState;
+
+	m_EventMap["OptionsGraphicButton"] = mapEventTypeFunction;
+	mapEventTypeFunction.clear();
+	//////////////////////////EVENTS/////////////////////////////////
+
+	p_c_etyDialogOptionsMenu->createDialogitem_TextButton(
+		"OptionsAudioButton", sf::Vector2f( 387.75f, -340.f ), p_c_etyLuaScript->get_TableString( "OptionsAudioButtonCaption", m_strTempLanguage ), 24.f, ety::Color( 85.f, 85.f, 85.f ),
+		ety::Color( 8.f, 201.f, 206.f )
+		);
+
+	p_c_etyButtonTmp = p_c_etyDialogOptionsMenu->get_DialogitemByCustomID<CButton*>("OptionsAudioButton");
+	p_c_etyButtonTmp->set_AnchorCentered(true);
+
+	//////////////////////////EVENTS/////////////////////////////////
+	mapEventTypeFunction[en_etyEventType] = &event_changeGameState;
+
+	m_EventMap["OptionsAudioButton"] = mapEventTypeFunction;
+	mapEventTypeFunction.clear();
+	//////////////////////////EVENTS/////////////////////////////////
+
+	////////////////////////////////////////////*Buttons ENDE*////////////////////////////////////////////
+
+	////////////////////////////////////////////*ComboBoxes ANFANG*////////////////////////////////////////////
+	
+	std::list<std::string>* p_listLanguageComboBoxCaptions;
+	p_listLanguageComboBoxCaptions = new std::list<std::string>();
+
+	p_listLanguageComboBoxCaptions->push_back( "German"  );
+	p_listLanguageComboBoxCaptions->push_back( "English" );
+	p_listLanguageComboBoxCaptions->push_back( "Russian" );
+
+	unsigned int uiCurrentSelection = 0;
+
+	if( m_strTempLanguage == "German" )
+	{
+		uiCurrentSelection = 0;
+	}
+	else if( m_strTempLanguage == "English" )
+	{
+		uiCurrentSelection = 1;
+	}
+	else if( m_strTempLanguage == "Russian" )
+	{
+		uiCurrentSelection = 2;
+	}
+
+	p_c_etyDialogOptionsMenu->createDialogitem_ComboBox( 
+		"OptionsLanguageComboBox", p_c_etyCurrentRessourceManager->get_Texture( "StandardComboBoxSetAlphaSCRBTest.png" ), 200.f, 50.f, sf::Vector2f( 390.f, -425.f ), 
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 200, 50 )), ety::Color( 85.f, 85.f, 85.f ), ety::Color( 8.f, 201.f, 206.f ), 20
+		);
+
+	CComboBox* p_c_etyComboBoxTmp = p_c_etyDialogOptionsMenu->get_DialogitemByCustomID<CComboBox*>("OptionsLanguageComboBox");
+	p_c_etyComboBoxTmp->set_AnchorCentered(true);
+	sf::Vector2f c_sfVector2fNewCaptionPosition = p_c_etyComboBoxTmp->get_HeaderBox()->get_CaptionLabel()->get_Position();
+	c_sfVector2fNewCaptionPosition.x			-=	(p_c_etyComboBoxTmp->get_Width() * 0.22f)/2;
+	p_c_etyComboBoxTmp->get_HeaderBox()->get_CaptionLabel()->set_Position(c_sfVector2fNewCaptionPosition);
+	p_c_etyComboBoxTmp->add_ListEntries(*p_listLanguageComboBoxCaptions);
+	p_c_etyComboBoxTmp->set_UnfoldedEntries(3);
+	p_c_etyComboBoxTmp->set_CurrentSelectedEntry(uiCurrentSelection, true);
+
+	//////////////////////////EVENTS/////////////////////////////////
+	en_etyEventType = EventType::enMOUSELEFTRELEASED;
+	mapEventTypeFunction[en_etyEventType] = &event_changeTempLanguage;
+
+	std::list<CButton*>::iterator itEntries = p_c_etyComboBoxTmp->get_ListEntriesButtons().begin();
+	for(itEntries ; itEntries != p_c_etyComboBoxTmp->get_ListEntriesButtons().end() ; itEntries++)
+	{
+		m_EventMap[(*itEntries)->get_CustomID()] = mapEventTypeFunction;
+		
+	}
+
+	mapEventTypeFunction.clear();	
+	//////////////////////////EVENTS/////////////////////////////////
+	
+	////////////////////////////////////////////*ComboBoxes ENDE*////////////////////////////////////////////
+
+	////////////////////////////////////////////*Labels ANFANG*////////////////////////////////////////////
+	p_c_etyDialogOptionsMenu->createDialogitem_Label(
+		"OptionsTitleLabel", p_c_etyLuaScript->get_TableString( "OptionsTitleLabel", m_strTempLanguage ), 32.f, ety::Color( 255.f, 255.f, 255.f ), sf::Vector2f( 20, -140 )
+		);
+
+	p_c_etyDialogOptionsMenu->get_DialogitemByCustomID<CLabel*>("OptionsTitleLabel")->set_Anchor(Anchor::enALIGNEDMIDTOP);
+
+	p_c_etyDialogOptionsMenu->createDialogitem_Label( 
+		"OptionsLanguageLabel", p_c_etyLuaScript->get_TableString( "OptionsLanguageLabel", m_strTempLanguage ), 20.f, ety::Color( 85.f, 85.f, 85.f ), sf::Vector2f( 187.75f, -420.f )
+		);
+
+	CLabel* p_c_etyLabelTmp = p_c_etyDialogOptionsMenu->get_DialogitemByCustomID<CLabel*>("OptionsLanguageLabel");
+	p_c_etyLabelTmp->set_AnchorCentered(true);
+
+	////////////////////////////////////////////*Labels ENDE*////////////////////////////////////////////
+
+	////////////////////////////////////////////*OptionsMenu ENDE*///////////////////////////////////////////
+	
+	p_c_etyLuaScript->close_Lua();
+}
+
+
+const ety::GameStateRunning::en_etyGameStateRunning			ety::COptionState::handle_GameStateEvents		( const sf::Event& sfEventLastEvent  )
+{
+	CDialogitem* p_c_etyDialogitemEvent = mp_c_etyDialogManager->get_MouseEventDialogitem();
+
+	if(sfEventLastEvent.type == sf::Event::KeyReleased)
+	{
+		if(sfEventLastEvent.key.code == sf::Keyboard::Escape)
+		{
+			return event_exitOptionsMenu(1, mp_c_etyDialogManager);
+		}
+	}
+
+	sf::Event c_sfEvent = sfEventLastEvent;
+	mp_c_etyDialogManager->handle_Events(c_sfEvent);
+	
+	if(p_c_etyDialogitemEvent != NULL)
+	{
+		p_Function p_FunctionEvent = get_EventFunction(p_c_etyDialogitemEvent->get_CustomID(), c_sfEvent);
+		if(p_FunctionEvent != NULL)
+		{
+			std::string strCustomID = p_c_etyDialogitemEvent->get_CustomID();
+
+			if(strCustomID == "OptionsGraphicButton")
+			{
+				return p_FunctionEvent(2, mp_c_etyDialogManager, new std::string("GraphicOptionState"));
+			}
+			else if(strCustomID == "OptionsAudioButton")
+			{
+				return p_FunctionEvent(2, mp_c_etyDialogManager, new std::string("AudioOptionState"));
+			}
+			else
+			{
+				return p_FunctionEvent(1, mp_c_etyDialogManager);
+			}
+		}
+	}
+
+	return ety::GameStateRunning::enTRUE;
+}
+
+
+void														ety::COptionState::set_TempLanguage				( std::string strTempLanguage )
+{
+	m_strTempLanguage = strTempLanguage;
+}
+
+const std::string&											ety::COptionState::get_TempLanguage				( void )
+{
+	return m_strTempLanguage;
+}
+ety::CGamesettings*	const									ety::COptionState::get_GamesettingsManager		( void )
+{
+	return mp_c_ActualGamesettingsManager;
+}
+
+
+ety::GameStateRunning::en_etyGameStateRunning				ety::COptionState::event_exitOptionsMenu		( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+	CDialogManager* p_c_etyDialogManager = static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*));
+	va_CloseArgumentList(va_ALParameter);
+
+	p_c_etyDialogManager->get_ParentGameState()->get_GameStatemanager()->popback_GameState();
+
+	return ety::GameStateRunning::enFALSE;
+}
+ety::GameStateRunning::en_etyGameStateRunning				ety::COptionState::event_changeGameState		( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+	CDialogManager* p_c_etyDialogManager	= static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*));
+	std::string strGameState				= *static_cast<std::string*>(va_getArgument(va_ALParameter, void*));
+	va_CloseArgumentList(va_ALParameter);
+
+	p_c_etyDialogManager->get_ParentGameState()->get_GameStatemanager()->pushback_GameState( strGameState, ety::GamestateStatus::enBACKGROUND );
+
+	return ety::GameStateRunning::enFALSE;
+}
+ety::GameStateRunning::en_etyGameStateRunning				ety::COptionState::event_changeLanguage			( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+	CDialogManager* p_c_etyDialogManager = static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*));
+	va_CloseArgumentList(va_ALParameter);
+
+	COptionState* p_c_etyOptionState = static_cast<COptionState*>(p_c_etyDialogManager->get_ParentGameState());
+
+	p_c_etyOptionState->get_GameStatemanager()->reinit_Gamestates( p_c_etyOptionState->get_TempLanguage() );
+	p_c_etyOptionState->get_GamesettingsManager()->save_Settings();
+
+	return ety::GameStateRunning::enTRUE;
+}
+ety::GameStateRunning::en_etyGameStateRunning				ety::COptionState::event_changeTempLanguage		( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+    va_OpenArgumentList(va_ALParameter, iAmount);
+	CDialogManager* p_c_etyDialogManager = static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*));
+	va_CloseArgumentList(va_ALParameter);
+
+	COptionState* p_c_etyOptionState = static_cast<COptionState*>(p_c_etyDialogManager->get_ParentGameState());
+
+	CComboBox* p_c_etyComboBoxLanguageBox = static_cast <CComboBox*> (p_c_etyDialogManager->get_DialogbyCustomID("OptionsMenu")->
+																		get_DialogitemByCustomID<CComboBox*>("OptionsLanguageComboBox"));
+
+	if(p_c_etyComboBoxLanguageBox->get_CurrentSelectedEntrie() == 0)
+	{
+		p_c_etyOptionState->set_TempLanguage("German");
+	}
+	else if(p_c_etyComboBoxLanguageBox->get_CurrentSelectedEntrie() == 1)
+	{
+		p_c_etyOptionState->set_TempLanguage("English");
+	}
+	else
+	{
+		p_c_etyOptionState->set_TempLanguage("Russian");
+	}
+
+	return ety::GameStateRunning::enTRUE;
+}

@@ -1,0 +1,39 @@
+if c_etyWorld ~= nil then
+
+	c_etyWorld:create_StaticBackground		( "Alpha-Centauri-System.jpg" );
+	
+	--c_etyWorld:create_SpaceshipEntity		( "AlienCarrier"		, "AlienCarrier"				, sfVector2f( 100, 100 )	, 0		, 0		, 	"Flyer"	);
+	--c_etyWorld:create_SpaceshipEntity		( "AlienCruiser"		, "AlienCruiser"				, sfVector2f( 200, 200 )	, 0		, 55	,	"Flyer"	);
+	--c_etyWorld:create_SpaceshipEntity		( "AlienFighter"		, "AlienFighter"				, sfVector2f( 100, 300 )	, 0		, 0 	,	"Flyer"	);
+	--c_etyWorld:create_SpaceshipEntity		( "AlienScorpion"		, "AlienScorpion"				, sfVector2f( 100, 500 )	, 0		, 55 	,	"Flyer"	);
+	--c_etyWorld:create_SpaceshipEntity		( "HumanCarrier"		, "HumanCarrier"				, sfVector2f( 200, 100 )	, 0		, 0 	,	"Flyer"	);
+	--c_etyWorld:create_SpaceshipEntity		( "HumanCruiser"		, "HumanCruiser"				, sfVector2f( 200, 300 )	, 0		, 55 	,	"Flyer"	);
+	--c_etyWorld:create_SpaceshipEntity		( "HumanPhalanx"		, "HumanPhalanx"				, sfVector2f( 100, 400 )	, 0		, 55 	,	"Flyer"	);
+	--c_etyWorld:create_SpaceshipEntity		( "HumanSpacestation"	, "HumanSpacestation"			, sfVector2f( 200, 500 )	, 0		, 0 	,	"Flyer"	);
+	--c_etyWorld:create_SpaceshipEntity		( "HumanDrone"			, "HumanDrone"					, sfVector2f( 500, 0 )		, 0		, 55 	,	"Flyer"	);
+	--c_etyWorld:create_SpaceshipEntity		( "HumanDrone2"			, "HumanDrone2"					, sfVector2f( 300, 0 )		, 0		, 55 	,	"Flyer"	);
+
+	c_etyWorld:create_NPCEntity("testEntity1", "AlienCarrier", sfVector2f(0, 100), 0, "Flyer");
+	c_etyWorld:create_NPCEntity("testEntity2", "AlienCruiser", sfVector2f(100, 250), 0, "Flyer");
+	
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest"		, "MeteoriteBig"				, sfVector2f( 0, 200 )		, sfVector2f( -10, 10 )	, -10	, 25	, 20 	); 
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest1"		, "MeteoriteMedium"				, sfVector2f( 0, 100 )		, sfVector2f( 10, -5 )	, -4	, 45	, 5 	); 
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest2"		, "MeteoriteSmall"				, sfVector2f( 0, 50 )		, sfVector2f( 20, -5 )	, -3	, 75	, 15 	); 
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest3"		, "MeteoriteMephitic"			, sfVector2f( 0, 0 )		, sfVector2f( 0, -10 )	, -2	, 55	, 10 	); 
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest4"		, "MeteoriteMephiticPustules"	, sfVector2f( 0, 250 )		, sfVector2f( 0, 10 )	, -3	, 50	, 10 	);
+
+
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest5"		, "MeteoriteSmall"				, sfVector2f( 40, 25)		, sfVector2f( 20, -5 )	, -3	, 75	, 15 	); 
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest6"		, "MeteoriteMephitic"			, sfVector2f( 79, 10 )		, sfVector2f( 0, -10 )	, -2	, 55	, 10 	); 
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest7"		, "MeteoriteMephiticPustules"	, sfVector2f( 60, 125 )		, sfVector2f( 0, 10 )	, -3	, 50	, 10 	); 	
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest8"		, "MeteoriteSmall"				, sfVector2f( 5, 80 )		, sfVector2f( 20, -5 )	, -3	, 75	, 15 	); 
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest9"		, "MeteoriteMephitic"			, sfVector2f( 55, 100 )		, sfVector2f( 0, -10 )	, -2	, 55	, 10 	); 
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest10"		, "MeteoriteMephiticPustules"	, sfVector2f( 0, 95 )		, sfVector2f( 0, 10 )	, -3	, 50	, 10 	); 
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest11"		, "MeteoriteMedium"				, sfVector2f( 88, 150 )		, sfVector2f( 10, -5 )	, -4	, 45	, 5 	); 
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest12"		, "MeteoriteMedium"				, sfVector2f( 125, 200 )		, sfVector2f( 10, -5 )	, -4	, 45	, 5 	); 
+
+	c_etyWorld:create_PlayerEntity			( "HumanFighter", 180 );
+	
+	c_etyWorld:create_Trigger				( "initMissions", true );
+	c_etyWorld:create_Trigger				( "testOptionalMission", true );
+end

@@ -1,0 +1,333 @@
+#include "CUserInterface.hpp"
+#include "CDialogitem.hpp"
+#include "CDialogManager.hpp"
+#include "CIngameState.hpp"
+#include "CGamesettings.hpp"
+#include "CWorld.hpp"
+#include "CSlideControl.hpp"
+#include "CLabel.hpp"
+#include "CButton.hpp"
+#include "CPictureControl.hpp"
+#include "CGameState.hpp"
+#include "CShield.hpp"
+#include "CGenerator.hpp"
+#include "CProjectileWeapon.hpp"
+
+
+													ety::CUserInterface::CUserInterface				(void)
+									:mp_c_etyIngameState							(NULL)
+									,mp_c_etyEntityPlayer							(NULL)
+{
+}
+
+
+													ety::CUserInterface::~CUserInterface			(void)
+{
+	CDialogManager* p_c_etyDialogManager	=	mp_c_etyIngameState->get_DialogManager();
+
+	std::map<std::string, CDialog*>::iterator	itDialog	=	m_mapDialogs.begin();
+
+	for(itDialog ; itDialog != m_mapDialogs.end() ; itDialog++)
+	{
+		p_c_etyDialogManager->delete_Dialog((*itDialog).second);
+	}
+
+	m_mapDialogs.clear();
+}
+
+													ety::CUserInterface::CUserInterface				( CIngameState* const p_c_etyIngameState )
+													:mp_c_etyIngameState							( p_c_etyIngameState )
+{
+	mp_c_etyEntityPlayer =	gp_c_etyWorld->get_Entitymanager()->get_Entity("Player");
+}
+
+void												ety::CUserInterface::add_Dialog					( CDialog* const p_c_etyDialog )
+{
+	m_mapDialogs[p_c_etyDialog->get_DialogID()]	=	p_c_etyDialog;
+}
+void												ety::CUserInterface::init_UserInterface			( ety::CRessourceManager* const p_c_etyCurrentRessourceManager, 
+																										ety::CGamesettings* const p_c_etyCurrentGamesettingManager )
+{	
+	sf::VideoMode	c_sfCurrentVideomode	=	p_c_etyCurrentGamesettingManager->get_Videomode();
+	CDialogManager* p_c_etyDialogManager	=	mp_c_etyIngameState->get_DialogManager();
+
+	std::string		strLanguage				= p_c_etyCurrentGamesettingManager	->get_Language();
+	sf::Font		c_sfCurrentFont			= p_c_etyCurrentRessourceManager	->get_Font("Standard.ttf");
+
+	p_c_etyDialogManager->set_GamesettingsManager	( p_c_etyCurrentGamesettingManager );
+	p_c_etyDialogManager->set_StandardFont			( c_sfCurrentFont );
+
+	CLua* const p_c_etyLuaScript			= p_c_etyDialogManager->get_LuaScript();
+	p_c_etyLuaScript->init_Lua();
+	p_c_etyLuaScript->start_Script("Initialisation/Gamestates/Language.lua");
+
+	enum EventType::en_etyEventType en_etyEventType = EventType::enNONE;
+	std::map<enum EventType::en_etyEventType, p_Function> mapEventTypeFunction;
+
+	////////////////////////////////////////////*ShipStatus ANFANG*////////////////////////////////////////////
+
+	CDialog* p_c_etyDialogShipStatus	=	new CDialog(
+		"ShipStatus", p_c_etyCurrentRessourceManager->get_Texture( "HUD-Backgrounds.png" ), 300.f, 225.f,
+		sf::Vector2f( 0, 0 ), sf::IntRect( 0, 0, 400, 400 ), p_c_etyDialogManager, c_sfCurrentVideomode);
+
+	p_c_etyDialogShipStatus->set_Affinity(Affinity::enFOREGROUND);
+	p_c_etyDialogShipStatus->set_Anchor(Anchor::enALIGNEDBOTTOMLEFT);
+
+	m_mapDialogs["ShipStatus"]	=	p_c_etyDialogShipStatus;
+
+
+	////////////////////////////////////////////*PictureControls ANFANG*////////////////////////////////////////////
+
+	p_c_etyDialogShipStatus->createDialogitem_PictureControl(
+		"ShieldStatusPlayerPictureControl", p_c_etyCurrentRessourceManager->get_Texture( "PlayerShieldStatus.png" ), 232.f, 200.f, sf::Vector2f( 0.f, 0.f ),
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 116, 100 ))
+		);
+
+	CPictureControl*	p_c_etyPictureControlTmp	=	p_c_etyDialogShipStatus->get_DialogitemByCustomID<CPictureControl*>("ShieldStatusPlayerPictureControl");
+	p_c_etyPictureControlTmp->set_Anchor(Anchor::enMID);
+	p_c_etyPictureControlTmp->set_AnchorCentered(true);
+
+	p_c_etyDialogShipStatus->createDialogitem_PictureControl(
+		"ShipStatusPlayerPictureControl", p_c_etyCurrentRessourceManager->get_Texture( "PlayerShipStatus.png" ), 220.f, 154.f, sf::Vector2f( 0.f, 0.f ),
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 110, 77 ))
+		);
+
+	p_c_etyPictureControlTmp	=	p_c_etyDialogShipStatus->get_DialogitemByCustomID<CPictureControl*>("ShipStatusPlayerPictureControl");
+	p_c_etyPictureControlTmp->set_Anchor(Anchor::enMID);
+	p_c_etyPictureControlTmp->set_AnchorCentered(true);
+	p_c_etyPictureControlTmp->set_ColorFilter(ety::Color(0.f, 255.f, 12.f));
+
+	////////////////////////////////////////////*PictureControls ENDE*////////////////////////////////////////////
+	////////////////////////////////////////////*ShipStatus ENDE*////////////////////////////////////////////
+
+
+
+	////////////////////////////////////////////*EquipmentStatus ANFANG*////////////////////////////////////////////
+
+	CDialog* p_c_etyDialogEquipmentStatus	=	new CDialog(
+		"EquipmentStatus", p_c_etyCurrentRessourceManager->get_Texture( "HUD-Backgrounds.png" ), 300.f, 225.f,
+		sf::Vector2f( 0, 0 ), sf::IntRect( 0, 0, 400, 400 ), p_c_etyDialogManager, c_sfCurrentVideomode);
+
+	p_c_etyDialogEquipmentStatus->set_Affinity(Affinity::enFOREGROUND);
+	p_c_etyDialogEquipmentStatus->set_Anchor(Anchor::enALIGNEDBOTTOMRIGHT);
+
+	////////////////////////////////////////////*SlideControls ANFANG*////////////////////////////////////////////
+	CGenerator*	p_c_etyGenerator	=	static_cast<CGenerator*>(mp_c_etyEntityPlayer->get_Component<CItemModulesComponent>("ItemModulesComponent")->get_EquipmentFromModule(ModuleType::enGENERATOR));
+
+	p_c_etyDialogEquipmentStatus->createDialogitem_SlideControl( 
+		"GeneratorStatus", p_c_etyCurrentRessourceManager->get_Texture( "SlideControl.png" ), 250.f, 50.f, sf::Vector2f( 0.f, -20.f ), 
+		sf::Vector2f( 0.f, p_c_etyGenerator->get_EnergyCapacity() ), p_c_etyGenerator->get_CurrentEnergy(), sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 619, 52 ))
+		);
+
+	CSlideControl* p_c_etySlideControlTmp = p_c_etyDialogEquipmentStatus->get_DialogitemByCustomID<CSlideControl*>("GeneratorStatus");
+	p_c_etySlideControlTmp->set_Anchor(Anchor::enALIGNEDMIDTOP);
+	p_c_etySlideControlTmp->set_AnchorCentered(true);
+	p_c_etySlideControlTmp->create_ValueDisplay(true, false, 15.f, ety::Color( 255.f, 255.f, 255.f ), Anchor::enMID, true, sf::Vector2f( 0.f, 0.f ));
+
+
+	/*CProjectileWeapon*	p_c_etyProjectileWeapon	=	static_cast<CProjectileWeapon*>(mp_c_etyEntityPlayer->get_Component<CItemModulesComponent>("ItemModulesComponent")->get_EquipmentFromModule(ModuleType::enPROJECTILEWEAPON));
+
+	p_c_etyDialogEquipmentStatus->createDialogitem_SlideControl( 
+		"AmmunitionStatus", p_c_etyCurrentRessourceManager->get_Texture( "SlideControl.png" ), 250.f, 50.f, sf::Vector2f( 0.f, -90.f ), sf::Vector2f( 0.f, 0.f ),
+		float( 0.f ), sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 619, 52 ))
+		);
+
+	p_c_etySlideControlTmp = p_c_etyDialogEquipmentStatus->get_DialogitemByCustomID<CSlideControl*>("AmmunitionStatus");
+	p_c_etySlideControlTmp->set_Anchor(Anchor::enALIGNEDMIDTOP);
+	p_c_etySlideControlTmp->set_AnchorCentered(true);
+	p_c_etySlideControlTmp->create_ValueDisplay(true, false, 15.f, ety::Color( 255.f, 255.f, 255.f ), Anchor::enMID, true, sf::Vector2f( 0.f, 0.f ));*/
+	////////////////////////////////////////////*SlideControls ENDE*//////////////////////////////////////////// 
+
+	m_mapDialogs["EquipmentStatus"]	=	p_c_etyDialogEquipmentStatus;
+	////////////////////////////////////////////*EquipmentStatus ENDE*////////////////////////////////////////////
+
+
+
+	////////////////////////////////////////////*MiniMap ANFANG*////////////////////////////////////////////
+
+	CDialog* p_c_etyDialogMiniMap	=	new CDialog(
+		"MiniMap", p_c_etyCurrentRessourceManager->get_Texture( "HUD-Backgrounds.png" ), 300.f, 225.f,
+		sf::Vector2f( 0, 0 ), sf::IntRect( 0, 0, 400, 400 ), p_c_etyDialogManager, c_sfCurrentVideomode);
+
+	p_c_etyDialogMiniMap->set_Affinity(Affinity::enFOREGROUND);
+	p_c_etyDialogMiniMap->set_Anchor(Anchor::enALIGNEDTOPRIGHT);
+
+	m_mapDialogs["MiniMap"]	=	p_c_etyDialogMiniMap;
+	////////////////////////////////////////////*MiniMap ENDE*////////////////////////////////////////////
+
+
+
+	////////////////////////////////////////////*IngameMenu ANFANG*////////////////////////////////////////////
+
+	CDialog* p_c_etyDialogIngameMenu	=	new CDialog(
+		"IngameMenu", p_c_etyCurrentRessourceManager->get_Texture( "HUD-Backgrounds.png" ), 300.f, 400.f,
+		sf::Vector2f( 0, 0 ), sf::IntRect( 0, 0, 400, 400 ), p_c_etyDialogManager, c_sfCurrentVideomode);
+
+	p_c_etyDialogIngameMenu->set_Affinity(Affinity::enFOREGROUND);
+	p_c_etyDialogIngameMenu->set_AnchorCentered(true);
+	p_c_etyDialogIngameMenu->set_Anchor(Anchor::enMID);
+	p_c_etyDialogIngameMenu->set_Visibility(false);
+
+
+	////////////////////////////////////////////*Buttons ANFANG*//////////////////////////////////////////// 
+	p_c_etyDialogIngameMenu->createDialogitem_Button(
+		"IngameMenuCloseButton", p_c_etyCurrentRessourceManager->get_Texture( "HUD-Button.png" ), 200.f, 50.f, sf::Vector2f( 50.f, -50.f ), 
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 200, 75 ))
+		);
+
+	//////////////////////////EVENTS/////////////////////////////////
+	en_etyEventType = EventType::enMOUSELEFTRELEASED;
+	mapEventTypeFunction[en_etyEventType] = &event_closeIngameMenu;
+
+	mp_c_etyIngameState->add_Event("IngameMenuCloseButton", mapEventTypeFunction);
+	mapEventTypeFunction.clear();
+	//////////////////////////EVENTS/////////////////////////////////
+
+	p_c_etyDialogIngameMenu->createDialogitem_Button(
+		"IngameMenuExitGameButton", p_c_etyCurrentRessourceManager->get_Texture( "HUD-Button.png" ), 200.f, 50.f, sf::Vector2f( 50.f, -300.f ), 
+		sf::IntRect(sf::Vector2i( 0, 0 ), sf::Vector2i( 200, 75 ))
+		);
+
+	//////////////////////////EVENTS/////////////////////////////////
+	en_etyEventType = EventType::enMOUSELEFTRELEASED;
+	mapEventTypeFunction[en_etyEventType] = &CIngameState::event_exitIngame;
+
+	mp_c_etyIngameState->add_Event("IngameMenuExitGameButton", mapEventTypeFunction);
+	mapEventTypeFunction.clear();
+	//////////////////////////EVENTS/////////////////////////////////
+
+	////////////////////////////////////////////*Captions ANFANG*////////////////////////////////////////////
+	p_c_etyDialogIngameMenu->get_DialogitemByCustomID<ety::CButton*>( "IngameMenuCloseButton" )
+					 ->create_CaptionLabel(
+					 ety::Color( 255.f, 255.f, 255.f ), p_c_etyLuaScript->get_TableString( "IngameMenuCloseButtonCaption", strLanguage ), 18.f, ety::Color( 85.f, 85.f, 85.f )
+					 );
+
+	p_c_etyDialogIngameMenu->get_DialogitemByCustomID<ety::CButton*>( "IngameMenuExitGameButton" )
+					 ->create_CaptionLabel(
+					 ety::Color( 255.f, 255.f, 255.f ), p_c_etyLuaScript->get_TableString( "IngameMenuExitGameButtonCaption", strLanguage ), 18.f, ety::Color( 85.f, 85.f, 85.f )
+					 );
+	////////////////////////////////////////////*Captions ENDE*////////////////////////////////////////////
+	////////////////////////////////////////////*Buttons ENDE*//////////////////////////////////////////// 
+
+	m_mapDialogs["IngameMenu"]	=	p_c_etyDialogIngameMenu;
+	////////////////////////////////////////////*IngameMenu ENDE*////////////////////////////////////////////
+
+
+
+	////////////////////////////////////////////*InfoWindow ANFANG*////////////////////////////////////////////
+	CDialog* p_c_etyDialogInfoWindow	=	new CDialog(
+		"InfoWindow", p_c_etyCurrentRessourceManager->get_Texture( "HUD-Backgrounds.png" ), 400.f, 200.f,
+		sf::Vector2f( 0, 0 ), sf::IntRect( 0, 0, 400, 400 ), p_c_etyDialogManager, c_sfCurrentVideomode);
+
+	p_c_etyDialogInfoWindow->set_Anchor(Anchor::enALIGNEDLEFT);
+	//p_c_etyDialogInfoWindow->set_Visibility(false);
+
+
+	////////////////////////////////////////////*Labels ANFANG*//////////////////////////////////////////// 
+	CLabel*	p_c_etyLabelTmp	=	NULL;	
+
+	p_c_etyDialogInfoWindow->createDialogitem_Label(	
+		"InfoWindowTitle","Title", 22.f, sf::Color(255,255,255,200), sf::Vector2f(0,-5)
+		);
+
+	p_c_etyLabelTmp	=	p_c_etyDialogInfoWindow->get_DialogitemByCustomID<CLabel*>("InfoWindowTitle");
+	p_c_etyLabelTmp->set_Anchor(Anchor::enALIGNEDMIDTOP);
+	p_c_etyLabelTmp->set_AnchorCentered(true);
+	p_c_etyLabelTmp->set_TextStyle(sf::Uint32(5));
+
+	p_c_etyDialogInfoWindow->createDialogitem_Label(	
+		"InfoWindowContent","Content (Quest Info-Window)", 15.f, sf::Color(255,255,255,200), sf::Vector2f(5,-45)
+		);
+
+	p_c_etyLabelTmp	=	p_c_etyDialogInfoWindow->get_DialogitemByCustomID<CLabel*>("InfoWindowContent");
+	p_c_etyLabelTmp->set_Anchor(Anchor::enTOPLEFT);
+
+	////////////////////////////////////////////*Labels ENDE*//////////////////////////////////////////// 
+
+
+	m_mapDialogs["InfoWindow"]	=	p_c_etyDialogInfoWindow;
+	////////////////////////////////////////////*InfoWindow ENDE*////////////////////////////////////////////
+
+	p_c_etyLuaScript->close_Lua();
+}
+void												ety::CUserInterface::update_UserInterface		( const sf::Uint32& uiFrameTime )
+{
+	float fStructureStability	=	float(*mp_c_etyEntityPlayer->get_Component<CAttributeComponent>("AttributeComponent")->m_c_etyAttributes.get_Attribute<unsigned int>("uiStructureStability"));
+	CShield*	p_c_etyShield	=	static_cast<CShield*>(mp_c_etyEntityPlayer->get_Component<CItemModulesComponent>("ItemModulesComponent")->get_EquipmentFromModule(ModuleType::enSHIELD));
+
+	ety::Color	c_sfColorFilter(0.f,0.f,0.f);
+
+	if(fStructureStability > 500.f)
+	{
+		c_sfColorFilter	=	ety::Color(float(60.f + (192-(fStructureStability-500)/2.6)) , 255.f, 0.f);
+	}
+	else if( fStructureStability < 500.f)
+	{
+		c_sfColorFilter	=	ety::Color(255.f, float(252.f  - (252-(fStructureStability)/1.98)), 0.f);
+	}
+
+
+	ety::Color c_etyColorFilter(255.f, 255.f, 255.f, 255.f * (p_c_etyShield->get_ShieldStatus()/p_c_etyShield->get_MaximalAbsorbedDamage()));
+
+	m_mapDialogs["ShipStatus"]->get_DialogitemByCustomID<CPictureControl*>("ShieldStatusPlayerPictureControl")->set_ColorFilter(c_etyColorFilter);
+	m_mapDialogs["ShipStatus"]->get_DialogitemByCustomID<CPictureControl*>("ShipStatusPlayerPictureControl")->set_ColorFilter(c_sfColorFilter);
+}
+
+
+void												ety::CUserInterface::set_InfoWindowContent		( std::string strInfoWindowContent )
+{
+	m_mapDialogs["InfoWindow"]->get_DialogitemByCustomID<CLabel*>("InfoWindowContent")->set_Content(strInfoWindowContent);
+}
+void												ety::CUserInterface::set_InfoWindowTitle		( std::string strInfoWindowTitle )
+{
+	m_mapDialogs["InfoWindow"]->get_DialogitemByCustomID<CLabel*>("InfoWindowTitle")->set_Content(strInfoWindowTitle);
+}
+void												ety::CUserInterface::set_InfoWindowVisiblity	( bool bVisibility )
+{
+	m_mapDialogs["InfoWindow"]->set_Visibility(bVisibility);
+}
+void												ety::CUserInterface::set_Player					( CEntity* const p_c_etyEntityPlayer)
+{
+	mp_c_etyEntityPlayer	=	p_c_etyEntityPlayer;
+}
+				
+ety::CDialog*	const								ety::CUserInterface::get_DialogByID				( std::string strDialogID )
+{
+	if(m_mapDialogs.find(strDialogID) != m_mapDialogs.end())
+	{
+		return	m_mapDialogs[strDialogID];
+	}
+	
+	return NULL;
+}
+
+
+ety::GameStateRunning::en_etyGameStateRunning		ety::CUserInterface::event_closeIngameMenu		( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+	va_OpenArgumentList(va_ALParameter, iAmount);
+
+	CDialogManager* p_c_etyDialogManager	=	static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*));  
+	CIngameState*	p_c_etyIngameState		=	static_cast<CIngameState*>(p_c_etyDialogManager->get_ParentGameState());
+	va_CloseArgumentList(va_ALParameter);
+
+	p_c_etyDialogManager->get_DialogbyCustomID("IngameMenu")->set_Visibility(false);
+	p_c_etyIngameState->set_GamePaused(false);
+	//get_DialogByID("IngameMenu")->set_Visibility(false);
+	//mp_c_etyIngameState->set_GamePaused(false);
+
+	return ety::GameStateRunning::enTRUE;
+}
+ety::GameStateRunning::en_etyGameStateRunning		ety::CUserInterface::event_openIngameMenu		( int iAmount, ... )
+{
+	va_ArgumentList va_ALParameter;
+	va_OpenArgumentList(va_ALParameter, iAmount);
+
+	CDialogManager* p_c_etyDialogManager	=	static_cast<CDialogManager*>(va_getArgument(va_ALParameter, void*));  
+	va_CloseArgumentList(va_ALParameter);
+
+	p_c_etyDialogManager->get_DialogbyCustomID("IngameMenu")->set_Visibility(true);
+	//get_DialogByID("IngameMenu")->set_Visibility(false);
+
+	return ety::GameStateRunning::enTRUE;
+}

@@ -1,0 +1,7 @@
+http://www.cityindex.ru/cgi-bin/ci/search.pl?query=%F8%F0%E8%F4%F2&stpos=102&stype=AND
+
+Modifiziert: hab alle Zeichen die Gleich waren aus dem alten .ttf übernommen und einige der Kyrilischen
+zeichen passend umgemalt
+
+Da ich nicht wirklich weiß wie ihr die Schrifft implementiert, hab ich ein übersichts Screenschot gemacht
+über dem Buchstaben befindet sich offensichtlich seine "System" nahe ansprache. Fileicht ist es ja hilfreich.

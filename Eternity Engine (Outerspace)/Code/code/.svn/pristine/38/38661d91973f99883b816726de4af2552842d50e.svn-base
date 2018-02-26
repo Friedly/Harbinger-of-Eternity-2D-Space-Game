@@ -1,0 +1,65 @@
+#include "CProjectileWeapon.hpp"
+#include "CModule.hpp"
+#include "CMathConvertClasses.hpp"
+
+
+							ety::CProjectileWeapon::CProjectileWeapon			( const std::string& strDirectory, const std::string& strItemname, ety::CRessourceManager* const p_c_etyCurrentRessourceManager )
+								:CWeapon( strDirectory, strItemname, p_c_etyCurrentRessourceManager)
+							{
+								m_en_etyModuleType = ety::ModuleType::enPROJECTILEWEAPON;
+							}
+							ety::CProjectileWeapon::~CProjectileWeapon			( void )
+							{
+							}
+
+		void				ety::CProjectileWeapon::update_Item					( const sf::Uint32& uiFrameTime )
+		{
+			const sf::Sprite& spr = mp_c_etyModuleParent->get_Appearance();
+
+			sf::Vector2f test = ety::CMath::rotate_Vector( sf::Vector2f( 0.f , -5.f ), spr.getRotation() );
+			
+			std::cout << spr.getRotation() << std::endl;
+
+			std::cout << test.x << "  -  " << test.y << std::endl;
+
+			//Textur Center!
+			//Position Via Richtungsvektor von der Mitte des Raumschiffsaus
+			//Richtungsvektor muss mit dem Schiff mit rotieren
+			m_c_sfSpriteAppearance.setPosition	( spr.getPosition() + test );
+			//Rotation des Turrets
+			//m_c_sfSpriteAppearance.setRotation	( spr.getRotation() );
+		}
+
+//Get-Methoden
+const	float				ety::CProjectileWeapon::get_ReloadTime				( void )
+{
+	return m_fReloadTime;
+}
+const	unsigned int		ety::CProjectileWeapon::get_ClipSize				( void )
+{
+	return m_uiClipSize;
+}
+const	std::string			ety::CProjectileWeapon::get_SpecificInformation		( void )
+{
+	std::stringstream ssStream;
+	//String noch ändern
+	std::string strInformation = m_strName + "\n\n\nKlasse: ";
+	ssStream << m_uiClass;
+	strInformation += ssStream.str() + "\n\nMasse: ";
+	ssStream.str("");
+	ssStream << m_fMass;
+	strInformation += ssStream.str() + " ME\n\nPrice: ";
+	ssStream.str("");
+	ssStream << m_fPrice;
+	strInformation += ssStream.str() + "$\n\nSchaden: ";
+	ssStream.str("");
+	ssStream << m_fDamage;
+	strInformation += ssStream.str() + "\n\nFrRate: ";
+	ssStream.str("");
+	ssStream << m_fFiringRate;
+	strInformation += ssStream.str();
+	ssStream.str("");
+
+	return strInformation;
+}
+

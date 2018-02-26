@@ -1,0 +1,193 @@
+#include "CItemModulesComponent.hpp"
+#include "CEntity.hpp"
+#include "CAttributeComponent.hpp"
+#include "CLua.hpp"
+
+#include "CAmmunitionDump.hpp"
+#include "CShield.hpp"
+#include "CEngine.hpp"
+#include "CArmor.hpp"
+#include "CGenerator.hpp"
+#include "CProjectileWeapon.hpp"
+#include "CRocketLauncher.hpp"
+#include "CLaserWeapon.hpp"
+
+
+																	ety::CItemModulesComponent::CItemModulesComponent		( const std::string& c_stdStringEntityKey )
+																	{
+																		ety::CLua c_etyLuaScript;
+
+																		c_etyLuaScript.init_Lua();
+																			
+																		ety::CItemModulesComponent::register_ClassToLuabind( &c_etyLuaScript );
+																			
+																		c_etyLuaScript.start_Script("Initialisation/Entities/Entities.lua");
+																			
+																		luabind::globals( c_etyLuaScript.get_LuaState() )["c_etyItemModulesComponent"]	= this;
+
+																		if( c_etyLuaScript.call_Function( c_stdStringEntityKey, 0, 0 ) == false )
+																		{
+																		}
+																			
+																		c_etyLuaScript.close_Lua();
+																	}
+																	ety::CItemModulesComponent::~CItemModulesComponent		( void )
+																		{
+																		}
+
+const		bool													ety::CItemModulesComponent::call_ItemScript				( const std::string& c_stdStringTemplate, ety::CItemManagement* const p_c_etyItemManagement )
+			{
+				ety::CLua c_etyLuaScript;
+
+				c_etyLuaScript.init_Lua();
+																			
+				ety::CItemModulesComponent::register_ClassToLuabind( &c_etyLuaScript );
+																																	
+				luabind::globals( c_etyLuaScript.get_LuaState() )["c_etyItemModulesComponent"]	= this;
+				luabind::globals( c_etyLuaScript.get_LuaState() )["c_etyItemManagement"]		= p_c_etyItemManagement;
+
+				if( c_etyLuaScript.start_Script("Initialisation/Entities/Templates.lua") == false )
+				{
+					return false;
+				}
+
+				if( c_etyLuaScript.call_Function( c_stdStringTemplate, 0, 0 ) == false )
+				{
+					return false;
+				}
+																			
+				c_etyLuaScript.close_Lua();
+				
+				return true;
+			}
+
+const		bool													ety::CItemModulesComponent::create_EquipmentModule		( const sf::Vector2i& c_sfVectorClassRange, const ety::ModuleType::en_etyModuleType en_etyModuleType )
+			{
+				std::map< ety::ModuleType::en_etyModuleType, boost::shared_ptr<ety::CModule> >::iterator itEquipmentModuleByType = m_c_stdMapEquipmentModuleByType.find( en_etyModuleType );
+
+				if( itEquipmentModuleByType != m_c_stdMapEquipmentModuleByType.end() )
+				{
+					return false;
+				}
+
+				m_c_stdMapEquipmentModuleByType[ en_etyModuleType ] = boost::shared_ptr<ety::CModule>( new ety::CModule( en_etyModuleType, c_sfVectorClassRange, sf::Vector2f( 0.f, 0.f ) ) );
+
+				return true;
+			}
+const		bool													ety::CItemModulesComponent::create_WeaponModule			( const std::string& c_stdStringModuleID, const sf::Vector2f& c_sfVectorPosition, const sf::Vector2i& c_sfVectorClassRange, const ety::ModuleType::en_etyModuleType en_etyModuleType )
+			{
+				std::map< std::string, boost::shared_ptr<ety::CModule> >::iterator itWeaponModuleByID = m_c_stdMapWeaponModuleByID.find( c_stdStringModuleID );
+
+				if( itWeaponModuleByID != m_c_stdMapWeaponModuleByID.end() )
+				{
+					return false;
+				}
+
+				m_c_stdMapWeaponModuleByID[ c_stdStringModuleID ] = boost::shared_ptr<ety::CModule>( new ety::CModule( en_etyModuleType, c_sfVectorClassRange, c_sfVectorPosition ) );
+
+				return true;
+			}
+
+			void													ety::CItemModulesComponent::update_Component			( const sf::Uint32& uiFrameTime )
+			{
+				std::map< ety::ModuleType::en_etyModuleType, boost::shared_ptr<ety::CModule> >::iterator itEquipmentModuleByType = m_c_stdMapEquipmentModuleByType.begin();
+				std::map< std::string, boost::shared_ptr<ety::CModule> >::iterator itWeaponModuleByID = m_c_stdMapWeaponModuleByID.begin();
+				
+				for( itEquipmentModuleByType ; itEquipmentModuleByType != m_c_stdMapEquipmentModuleByType.end() ; itEquipmentModuleByType++ )
+				{
+					itEquipmentModuleByType->second->update_Module( uiFrameTime );
+				}
+
+				for( itWeaponModuleByID ; itWeaponModuleByID != m_c_stdMapWeaponModuleByID.end() ; itWeaponModuleByID++ )
+				{
+					itWeaponModuleByID->second->update_Module( uiFrameTime );
+				}
+			}
+
+			void													ety::CItemModulesComponent::render_Component			( sf::RenderTexture* const p_c_sfRenderTextureGameScene )
+			{
+				std::map< std::string, boost::shared_ptr<ety::CModule> >::iterator itWeaponModuleByID = m_c_stdMapWeaponModuleByID.begin();
+				
+				for( itWeaponModuleByID ; itWeaponModuleByID != m_c_stdMapWeaponModuleByID.end() ; itWeaponModuleByID++ )
+				{
+					itWeaponModuleByID->second->render_Module( p_c_sfRenderTextureGameScene );
+				}
+			}
+
+			void													ety::CItemModulesComponent::register_ClassToLuabind		( ety::CLua* const p_c_etyLuaScript )
+			{
+				luabind::module( p_c_etyLuaScript->get_LuaState() )
+				[ 
+					luabind::class_<ety::CItemModulesComponent>("CItemModulesComponent")
+					.def( "create_EquipmentModule"	, &ety::CItemModulesComponent::create_EquipmentModule		)
+					.def( "create_WeaponModule"		, &ety::CItemModulesComponent::create_WeaponModule			)
+					.def( "set_EquipmentToModule"	, &ety::CItemModulesComponent::set_EquipmentItemToModule	)
+					.def( "set_WeaponToModule"		, &ety::CItemModulesComponent::set_WeaponItemToModule		)
+					.def( "get_EquipmentToModule"	, &ety::CItemModulesComponent::get_EquipmentFromModule		)
+					.def( "get_WeaponToModule"		, &ety::CItemModulesComponent::get_WeaponFromModule			),
+
+					luabind::class_<ety::CItemManagement>("CItemManagement")
+					.def( "get_Item", &ety::CItemManagement::get_Item ),
+
+					luabind::class_<ety::CItem>("CItem")
+				];
+			}
+
+const		bool													ety::CItemModulesComponent::set_EquipmentItemToModule	( ety::CItem* const p_c_etyItem )
+			{
+				std::map< ety::ModuleType::en_etyModuleType, boost::shared_ptr<ety::CModule> >::iterator itEquipmentModuleByType = m_c_stdMapEquipmentModuleByType.find( p_c_etyItem->get_ItemType() );
+
+				if( itEquipmentModuleByType != m_c_stdMapEquipmentModuleByType.end() )
+				{
+					itEquipmentModuleByType->second->set_Item( p_c_etyItem );
+
+					return true;
+				}
+
+				return false;
+			}
+const		bool													ety::CItemModulesComponent::set_WeaponItemToModule		( const std::string& c_stdStringModuleID, ety::CItem* const p_c_etyItem )
+			{
+				std::map< std::string, boost::shared_ptr<ety::CModule> >::iterator itWeaponModuleByID = m_c_stdMapWeaponModuleByID.find( c_stdStringModuleID );
+
+				if( itWeaponModuleByID != m_c_stdMapWeaponModuleByID.end() )
+				{
+					itWeaponModuleByID->second->set_Item( p_c_etyItem );
+
+					return true;
+				}
+
+				return false;
+			}
+
+			ety::CItem*								const			ety::CItemModulesComponent::get_EquipmentFromModule		( const ety::ModuleType::en_etyModuleType en_etyModuleType )
+			{
+				std::map< ety::ModuleType::en_etyModuleType, boost::shared_ptr<ety::CModule> >::iterator itEquipmentModuleByType = m_c_stdMapEquipmentModuleByType.find( en_etyModuleType );
+
+				if( itEquipmentModuleByType != m_c_stdMapEquipmentModuleByType.end() )
+				{
+					return itEquipmentModuleByType->second->get_Item();
+				}
+
+				return NULL;
+			}
+			ety::CItem*								const			ety::CItemModulesComponent::get_WeaponFromModule		( const std::string& c_stdStringModuleID )
+			{
+				std::map< std::string, boost::shared_ptr<ety::CModule> >::iterator itWeaponModuleByID = m_c_stdMapWeaponModuleByID.find( c_stdStringModuleID );
+
+				if( itWeaponModuleByID != m_c_stdMapWeaponModuleByID.end() )
+				{
+					return itWeaponModuleByID->second->get_Item();
+				}
+
+				return NULL;
+			}
+
+const		std::string												ety::CItemModulesComponent::get_FamilyID				( void )
+			{
+				return "ItemModulesComponent";
+			}
+const		std::string												ety::CItemModulesComponent::get_ComponentID				( void )
+			{
+				return "ItemModulesComponent";
+			}

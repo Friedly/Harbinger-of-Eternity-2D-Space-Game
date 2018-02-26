@@ -1,0 +1,56 @@
+#include "CCameraComponent.hpp"
+#include "CRenderComponent.hpp"
+
+#include "CEntity.hpp"
+
+//#########################################################################################################//
+//#########################################################################################################//
+//#########################################################################################################//
+							ety::CCameraComponent::CCameraComponent						( const sf::Vector2f& c_sfVectorCameraSize )
+							{
+								m_c_sfViewCamera.setSize( c_sfVectorCameraSize );
+							}
+							ety::CCameraComponent::~CCameraComponent					( void )
+							{
+							}
+
+const		sf::View&		ety::CCameraComponent::get_View								( void )
+{
+	return m_c_sfViewCamera;
+}
+
+const		std::string		ety::CCameraComponent::get_FamilyID							( void )
+			{
+				return "CameraComponent";
+			}
+			
+//#########################################################################################################//
+//#########################################################################################################//
+//#########################################################################################################//
+
+							ety::CCenteredCameraComponent::CCenteredCameraComponent		( const sf::Vector2f& c_sfVectorCameraSize )
+								: CCameraComponent( c_sfVectorCameraSize )
+							{
+							}
+							ety::CCenteredCameraComponent::~CCenteredCameraComponent	( void )
+							{
+							}
+
+			void			ety::CCenteredCameraComponent::update_Component				( const sf::Uint32& uiFrameTime )
+			{
+				ety::CRenderComponent* p_c_etyRenderComponent = mp_c_Owner->get_Component<ety::CRenderComponent>("RenderComponent");
+
+				if( p_c_etyRenderComponent != NULL )
+				{
+					m_c_sfViewCamera.setCenter( p_c_etyRenderComponent->get_Position() );
+				}
+			}
+
+const		std::string		ety::CCenteredCameraComponent::get_ComponentID				( void )
+			{
+				return "CenteredCameraComponent";
+			}
+
+//#########################################################################################################//
+//#########################################################################################################//
+//#########################################################################################################//

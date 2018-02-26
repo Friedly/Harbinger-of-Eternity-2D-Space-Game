@@ -1,0 +1,31 @@
+--[Events]
+function Events()
+	c_etyTrigger:add_TimeEvent( 0, 5.0, true);
+end
+--[Events]
+
+--[Actions]
+function Actions()
+
+	print("YEHA! Mission completed!");
+	
+end
+--[Actions]
+
+--[Conditions]
+function Conditions()
+	
+	playerAttribute	=	c_etyEntitymanager:get_Entity("Player"):get_AttributeComponent("AttributeComponent").m_c_etyAttributes:get_UnsignedIntAttribute("uiStructureStability");
+	taskAttribute	=	c_etyWorld:get_MissionByID("testOptionalMission"):get_TaskByID("testAttributeTask"):get_Attribute():get_UnsignedIntAttribute("uiStructureStability");
+
+	if playerAttribute >= taskAttribute then
+		Actions()
+		return true;
+	else
+		print("YOU FAILED!");
+		return false;
+	end
+	
+end
+--[Conditions]
+

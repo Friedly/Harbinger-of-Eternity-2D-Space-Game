@@ -1,0 +1,256 @@
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////																																	   ///////////
+///////////															CGamesettings.cpp														   ///////////
+///////////																									                                   ///////////
+///////////			Diese Klasse dient zum Laden und Speichern von Spieleinstellungen mit optionaler Hilfe einer INI-Datei.					   ///////////
+///////////																																	   ///////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Includes der Eternity-Engine
+#include "CGamesettings.hpp"
+#include "CRessourceManager.hpp"
+#include "CApplication.hpp"
+#include "CLua.hpp"
+
+//Standart Konstruktor und Destruktor.
+								ety::CGamesettings::CGamesettings				( void )
+									: mp_c_etyApplication		( NULL )
+									, mp_c_etyRessourceManager	( NULL )
+									, m_bFullscreenEnabled		( true )
+									, m_bVerticalSyncEnabled	( true )
+									, m_bShowWindowsCursor		( true )
+									, m_usMastervolume			( 100 )
+									, m_usMusicvolume			( 100 )
+									, m_usSoundvolume			( 100 )
+									, m_usFramesPerSecondLimit	( 60 )
+									, m_strLanguage				( "English" )
+									, m_c_sfVideoMode			( sf::VideoMode::getFullscreenModes()[0] )
+{
+}
+								ety::CGamesettings::CGamesettings				( const std::string& strIniFileDirectory )
+								{
+									set_IniFileDirectory( strIniFileDirectory );
+									load_Settings();
+								}
+								ety::CGamesettings::~CGamesettings				( void )
+{
+}
+
+//Die Übernahme der neuen Einstellungen findet in dieser Methode statt. Diese Methode übernimmt
+//als Standart immer alle Einstellungen, wenn man einzelne Einstellungen übernehmen will,
+//müssen die richten Parameter gewählt werden.
+const	bool					ety::CGamesettings::apply_Settings				( const bool bChangeVideomode, const bool bChangeVerticalSync, const bool bChangeWindowsCursor, const bool bChangeAudiosettings )
+{
+	//Die Einstellungen welche die Applikation betreffen können nur übernommen werden,
+	//wenn die aktuelle Applikation gesetzt wurde.
+	if( mp_c_etyApplication != NULL )
+	{
+		if( bChangeVideomode == true )
+		{
+			mp_c_etyApplication->create_RenderWindow( m_c_sfVideoMode, m_bFullscreenEnabled );
+		}
+
+		if( bChangeVerticalSync == true )
+		{
+			mp_c_etyApplication->enable_VerticalSync( m_bVerticalSyncEnabled );
+		}
+
+		if( bChangeWindowsCursor == true )
+		{
+			mp_c_etyApplication->show_WindowsMouseCursor( m_bShowWindowsCursor );
+		}
+
+		mp_c_etyApplication->set_FramerateLimit( m_usFramesPerSecondLimit );
+	}
+	else
+	{
+		//Die Application wurde noch nicht gesetzt.
+		return false;
+	}
+
+	//Die Einstellungen welche die Audiodateien betreffen können nur übernommen werden,
+	//wenn der aktuelle Audiomanager gesetzt wurde.
+	if( mp_c_etyRessourceManager != NULL && bChangeAudiosettings == true)
+	{
+		mp_c_etyRessourceManager->apply_Volume( m_usMastervolume, ety::VolumeType::enMASTERVOLUME	);
+		mp_c_etyRessourceManager->apply_Volume( m_usMusicvolume	, ety::VolumeType::enMUSICVOLUME	);
+		mp_c_etyRessourceManager->apply_Volume( m_usSoundvolume , ety::VolumeType::enSOUNDVOLUME	);
+	}
+
+	//Die neuen Einstellungen werden sofort gespeichert.
+	save_Settings();
+
+	//Die Einstellungen wurden erfolgreich übernommen.
+	return true;
+}
+
+		void					ety::CGamesettings::load_Settings				( void )
+		{
+			//Sektion [DISPLAY]...
+			set_Videomode				( sf::VideoMode(	m_c_etyIniFile.read_Integer( "DISPLAY"	, "iScreenWidth"	, sf::VideoMode::getFullscreenModes()[0].width ),
+															m_c_etyIniFile.read_Integer( "DISPLAY"	, "iScreenHeight"	, sf::VideoMode::getFullscreenModes()[0].height ) ) );
+		
+			set_FullscreenStatus		( m_c_etyIniFile.read_Boolean( "DISPLAY"	, "bFullscreenMode"			, true		) );
+			set_VerticalSyncStatus		( m_c_etyIniFile.read_Boolean( "DISPLAY"	, "bVerticalSync"			, false		) );
+			set_WindowsCursorStatus		( m_c_etyIniFile.read_Boolean( "DISPLAY"	, "bWindowsCursor"			, false		) );
+			set_FramesPerSecondLimit	( m_c_etyIniFile.read_Integer( "DISPLAY"	, "iFramesPerSecondLimit"	, 60		) );
+
+			//Sektion [SOUND]...
+			set_Mastervolume			( m_c_etyIniFile.read_Integer( "SOUND"	, "iMasterVolume"				, 100		) );
+			set_Musicvolume				( m_c_etyIniFile.read_Integer( "SOUND"	, "iMusicVolume"				, 100		) );
+			set_Soundvolume				( m_c_etyIniFile.read_Integer( "SOUND"	, "iSoundvolume"				, 100		) );
+		
+			//Sektion [LANGUAGE]...
+			set_Language				( m_c_etyIniFile.read_String( "LANGUAGE", "strLanguage"					, "English" ) );
+		}
+
+		void					ety::CGamesettings::register_ClassToLuabind		( ety::CLua* const p_c_etyLuaScript )
+		{
+			luabind::module( p_c_etyLuaScript->get_LuaState() )
+			[ 
+				luabind::class_<CGamesettings>("CGamesettings")
+				.def( "get_FullscreenStatus"	, &CGamesettings::get_FullscreenStatus		)
+				.def( "get_Language"			, &CGamesettings::get_Language				)
+				.def( "get_Mastervolume"		, &CGamesettings::get_Mastervolume			)
+				.def( "get_Soundvolume"			, &CGamesettings::get_Soundvolume			)
+				.def( "get_Musicvolume"			, &CGamesettings::get_Musicvolume			)
+				.def( "get_VerticalSyncStatus"	, &CGamesettings::get_VerticalSyncStatus	)
+				.def( "get_Videomode"			, &CGamesettings::get_Videomode				)
+				.def( "get_WindowsCursorStatus"	, &CGamesettings::get_WindowsCursorStatus	)
+			];
+		}
+
+//Diese Methode speichert alle Einstellungen in eine vorher angegebenen INI-Datei.
+		void					ety::CGamesettings::save_Settings				( void )
+		{
+			//Sektion [DISPLAY]...
+			m_c_etyIniFile.write_Integer( "DISPLAY"		, "iScreenWidth"				, m_c_sfVideoMode.width		);
+			m_c_etyIniFile.write_Integer( "DISPLAY"		, "iScreenHeight"				, m_c_sfVideoMode.height	);
+			m_c_etyIniFile.write_Integer( "DISPLAY"		, "iFramesPerSecondLimit"		, m_usFramesPerSecondLimit	);
+			m_c_etyIniFile.write_Boolean( "DISPLAY"		, "bVerticalSync"				, m_bVerticalSyncEnabled	);		
+			m_c_etyIniFile.write_Boolean( "DISPLAY"		, "bWindowsCursor"				, m_bShowWindowsCursor		);		
+			m_c_etyIniFile.write_Boolean( "DISPLAY"		, "bFullscreenMode"				, m_bFullscreenEnabled		);		
+
+			//Sektion [SOUND]...
+			m_c_etyIniFile.write_Integer( "SOUND"		, "iMasterVolume"				, m_usMastervolume			);	
+			m_c_etyIniFile.write_Integer( "SOUND"		, "iMusicVolume"				, m_usMusicvolume			);	
+			m_c_etyIniFile.write_Integer( "SOUND"		, "iSoundvolume"				, m_usSoundvolume			);
+
+			//Sektion [LANGUAGE]...
+			m_c_etyIniFile.write_String( "LANGUAGE"		, "strLanguage"					, m_strLanguage				);	
+		}
+
+//Die Set-Methoden zum setzen privater Membervariablen.
+		void					ety::CGamesettings::set_FullscreenStatus		( const bool bNewFullscreenStatus )
+		{
+			m_bFullscreenEnabled = bNewFullscreenStatus;
+		}
+		void					ety::CGamesettings::set_VerticalSyncStatus		( const bool bNewVerticalSyncStatus )
+		{
+			m_bVerticalSyncEnabled = bNewVerticalSyncStatus;
+		}
+		void					ety::CGamesettings::set_WindowsCursorStatus		( const bool bNewWindowsCursorStatus )
+		{
+			m_bShowWindowsCursor = bNewWindowsCursorStatus;
+		}
+		void					ety::CGamesettings::set_FramesPerSecondLimit	( const unsigned short usFramesPerSecondLimit )
+		{
+			m_usFramesPerSecondLimit  = usFramesPerSecondLimit;
+		}
+		void					ety::CGamesettings::set_Mastervolume			( const unsigned short usMastervolume )
+		{
+			if( usMastervolume <= 100 && usMastervolume >= 0)
+			{
+				m_usMastervolume = usMastervolume;
+			}
+		}
+		void					ety::CGamesettings::set_Musicvolume				( const unsigned short usMusicvolume )
+		{
+			if( usMusicvolume <= 100 && usMusicvolume >= 0)
+			{
+				m_usMusicvolume = usMusicvolume;
+			}
+		}
+		void					ety::CGamesettings::set_Soundvolume				( const unsigned short usSoundvolume )
+		{
+			if( usSoundvolume <= 100 && usSoundvolume >= 0)
+			{
+				m_usSoundvolume = usSoundvolume;
+			}
+		}
+		void					ety::CGamesettings::set_Videomode				( const sf::VideoMode& c_sfVideomode )
+		{
+			//Überprüfung ob die neue Auflösung gültig ist.
+			if(c_sfVideomode.isValid() == true)
+			{
+				m_c_sfVideoMode = c_sfVideomode;
+			}
+			else
+			{
+				//Die Auflösung ist nicht gültig, somit wird die best mögliche Auflösung gesetzt.
+				m_c_sfVideoMode = sf::VideoMode::getFullscreenModes()[0];
+
+				//Einstellungen speichern.
+				save_Settings();
+			}
+		}
+		void					ety::CGamesettings::set_IniFileDirectory		( const std::string& strIniFileDirectory )
+		{
+			char p_chIniDirectory[255] = "";
+
+			_getcwd( p_chIniDirectory, 255 );
+
+			strcat_s( p_chIniDirectory, "/" );
+			strcat_s( p_chIniDirectory, strIniFileDirectory.c_str() );
+
+			m_c_etyIniFile.set_IniFileDirectory( p_chIniDirectory );
+		}
+		void					ety::CGamesettings::set_Language				( const std::string& strNewLanguage )
+		{
+			if( strNewLanguage == "German" || strNewLanguage == "English" || strNewLanguage == "Russian" )
+			{
+				m_strLanguage = strNewLanguage;
+			}
+		}
+		void					ety::CGamesettings::set_Application				( ety::CApplication* const p_c_etyNewApplication )
+		{
+			mp_c_etyApplication = p_c_etyNewApplication;
+		}
+		void					ety::CGamesettings::set_RessourceManager		( ety::CRessourceManager* const p_c_etyNewRessourceManager )
+		{
+			mp_c_etyRessourceManager = p_c_etyNewRessourceManager;
+		}
+
+//Die Get-Methoden zur Rückgabe von privaten Membervariablen.
+const	bool					ety::CGamesettings::get_FullscreenStatus		( void )
+		{
+			return m_bFullscreenEnabled;
+		}
+const	bool					ety::CGamesettings::get_VerticalSyncStatus		( void )
+		{
+			return m_bVerticalSyncEnabled;
+		}
+const	bool					ety::CGamesettings::get_WindowsCursorStatus		( void )
+		{
+			return m_bShowWindowsCursor;
+		}
+const	unsigned short			ety::CGamesettings::get_Mastervolume			( void )
+		{
+			return m_usMastervolume;
+		}
+const	unsigned short			ety::CGamesettings::get_Musicvolume				( void )
+		{
+			return m_usMusicvolume;
+		}
+const	unsigned short			ety::CGamesettings::get_Soundvolume				( void )
+		{
+			return m_usSoundvolume;
+		}
+const	sf::VideoMode& 			ety::CGamesettings::get_Videomode				( void )
+		{
+			return m_c_sfVideoMode;
+		}
+const	std::string&			ety::CGamesettings::get_Language				( void )
+		{
+			return m_strLanguage;
+		}

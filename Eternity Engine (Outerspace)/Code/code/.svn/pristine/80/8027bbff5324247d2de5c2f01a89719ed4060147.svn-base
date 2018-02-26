@@ -1,0 +1,200 @@
+#pragma once
+
+#include <map>
+#include <vector>
+#include <list>
+
+#include <iostream>
+
+typedef std::map<std::string, std::string>			mapItemByModule;
+typedef std::map<std::string, mapItemByModule>		mapItemsBySpaceship;
+
+namespace ety
+{
+	class CAttribute
+	{
+	private:
+	protected:
+		//Diese Map hat den Dienst alle möglichen Attribute zu speichern,
+		//die für das Profil relevant sind.
+		//Diese Attribute bekommen einen Namen als String hinzugefügt,
+		//um diese ansprechen zu können.
+		std::map< std::string, void* >		m_mapAttributesByName;
+		std::map< std::string, void* >		m_mapAllocatedAttributesByName;
+
+	public:
+		//Konstruktor/Destruktor
+											CAttribute					( void )
+											{
+											}
+											~CAttribute					( void )
+											{
+												m_mapAttributesByName.clear();
+
+												for( std::map< std::string, void* >::iterator itAllocatedAttributeByName = m_mapAllocatedAttributesByName.begin(); itAllocatedAttributeByName != m_mapAllocatedAttributesByName.end(); ++itAllocatedAttributeByName)
+												{
+													delete itAllocatedAttributeByName->second;
+													itAllocatedAttributeByName->second = NULL;
+												}
+
+												m_mapAllocatedAttributesByName.clear();
+											}
+	
+		//Diese Methode für ein Attribut mit einem eindeutigen Namen hinzu, ist dieser Name jedoch bereits gespeichert,
+		//wird dieses Attribut auch nicht hinzugefügt und es wird false zurückgegeben.
+		template<class T>		const bool	add_Attribute				( const std::string& strAttributeName, T* const tValue, const bool bAllocated )
+		{
+			if( bAllocated == true )
+			{
+				std::map< std::string, void* >::iterator itAllocatedAttributesByName = m_mapAllocatedAttributesByName.find( strAttributeName );
+
+				if( itAllocatedAttributesByName == m_mapAllocatedAttributesByName.end() )
+				{
+					m_mapAllocatedAttributesByName[strAttributeName] = static_cast<void*>( tValue );
+
+					return true;
+				}
+
+				return false;
+			}
+
+			std::map< std::string, void* >::iterator itAttributesByName = m_mapAttributesByName.find( strAttributeName );
+
+			if( itAttributesByName == m_mapAttributesByName.end() )
+			{
+				m_mapAttributesByName[strAttributeName] = static_cast<void*>( tValue );
+
+				return true;
+			}
+
+			return false;
+		}
+		template<class T>		const bool	add_Attribute				( const std::string& strAttributeName, const T& tValue )
+		{
+			std::map< std::string, void* >::iterator itAllocatedAttributesByName = m_mapAllocatedAttributesByName.find( strAttributeName );
+
+			if( itAllocatedAttributesByName == m_mapAllocatedAttributesByName.end() )
+			{
+				m_mapAllocatedAttributesByName[strAttributeName] = static_cast<void*>( new T( tValue ) );
+
+				return true;
+			}
+
+			return false;
+		}
+
+		template<class T>		const bool	change_Attribute			( const std::string& strAttributeName, T* const tValue, const bool bAllocated )
+		{
+			if( bAllocated == true )
+			{
+				std::map< std::string, void* >::iterator itAllocatedAttributesByName = m_mapAllocatedAttributesByName.find( strAttributeName );
+
+				if( itAllocatedAttributesByName != m_mapAllocatedAttributesByName.end() )
+				{
+					delete itAllocatedAttributesByName->second;
+
+					itAllocatedAttributesByName->second = NULL;
+					itAllocatedAttributesByName->second = static_cast<void*>( tValue );
+
+					return true;
+				}
+
+				return false;
+			}
+
+			std::map< std::string, void* >::iterator itAttributesByName = m_mapAttributesByName.find( strAttributeName );
+
+			if( itAttributesByName != m_mapAttributesByName.end() )
+			{
+				itAttributesByName->second = static_cast<void*>( tValue );
+
+				return true;
+			}
+
+			return false;
+		}
+		template<class T>		const bool	change_Attribute			( const std::string& strAttributeName, const T& tValue )
+		{
+			std::map< std::string, void* >::iterator itAllocatedAttributesByName = m_mapAllocatedAttributesByName.find( strAttributeName );
+
+			if( itAllocatedAttributesByName != m_mapAllocatedAttributesByName.end() )
+			{
+				delete itAllocatedAttributesByName->second;
+
+				itAllocatedAttributesByName->second = NULL;
+				itAllocatedAttributesByName->second = static_cast<void*>( new T( tValue ) );
+
+				return true;
+			}
+
+			return false;
+		}
+
+								const bool	delete_Attribute			( const std::string& strAttributeName )
+								{
+									std::map< std::string, void* >::iterator itAttributesByName = m_mapAttributesByName.find( strAttributeName );
+
+									if( itAttributesByName != m_mapAttributesByName.end() )
+									{
+										m_mapAttributesByName.erase(itAttributesByName);
+
+										return true;
+									}
+									else
+									{
+										std::map< std::string, void* >::iterator itAllocatedAttributesByName = m_mapAllocatedAttributesByName.find( strAttributeName );
+
+										if( itAllocatedAttributesByName != m_mapAllocatedAttributesByName.end() )
+										{
+											m_mapAllocatedAttributesByName.erase(itAllocatedAttributesByName);
+
+											return true;
+										}
+									}
+
+									return false;
+								}
+			 
+		//Diese Methode gibt ein Attribut mit dem übergebenen Namen zurück.
+		template<class T>		T* 	const	get_Attribute				( const std::string& strAttributeName )
+		{
+			std::map< std::string, void* >::iterator itAttributesByName = m_mapAttributesByName.find( strAttributeName );
+
+			if( itAttributesByName != m_mapAttributesByName.end() )
+			{
+				return static_cast<T*>( itAttributesByName->second );
+			}
+			else
+			{
+				std::map< std::string, void* >::iterator itAllocatedAttributesByName = m_mapAllocatedAttributesByName.find( strAttributeName );
+
+				if( itAllocatedAttributesByName != m_mapAllocatedAttributesByName.end() )
+				{
+					return static_cast<T*>( itAllocatedAttributesByName->second );
+				}
+			}
+
+			return NULL;
+		}
+		template<class T>		T	const	get_AttributeAsObject		( const std::string& strAttributeName )
+		{
+			std::map< std::string, void* >::iterator itAttributesByName = m_mapAttributesByName.find( strAttributeName );
+
+			if( itAttributesByName != m_mapAttributesByName.end() )
+			{
+				return *static_cast<T*>( itAttributesByName->second );
+			}
+			else
+			{
+				std::map< std::string, void* >::iterator itAllocatedAttributesByName = m_mapAllocatedAttributesByName.find( strAttributeName );
+
+				if( itAllocatedAttributesByName != m_mapAllocatedAttributesByName.end() )
+				{
+					return *static_cast<T*>( itAllocatedAttributesByName->second );
+				}
+			}
+
+			return T();
+		}
+	};
+}

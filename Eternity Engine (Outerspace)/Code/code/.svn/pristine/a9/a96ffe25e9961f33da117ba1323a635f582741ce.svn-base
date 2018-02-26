@@ -1,0 +1,33 @@
+if c_etyWorld ~= nil then
+
+	c_etyWorld:create_StaticBackground		( "Alpha-Centauri-System.jpg" );
+	
+	c_etyWorld:create_SpaceshipEntity		( "AlienCarrier"		, "AlienCarrier"				, sfVector2f( 100, 100 )	, 0		, 0		, 	"Flyer"	);
+	c_etyWorld:create_SpaceshipEntity		( "AlienCruiser"		, "AlienCruiser"				, sfVector2f( 200, 200 )	, 0		, 55	,	"Flyer"	);
+	c_etyWorld:create_SpaceshipEntity		( "AlienFighter"		, "AlienFighter"				, sfVector2f( 100, 300 )	, 0		, 0 	,	"Flyer"	);
+	c_etyWorld:create_SpaceshipEntity		( "AlienScorpion"		, "AlienScorpion"				, sfVector2f( 100, 500 )	, 0		, 55 	,	"Flyer"	);
+	c_etyWorld:create_SpaceshipEntity		( "HumanCarrier"		, "HumanCarrier"				, sfVector2f( 200, 100 )	, 0		, 0 	,	"Flyer"	);
+	c_etyWorld:create_SpaceshipEntity		( "HumanCruiser"		, "HumanCruiser"				, sfVector2f( 200, 300 )	, 0		, 55 	,	"Flyer"	);
+	c_etyWorld:create_SpaceshipEntity		( "HumanPhalanx"		, "HumanPhalanx"				, sfVector2f( 100, 400 )	, 0		, 55 	,	"Flyer"	);
+	c_etyWorld:create_SpaceshipEntity		( "HumanSpacestation"	, "HumanSpacestation"			, sfVector2f( 200, 500 )	, 0		, 0 	,	"Flyer"	);
+	c_etyWorld:create_SpaceshipEntity		( "HumanDrone"			, "HumanDrone"					, sfVector2f( 500, 0 )		, 0		, 55 	,	"Flyer"	);
+	c_etyWorld:create_SpaceshipEntity		( "HumanDrone2"			, "HumanDrone2"					, sfVector2f( 300, 0 )		, 0		, 55 	,	"Flyer"	);
+
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest"		, "MeteoriteBig"				, sfVector2f( 0, 200 )		, 15	, sfVector2f( -1, 1 )	, -10	, 25	, 2.5 	); 
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest1"		, "MeteoriteMedium"				, sfVector2f( 0, 100 )		, 20	, sfVector2f( 1, -0.5 )	, -4	, 45	, 5 	); 
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest2"		, "MeteoriteSmall"				, sfVector2f( 0, 50 )		, 15	, sfVector2f( 2, -0.5 )	, -3	, 75	, 15 	); 
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest3"		, "MeteoriteMephitic"			, sfVector2f( 0, 0 )		, 5		, sfVector2f( 0, -1 )	, -2	, 55	, 10 	); 
+	c_etyWorld:create_EnvironmentalEntity	( "AsteroidTest4"		, "MeteoriteMephiticPustules"	, sfVector2f( 0, 250 )		, 0		, sfVector2f( 0, 1 )	, -3	, 50	, 10 	); 
+
+	c_etyWorld:create_PlayerEntity			( "HumanFighter", 180 );
+	
+	testEntity 				= c_etyEntitymanager:get_Entity("Player");
+	testAttributeComponent 	= testEntity:get_AttributeComponent("AttributeComponent");
+	testAttributes			= testAttributeComponent.m_c_etyAttributes;
+	
+	print( testEntity:get_UniqueID() );
+	print( testAttributes:get_FloatAttribute("fRotationSpeed") );
+	print( testAttributes:get_UnsignedIntAttribute("uiStructureStability") );
+	
+	c_etyWorld:create_Trigger				( "TestTrigger", true );
+end

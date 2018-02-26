@@ -1,0 +1,56 @@
+#include "CLaserWeapon.hpp"
+
+
+						ety::CLaserWeapon::CLaserWeapon								( const std::string& strDirectory, const std::string& strItemname, ety::CRessourceManager* const p_c_etyCurrentRessourceManager )
+							:CWeapon( strDirectory, strItemname, p_c_etyCurrentRessourceManager )
+						{
+							m_en_etyModuleType = ety::ModuleType::enLASERWEAPON;
+						}
+						ety::CLaserWeapon::~CLaserWeapon							( void )
+						{
+						}
+
+		void			ety::CLaserWeapon::update_Item								( const sf::Uint32& uiFrameTime )
+		{
+		}
+
+//Get-Methoden
+const	float			ety::CLaserWeapon::get_EnergyPerShot						( void )
+{
+	return m_fEnergyPerShot;
+}
+const	float			ety::CLaserWeapon::get_OverHeatingPerShot					( void )
+{
+	return m_fOverHeatingPerShot;
+}
+const	float			ety::CLaserWeapon::get_TotalOverHeating						( void )
+{
+	return m_fTotalOverHeating;
+}
+const	float			ety::CLaserWeapon::get_CooldownPerSecond					( void )
+{
+	return m_fCooldownPerSecond;
+}
+const	std::string		ety::CLaserWeapon::get_SpecificInformation					( void )
+{
+	std::stringstream ssStream;
+	//String noch ändern
+	std::string strInformation = m_strName + "\n\n\nKlasse: ";
+	/*ssStream << m_uiClass;
+	strInformation += ssStream.str() + "\n\nMasse: ";
+	ssStream.str("");
+	ssStream << m_fMass;
+	strInformation += ssStream.str() + " ME\n\nPrice: ";
+	ssStream.str("");
+	ssStream << m_fPrice;
+	strInformation += ssStream.str() + "$\n\nTotal Armor: ";
+	ssStream.str("");
+	ssStream << m_fTotalArmor;
+	strInformation += ssStream.str() + "\n\nDmgRedctn.: ";
+	ssStream.str("");
+	ssStream << m_fDamageReductionPerShot;
+	strInformation += ssStream.str();
+	ssStream.str("");*/
+
+	return strInformation;
+}

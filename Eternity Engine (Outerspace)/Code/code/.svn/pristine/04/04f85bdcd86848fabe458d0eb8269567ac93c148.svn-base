@@ -1,0 +1,28 @@
+--[Events]
+function Events()
+	c_etyTrigger:add_TimeEvent( 0, 0.0, true);
+end
+--[Events]
+
+--[Actions]
+function Actions()
+
+	--testMission = c_etyWorld:create_Mission("testMission", true, true);
+	--testMission:add_Task(c_etyWorld:create_KillTask("testKillTask", true, 5));
+	
+end
+--[Actions]
+
+--[Conditions]
+function Conditions()
+
+	if true then
+		Actions()
+		return true;
+	else
+		return false;
+	end
+	
+end
+--[Conditions]
+

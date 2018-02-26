@@ -1,0 +1,11 @@
+#include "CAttributeTask.hpp"
+
+
+ety::CAttributeTask::CAttributeTask(void)
+{
+}
+
+
+ety::CAttributeTask::~CAttributeTask(void)
+{
+}
