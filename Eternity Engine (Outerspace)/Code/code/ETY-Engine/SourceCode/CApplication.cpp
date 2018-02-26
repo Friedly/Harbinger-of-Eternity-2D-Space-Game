@@ -1,0 +1,194 @@
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////																																	   ///////////
+///////////															CApplication.hpp														   ///////////
+///////////																									                                   ///////////
+///////////			Diese Klasse dient zum initialisieren und erstellen des Fensters. 														   ///////////
+///////////			Berechnung der Bilder pro Sekunde und das Zeichnen der gesamten Szene werden in dieser Klasse abgedeckt.				   ///////////
+///////////																									                                   ///////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Includes der Eternity-Engine
+#include "CApplication.hpp"
+#include "CMathConvertClasses.hpp"
+#include "CMouse.hpp"
+
+
+//Konstruktor der den Titel des Fensters initialisiert und der standart Destruktor.
+							ety::CApplication::CApplication					( const std::string strApplicationTitle )
+								: m_strApplicationTitle				( strApplicationTitle )
+								, m_bShowFramesPerSecond			( false )
+								, m_bShowWindowsCursor				( true )
+								, m_dFramesPerSecondTimer			( 0.f )
+{
+}
+							ety::CApplication::CApplication					( const std::string strApplicationTitle, const std::string strApplicationIcon )
+								: m_strApplicationTitle				( strApplicationTitle )
+								, m_bShowFramesPerSecond			( false )
+								, m_bShowWindowsCursor				( true )
+								, m_dFramesPerSecondTimer			( 0.f )
+							{
+								set_Icon( strApplicationIcon );
+							}
+							ety::CApplication::~CApplication				( void )
+{
+}
+
+//Diese Methode berechnet in gewissen Zeitabständen die Bilder in der Sekunde.
+void						ety::CApplication::calculate_FramesPerSecond	( void )
+{
+	//Uhr zurücksetzen dabei wird die vergangene Zeit zurückgegeben.
+	sf::Time c_sfTimeElapsed = m_c_sfClockFrametime.restart();
+	
+	//Aufaddieren der Zeit um nur alle 250.f Millisekunden zu aktualisieren.
+	m_dFramesPerSecondTimer += c_sfTimeElapsed.asMilliseconds();
+
+	//Alle 250.f Millisekunden werden die Bilder in der Sekunde aktualisiert.
+	if( m_dFramesPerSecondTimer >= 250.f )
+	{
+		//Die Bilder in der Sekunde in einen string umwandeln und dem Text übergeben zum zeichnen.
+		m_c_sfTextFramesPerSecond.setString( "Fps: " + ety::CConvert::convert_NumberToString( ( (1.f/c_sfTimeElapsed.asSeconds()) ) ) );
+
+		//Zurücksetzen des Timers.
+		m_dFramesPerSecondTimer = 0.f;
+	}
+}
+
+//Die Methode überprüft, ob das Fenster noch offen ist.
+const bool					ety::CApplication::check_ApplicationIsOpen		( void )
+{
+	return m_c_sfRenderWindowApplication.isOpen();
+}
+
+//Diese Methode schließt das Fenster.
+void						ety::CApplication::close_Application			( void )
+{
+	m_c_sfRenderWindowApplication.close();
+}
+
+//Diese Methode erstellt ein Fenster.
+void						ety::CApplication::create_RenderWindow			( const sf::VideoMode& c_sfVideomode, const bool bFullscreenStatus )
+{
+	//Mauzeiger wird auf die neue Auflösung angepasst, sowie der Bilder in der Sekunde Text.
+	ety::CMouse::scale_Size						( float(c_sfVideomode.width)/1680.f, float(c_sfVideomode.height)/1050.f );
+	m_c_sfTextFramesPerSecond.setCharacterSize	( unsigned int( 15.f*( float( c_sfVideomode.height )/1050.f ) ) );
+
+	//Neue Auflösung übernehmen mit oder ohne Vollbildmodus.
+	if( bFullscreenStatus == true )
+	{
+		m_c_sfRenderWindowApplication.create( c_sfVideomode, m_strApplicationTitle, sf::Style::Fullscreen );
+	}
+	else
+	{
+		m_c_sfRenderWindowApplication.create( c_sfVideomode, m_strApplicationTitle );
+	}
+
+	//Erstellung des Zwischenspeichers mit der neuen Auflösung.
+	m_c_sfRenderTextureGameScene.create( c_sfVideomode.width, c_sfVideomode.height );
+
+	//Der Maus bescheid sagen, dass das Fenster im Vollbildmodus ist.
+	ety::CMouse::set_Fullscreen( bFullscreenStatus );
+
+	//Die Maus das neue Fenster übergeben.
+	ety::CMouse::set_RenderWindow( &m_c_sfRenderWindowApplication );
+}
+
+//Diese Mehode zeichnet die aktuelle Szene.
+void						ety::CApplication::draw_CurrentScene			( void )
+{
+	//Wenn das Fenster offen ist...
+	if( m_c_sfRenderWindowApplication.isOpen() )
+	{
+		m_c_sfRenderTextureGameScene.setView( m_c_sfRenderTextureGameScene.getDefaultView() );
+
+		//Bilder in der Sekunde anzeigen oder nicht.
+		if( m_bShowFramesPerSecond == true )
+		{
+			m_c_sfRenderTextureGameScene.draw( m_c_sfTextFramesPerSecond );
+		}
+		
+		//Windows-Mauzeiger anzeigen oder nischt.
+		if( m_bShowWindowsCursor == false )
+		{
+			m_c_sfRenderTextureGameScene.draw( CMouse::get_CustomCursorSprite() );
+		}
+
+		//Zwischenspeicher zur richtigen Texture umwandeln.
+		m_c_sfRenderTextureGameScene.display();
+
+		//Sprite zeichnen.
+		m_c_sfRenderWindowApplication.draw( sf::Sprite( m_c_sfRenderTextureGameScene.getTexture() ) );
+
+		//Aktuelle Szene in das Fenster zeichnen.
+		m_c_sfRenderWindowApplication.display();
+
+		//Szene reinigen.
+		m_c_sfRenderTextureGameScene.clear();
+		m_c_sfRenderWindowApplication.clear();
+	}
+}
+
+//Diese Methode schaltet die vertikale Synchronisation an/aus.
+void						ety::CApplication::enable_VerticalSync			( const bool bEnableVerticalSync )
+{
+	m_c_sfRenderWindowApplication.setVerticalSyncEnabled( bEnableVerticalSync );
+}
+
+//Diese Methode speichert das aktuellste Event in den übergebenen Parameter.
+const bool					ety::CApplication::poll_Event					( sf::Event& c_sfCurrentEvent )
+{
+	return m_c_sfRenderWindowApplication.pollEvent( c_sfCurrentEvent );
+}
+
+//Mit dieser Methode schaltet die Anzeige der Bilder in der Sekunde an/aus.
+void						ety::CApplication::show_FramesPerSecond			( const bool bShowFramesPerSecond )
+{
+	m_bShowFramesPerSecond = bShowFramesPerSecond;
+}
+//Diese Methode schaltet den Windows-Mauszeiger an/aus.
+void						ety::CApplication::show_WindowsMouseCursor		( const bool bShowWindowsMouseCursor )
+{
+	m_c_sfRenderWindowApplication.setMouseCursorVisible( bShowWindowsMouseCursor );
+	m_bShowWindowsCursor = bShowWindowsMouseCursor;
+}
+
+//Aktualisiert das Fenster.
+void						ety::CApplication::update_Application			( void )
+{
+	calculate_FramesPerSecond();
+}
+
+//Die Set-Methoden zum setzen privater Membervariablen.
+void						ety::CApplication::set_FramerateLimit			( const unsigned short usFramesPerSecondLimit )
+{
+	m_c_sfRenderWindowApplication.setFramerateLimit( usFramesPerSecondLimit );
+}
+
+void						ety::CApplication::set_Icon						( const std::string& strIconTextureDirectory )
+{
+	sf::Image c_sfTextureIcon;
+
+	if( c_sfTextureIcon.loadFromFile( strIconTextureDirectory ) == true )
+	{
+		m_c_sfRenderWindowApplication.setIcon( c_sfTextureIcon.getSize().x, c_sfTextureIcon.getSize().y, c_sfTextureIcon.getPixelsPtr() );
+	}
+}
+
+//Die Get-Methoden zur Rückgabe von privaten Membervariablen.
+const bool					ety::CApplication::get_ShowFramesPerSecond		( void )
+{
+	return m_bShowFramesPerSecond;
+}
+const std::string&			ety::CApplication::get_ApplicationTitle			( void )
+{
+	return m_strApplicationTitle;
+}
+const sf::Uint32			ety::CApplication::get_Frametime				( void )
+{
+	sf::Time c_sfTimeElapsed = m_c_sfClockFrametime.getElapsedTime();
+	
+	return c_sfTimeElapsed.asMilliseconds();
+}
+sf::RenderTexture*	const	ety::CApplication::get_RenderTextureGameScene	( void )
+{
+	return &m_c_sfRenderTextureGameScene;
+}

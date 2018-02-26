@@ -1,0 +1,178 @@
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////								CDIALOGMANAGER.HPP							///////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+//Compiler Includes
+#include <list>
+#include <map>
+
+//Eternity Includes
+#include "CFilemanagement.hpp"
+#include "CMouse.hpp"
+#include "CLua.hpp"
+#include "CColor.hpp"
+
+#include <SFML\Graphics.hpp>
+#include <SFML\Audio.hpp>
+#include <SFML\Graphics\Texture.hpp>
+#include <SFML\Graphics\Sprite.hpp>
+#include <SFML\Window\VideoMode.hpp>
+
+
+
+
+namespace ety
+{
+	//typedef für eine map mit einem enum für den SoundType und einem Zeiger auf sf::Sound
+	typedef std::map<enum ety::SoundType::en_etySoundType,sf::Sound*>			mapSoundTypeSounds;
+	//iterator für die passende map (enum SoundType und Zeiger auf sf::Sound)
+	typedef std::map<enum ety::SoundType::en_etySoundType,sf::Sound*>::iterator	mapSoundTypeSoundsIT;
+
+
+	//Die Affinität eines Dialogitems gibt an, an was (Hintergrund/Vordergrund) das Dialogitem, in seiner Zeichenreihenfolge, orientiert ist.
+	//Hat das Dialogitem die Affinität enBACKGROUND, dann wird es ganz am Anfang gezeichnet und liegt damit relativ weit im Hintergrund.
+	//Bei der Affinität enFOREGROUND ist es genau anders herum. Die Affinität enSTANDARD beschreibt praktisch die Mitte von beiden.
+	namespace Affinity
+	{
+		enum						en_etyAffinity						{ enBACKGROUND, enFOREGROUND, enSTANDARD };
+	}
+
+	//enum das den Ankerpunkt auf dem Dialog bennent.
+	//Die Position eines Dialogitems und eines Dialogs ist meistens nicht absolut, sondern relativ, denn die Position ist oftmals auf einen Ankerpunkt bezogen. Dieser Ankerpunkt
+	//kann z.B. die Mitte eines Dialogs sein, wenn dann die Position eines Dialogitems (0,0) ist, liegt seine linke obere Ecke genau in der Mitte des Dialogs.
+	namespace Anchor
+	{
+		enum						en_etyAnchor						{ enTOPLEFT,enTOP,enTOPRIGHT,enLEFT,enMID,enRIGHT,enBOTTOMLEFT,enBOTTOM,enBOTTOMRIGHT,enALIGNEDMIDTOP, enALIGNEDLEFT, enALIGNEDBOTTOMLEFT, enALIGNEDBOTTOMRIGHT, enALIGNEDTOPLEFT, enALIGNEDTOPRIGHT };
+	}
+
+	//Gibt an wie ein Dialogitem an ein anderes angefügt ist.
+	//enCHILDREN bedeuetet, dass das Dialogitem ein Teil eines übergeordneten Dialogitems ist
+	//z.B. die Caption eines Buttons ist ein Label, welches aber bestandteil des Buttons ist
+	//Dies hat insbesondere auf den Ankerpunkt, welcher nun vom Parent-Dialogitem ausgeht und nicht
+	//vom Dialog, sowie die Position Auswirkungen.
+	//Desweiteren stehen Dialogitems vom Type enCHILDREN nicht in der Dialogitem-Liste eines Dialoges (es gibt aber auch Ausnahmen)
+	//Die Aspekte des Anchors/Position treffen auch auf den Type enATTACHED zu. Doch mit dem Unterschied, dass das Dialogitem nur
+	//an ein anderes angefügt ist, um die Position leichter zubestimmen. Sonst ist es völlig autark, da das Dialogitem
+	//an das es angefügt auch überhaupt nichts davon weiß.
+	//Der letzte Type ist der Standardmäßige, das Dialogitem ist nicht an ein anderes angefügt.
+	namespace AttachedType
+	{
+		enum						en_etyAttachedType					{enCHILDREN, enATTACHED, enNOTATTACHED};
+	}
+
+	//Enum für die Events die stattfinden können.
+	namespace EventType
+	{
+		enum						en_etyEventType						{enNONE,enMOUSEHOVER, enMOUSELEFTPRESSED, enMOUSELEFTRELEASED, enMOUSELEFTNOFOCUSRELEASED, enMOUSERIGHTPRESSED, 
+																			enMOUSERIGHTRELEASED, enMOUSERIGHTNOFOCUSRELEASED, enMOUSEDOUBLECLICKLEFT};
+	}
+
+	//Enum für den Textwriteoutstyle.
+	namespace TextwriteoutStyle
+	{
+		enum						en_etyTextwriteoutStyle				{ enSTANDARD, enCOD, enEDITCONTROLCURSORBLINK, enNONE };
+	}
+
+	//Enum für den VariableType
+	namespace VariableType
+	{
+		enum						en_etyVariableType					{ enSTRING, enFLOAT, enINT, enBYTE };
+	}
+
+
+	class CLua;
+	class CDialog;
+	class CDialogitem;
+	class CGameState;
+
+	//Der DialogManager ist die Schnittstelle zwischen Engine bzw. States und dem Dialogsystem. Er verwaltet das ganze Dialogsystem.
+	//Durch ihn ist es möglich das Dialogsystem in alle möglichen anderen Engines die SFML benutzen zu verfrachten, man muss nur die Funktionen des DialogManagers
+	//anpassen, da die Dialoge und Dialogitems komplett von dem Statesystem und der Engine abgeschnitten sind.
+	class CDialogManager
+	{
+	private:
+
+				bool									m_bModalDialog;
+				ety::CDialog*							mp_c_etyDialogModal;
+				ety::CDialogitem*						mp_c_etyDialogitemFocusedDialogitem;
+				ety::CDialogitem*						mp_c_etyDialogitemMouseEvent;
+				ety::CDialogitem*						mp_c_etyDialogitemDoubleClickEvent;
+				ety::CDialogitem*						mp_c_etyDialogitemMouseNoFocusRelease;
+				ety::CGamesettings*						mp_c_etyGamesettingsManager;
+				ety::CGameState*						mp_c_etyGameStateParentState;
+				//Diese Map beinhaltet alle Dialoge dieses Spielzustandes und der Schlüssel ist deren Name.
+				std::list<CDialog*>						m_listDialogs;
+				sf::Font								m_c_sfFontStandardFont;
+		const	sf::Texture*							mp_c_sfTextureStandardTooltip;	
+				sf::IntRect								m_c_sfIntRectTooltipStandardSubRect;
+				sf::Uint32								m_sfUint32ElapsedFrameTime;
+
+	protected:
+
+
+	public:		
+				//Standart Kon- und Destruktor
+														CDialogManager								(void);
+														~CDialogManager								(void);
+
+
+														CDialogManager								(ety::CGameState* const p_c_etyGameStateParentState);
+
+
+		const	bool									add_Dialog									( CDialog* const p_c_etyDialogNewDialog );
+
+				void									change_FocusedDialogitem					( ety::CDialogitem* const p_c_etyDialogitemNewFocusedDialogitem );
+				void									change_ModalDialog							( bool bDialogModal, CDialog* const p_c_etyDialogModalDialog, sf::Vector3f c_sfVector3fFactors );
+				bool									check_IsDialogitemActive					( CDialogitem* const p_c_etyDialogitem );
+				void									cleanup_Dialogs								( void );
+
+				const bool								delete_Dialog								( ety::CDialog* const p_c_etyDialog );
+				void									draw_Dialogs								( sf::RenderTexture* const p_c_sfRenderTextureGameScene );
+
+				void									handle_Events								( sf::Event& c_sfEvent );
+
+				void									reinit_Dialogs								( const sf::VideoMode& c_sfNewVideoMode );
+
+				void									update_Dialogs								( const sf::Uint32& uiFrameTime );
+				void									update_Language								( const std::string strNewLanguage, CLua* const mp_c_etyLuaScript );
+
+				//Set-Methoden
+				void									set_ModalDialog								( const bool bModalDialog );
+				void									set_StandardFont							( const sf::Font& c_sfFontStandardFont );
+				void									set_StandardTooltipTexture					( const	sf::Texture& c_sfTextureStandardTooltip, sf::IntRect c_sfIntRectStandardSubRect );
+				void									set_GamesettingsManager						( ety::CGamesettings* const p_c_etyCurrentGamesettingManager );
+				void									set_ElapsedFrameTime						( const sf::Uint32& uiFrameTime );
+
+
+				//Get-Methoden
+		const	bool									get_ModalDialog								( void );
+				std::list<ety::CDialog*>				get_Dialogs									( void );
+		const	std::string								get_Language								( void );
+		const	sf::Font&								get_StandardFont							( void );
+		const	sf::Texture*							get_StandardTooltipTexture					( void );
+		const	sf::IntRect&							get_StandardTooltipSubRect					( void );
+				CDialog*					const		get_DialogbyCustomID						( std::string strCustomID );
+				CDialogitem*				const		get_MouseEventDialogitem					( void );
+				CDialogitem*				const		get_MouseNoFocusEventDialogitem				( void );
+				CDialogitem*				const		get_FocusedDialogitem						( void );
+				CGameState*					const		get_ParentGameState							( void );
+				CLua*						const		get_LuaScript								( void );
+				///////////////////////////////////////////////////////////////////////////////////
+				/// \Beschreibung: 
+				/// Der Eventsoundmap werden alle Standartsounds eines Steuerelementtyps, des 
+				/// jeweiligen States hinzugefügt.
+				///
+				/// \parameter	void
+				///
+				/// \rückgabe	void
+				///////////////////////////////////////////////////////////////////////////////////
+		const	mapSoundTypeSounds						get_StandardSounds							( DialogitemType::en_etyDialogitemType en_etyDialogitemType );
+
+	};
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////								CDIALOGMANAGER.HPP							///////////
+///////////////////////////////////////////////////////////////////////////////////////////////

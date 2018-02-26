@@ -1,0 +1,65 @@
+#pragma once
+
+#include <SFML\Graphics\Texture.hpp>
+#include <SFML\Graphics\Sprite.hpp>
+
+#include <sstream>
+
+#include "CRessourceManager.hpp"
+
+namespace ety
+{
+	namespace ModuleType
+	{
+		enum en_etyModuleType { enLASERWEAPON, enROCKETLAUNCHER, enPROJECTILEWEAPON, enENGINE, enGENERATOR, enSHIELD, enARMOR, enAMMUNITIONDUMP };
+	}
+
+	class CModule;
+
+	class CItem
+	{
+	protected:
+						float											m_fMass;
+						float											m_fPrice;
+
+						unsigned int									m_uiClass;
+
+						ety::ModuleType::en_etyModuleType				m_en_etyModuleType;
+						ety::CModule*									mp_c_etyModuleParent;
+
+						std::string										m_strName;
+						std::string										m_strInformation;
+
+						sf::Sprite										m_c_sfSpriteAppearance;
+						sf::Sprite										m_c_sfSpriteIcon;
+
+	public:		
+																		CItem							( const std::string& strDirectory, const std::string& strItemname, ety::CRessourceManager* const p_c_etyCurrentRessourceManager );
+																		~CItem							( void );
+
+		virtual			void											update_Item						( const sf::Uint32& uiFrameTime ) = 0;
+		virtual 		void											render_Item						( sf::RenderTexture* const p_c_sfRenderTextureGameScene );
+
+			//Set-Methoden
+						void											set_Information					( const std::string& strInformation );
+						void											set_Mass						( const float fMass );
+						void											set_Price						( const float fPrice );
+						void											set_ParentModule				( CModule* const p_c_etyModuleParent );
+						void											set_Appearance					( const sf::Texture& c_sfTextureAppearance );
+						void											set_Icon						( const sf::Texture& c_sfTextureIcon );
+
+
+			//Get-Methoden
+				const	float											get_Mass						( void );
+				const	float											get_Price						( void );
+				const	unsigned int									get_Class						( void );
+				const	sf::Sprite&										get_Appearance					( void );
+				const	sf::Sprite&										get_Icon						( void );
+				const	ety::ModuleType::en_etyModuleType				get_ItemType					( void );
+				const	std::string&									get_Name						( void );
+				const	std::string&									get_Information					( void );	
+		virtual const	std::string										get_SpecificInformation			( void );
+	};
+}
+
+

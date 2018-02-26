@@ -1,0 +1,39 @@
+#pragma once
+
+#include "CItem.hpp"
+
+namespace ety
+{
+	class CWeapon : public CItem
+	{
+	protected:
+
+		float					m_fDamage;
+		float					m_fFiringRate;
+		float					m_fProjectileSpeed;
+		float					m_fRotatingSpeed;
+
+		sf::Sprite				m_c_sfSpriteProjectileAppearance;
+
+	public:
+								CWeapon								( const std::string& strDirectory, const std::string& strItemname, ety::CRessourceManager* const p_c_etyCurrentRessourceManager );
+								~CWeapon							( void );
+
+		//Set-Methoden
+				void			set_Damage							( const float fDamage );
+				void			set_FiringRate						( const float fFiringRate );
+				void			set_ProjectileSpeed					( const float fProjectileSpeed );
+				void			set_RotatingSpeed					( const float fRotatingSpeed );
+				void			set_ProjectileAppearance			( const sf::Sprite& c_sfSpriteProjectileAppearance );
+
+		//Get-Methoden
+		const	float&			get_Damage							( void );
+		const	float&			get_FiringRate						( void );
+		const	float&			get_ProjectileSpeed					( void );
+		const	float&			get_RotatingSpeed					( void );
+		const	sf::Sprite&		get_ProjectileAppearance			( void );
+		const	std::string		get_SpecificInformation				( void );
+	};
+}
+
+

@@ -1,0 +1,102 @@
+#include "CDialogGameState.hpp"
+
+
+								ety::CDialogGameState::CDialogGameState				(const std::string& strStateName)
+								:CGameState											(strStateName)
+{
+	mp_c_etyDialogManager = new CDialogManager(this);
+}
+
+
+								ety::CDialogGameState::~CDialogGameState			(void)
+{
+	mp_c_etyDialogManager->cleanup_Dialogs();
+}
+
+void							ety::CDialogGameState::add_Event					( const std::string& strCustomID, std::map<enum EventType::en_etyEventType, p_Function> mapEvent )
+{
+	m_EventMap[strCustomID]	=	mapEvent;
+}
+
+void							ety::CDialogGameState::reinit_Gamestate				( const sf::VideoMode& c_sfNewVideoMode, const bool bFullscreen )
+{
+	mp_c_etyDialogManager->reinit_Dialogs( c_sfNewVideoMode );
+}
+void							ety::CDialogGameState::reinit_Gamestate				( const std::string strNewLanguage )
+{
+	mp_c_etyDialogManager->update_Language( strNewLanguage, get_DialogManager()->get_LuaScript() );
+}
+
+void							ety::CDialogGameState::render_GameState				( sf::RenderTexture* const p_c_sfRenderTextureGameScene )
+{
+	mp_c_etyDialogManager->draw_Dialogs(p_c_sfRenderTextureGameScene);
+}
+
+		//Aktualisiert den Spielzustand.
+void							ety::CDialogGameState::update_GameState				( const sf::Uint32& uiFrameTime )
+{
+	mp_c_etyDialogManager->update_Dialogs(uiFrameTime);
+}
+
+
+ety::p_Function					ety::CDialogGameState::get_EventFunction			( const std::string& strCustomID, const sf::Event& c_sfEvent)
+{
+	enum EventType::en_etyEventType en_etyEventType = EventType::enNONE;
+
+	if(c_sfEvent.type == sf::Event::MouseButtonPressed)
+	{
+		if(c_sfEvent.mouseButton.button == sf::Mouse::Left)
+		{
+			en_etyEventType = EventType::enMOUSELEFTPRESSED;
+		}
+		if(c_sfEvent.mouseButton.button == sf::Mouse::Right)
+		{
+			en_etyEventType = EventType::enMOUSERIGHTPRESSED;
+		}
+	}
+	else if(c_sfEvent.type == sf::Event::MouseButtonReleased)
+	{
+		if(c_sfEvent.mouseButton.button == sf::Mouse::Left)
+		{
+			en_etyEventType = EventType::enMOUSELEFTRELEASED;
+		}
+		else if(c_sfEvent.mouseButton.button == sf::Mouse::Right)
+		{
+			en_etyEventType = EventType::enMOUSERIGHTRELEASED;
+		}
+	}
+	else if(c_sfEvent.type == sf::Event::MouseMoved)
+	{
+		en_etyEventType = EventType::enMOUSEHOVER;
+	}
+	else if(c_sfEvent.type == sf::Event::MouseButtonDoubleClick)
+	{
+		en_etyEventType = EventType::enMOUSEDOUBLECLICKLEFT;
+	}
+
+	EventMap::iterator itEventFunction = m_EventMap.find(strCustomID);
+
+	if(itEventFunction != m_EventMap.end())
+	{
+		std::map<enum EventType::en_etyEventType, p_Function>::iterator itEvents = itEventFunction->second.begin();
+
+		for(itEvents ; itEvents != itEventFunction->second.end() ; itEvents++)
+		{
+			if((*itEvents).first == en_etyEventType)
+			{
+				return (*itEvents).second;
+			}
+		}
+
+		/*if(itEventFunction->second.find(c_sfEvent) != itEventFunction->second.end())
+		{
+			return itEventFunction->second[c_sfEvent];
+		}*/
+	}
+
+	return NULL;
+}
+ety::CDialogManager* const		ety::CDialogGameState::get_DialogManager			( void )
+{
+	return mp_c_etyDialogManager;
+}

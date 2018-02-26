@@ -1,0 +1,291 @@
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////																																	   ///////////
+///////////													CGameStateManager.cpp															   ///////////
+///////////																									                                   ///////////
+///////////			 			Der GameStateManager verwaltet alle Spielzustände und sorgt dafür das sie gezeichnet						   ///////////
+///////////						aktualisiert und deren Events ausgewertet werden. Initialisierung und Laden der Ressourcen					   ///////////
+///////////						für ein Spielzustand wird auch in dieser Klasse abgedeckt.													   ///////////
+///////////																									                                   ///////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Includes der Eternity-Engine
+#include "CGameStateManager.hpp"
+#include "CDialogManager.hpp"
+
+//Standart Konstruktor und Destruktor.
+										ety::CGameStateManager::CGameStateManager					( void )
+											: mp_c_etyCurrentRessourceManager	( NULL )
+											, mp_c_etyCurrentGamesettings		( NULL )
+											, m_c_etyLoadingState				( "LoadingState", &m_c_etyGameStateFilemanagement )
+											, m_bRessourcesLoaded				( false )
+										{
+											m_c_etyLoadingState.set_GameStatemanager( this );
+										}
+										ety::CGameStateManager::~CGameStateManager					( void )
+										{
+											//Speicher freigeben.
+											std::map<std::string, ety::CGameState*>::iterator It = m_mapAllGameStates.begin();
+
+											for( It; It != m_mapAllGameStates.end(); It++ )
+											{
+												delete (It->second);
+											}
+
+											m_mapAllGameStates.clear();
+										}
+
+//Fügt einen Spielzustand zur Verwaltung hinzu.
+		void							ety::CGameStateManager::add_GameState						( ety::CGameState* const p_c_newGameState )
+		{
+			//Ist der Name nicht mindest 1 Zeichen lang...
+			if( p_c_newGameState->get_GameStateName().length() == 0 )
+			{
+				//ist dieser Spielzustand nicht gültig.
+				return ;
+			}
+
+			//Ist der Zeiger ein NULL-Zeiger...
+			if( p_c_newGameState == NULL )
+			{
+				//ist dieser Spielzustand ebenfalls nicht gültig.
+				return ;
+			}
+
+			//Ist ein Spielzustand bereits unter dem Namen registriert...
+			std::map<std::string, ety::CGameState*>::iterator itGameState = m_mapAllGameStates.find( p_c_newGameState->get_GameStateName() );
+			if( itGameState != m_mapAllGameStates.end() )
+			{
+				//ist dieser Spielzustand ebenfalls nicht gültig.
+				return ;
+			}
+
+			//Spielzustand wird in der Map registriert.
+			m_mapAllGameStates[p_c_newGameState->m_strGameStateName] = p_c_newGameState;
+			//Dem Spielzustand sagen von wem er verwaltet wird.
+			p_c_newGameState->set_GameStatemanager(this);
+		}
+
+//Wertet die aktuelle Eingabe für die aktiven Spielzustände aus.
+const	bool							ety::CGameStateManager::handle_CurrentGameStateEvents		( const sf::Event& sfEventLastEvent )
+		{
+			//Wenn keine Spielzustände mehr aktiv sind, wird das Programm beendet.
+			if( m_listActualGameStates.empty() == false )
+			{
+				//Alle Spielzustände werde durchgegangen...
+				std::list<ety::CGameState*>::iterator itGameState = m_listActualGameStates.begin();
+				for( itGameState; itGameState != m_listActualGameStates.end(); itGameState++)
+				{
+					//Die Events aktiver Spielzustände werden ausgewertet.
+					if( (*itGameState)->get_GameStateStatus() == ety::GamestateStatus::enACTIVE )
+					{
+						if( (*itGameState)->handle_GameStateEvents( sfEventLastEvent ) == ety::GameStateRunning::enFALSE )
+						{
+							//Wenn ein Event stattfand, welches den gerade überprüften Spielzustand beenden lies
+							//wird die Schleife abgebrochen.
+							break;
+						}
+					}
+				}
+			}
+
+			//Ist nach dem letzten Beenden eine Spielzustands keiner mehr vorhanden ist,
+			//wird das Programm beendet oder es wurde erst kein Spielzustand aktiv gesetzt.
+			if( m_listActualGameStates.empty() == true )
+			{
+				//Programm wird beendet.
+				return false;
+			}
+
+
+			//Das Programm soll weiter laufen.
+			return true;
+		}
+
+//Schiebt ein neuen Spielzustand aktiv hinten in die Liste. Der zurzeit aktuelle Spielzustand erhält einen neuen Status.
+		void							ety::CGameStateManager::pushback_GameState					( const std::string& strGameState, const ety::GamestateStatus::en_etyGamestateStatus en_etyNewCurrentGameStateStatus )
+		{
+			//Wenn keine Spielzustände registriert sind wird die Funktion nicht ausgeführt.
+			if( m_mapAllGameStates.empty() == false )
+			{
+				//Suchen des Spielzustandes...
+				std::map<std::string, ety::CGameState*>::iterator itNewActualState = m_mapAllGameStates.find( strGameState );
+
+				//Ist der Spielzustand gefunden worden...
+				if( itNewActualState != m_mapAllGameStates.end() )
+				{
+					//Ist in der Liste schon ein Spielzustand..
+					if( m_listActualGameStates.empty() == false )
+					{
+						//Ist der neue angegebene Status des aktuellen Spielzustandes enIDLE...
+						if( en_etyNewCurrentGameStateStatus == ety::GamestateStatus::enIDLE )
+						{
+							//wird er aus der Liste entfernt...
+							popback_GameState();
+						}
+						else
+						{
+							//Ansonsten wird der neue angegebene Status des aktuellen Spielzustandes übernommen.
+							m_listActualGameStates.back()->set_GameStateStatus( en_etyNewCurrentGameStateStatus );
+							m_listActualGameStates.back()->update_GameState( 0 );
+						}
+					}
+		
+					//Der neue Spielzustand wird in die Liste geschoben.
+					m_listActualGameStates.push_back( itNewActualState->second );
+
+					if( m_bRessourcesLoaded == false )
+					{
+						for( std::map<std::string, ety::CGameState*>::iterator itGamestateByName = m_mapAllGameStates.begin(); itGamestateByName != m_mapAllGameStates.end(); itGamestateByName++ )
+						{
+							//Es wird bescheid gesagt welchen GameState der Ladezustand laden soll.
+							m_c_etyLoadingState.add_GamestateToLoad( itGamestateByName->second->get_GameStateName() );
+							//Der neue Spielzustand wird auf enLOADING gesetzt.
+							itNewActualState->second->set_GameStateStatus( ety::GamestateStatus::enLOADING );
+						}
+
+						//Der Ladezustand wird in die Liste geschoben.
+						m_listActualGameStates.push_back( &m_c_etyLoadingState );
+
+						if(		mp_c_etyCurrentRessourceManager	!= NULL 
+							&&	mp_c_etyCurrentGamesettings		!= NULL  )
+						{
+							//Die Standart-Sounds für ein Spielzustand werden vorbereitet.
+							m_c_etyGameStateFilemanagement.assign_StandardSounds( m_listActualGameStates.back()->get_GameStateName(), mp_c_etyCurrentRessourceManager );
+
+							//Der neue aktuelle Spielzustand wird initialisiert.
+							m_listActualGameStates.back()->CGameState::init_GameState	( mp_c_etyCurrentRessourceManager, mp_c_etyCurrentGamesettings );
+							m_listActualGameStates.back()->init_GameState				( mp_c_etyCurrentRessourceManager, mp_c_etyCurrentGamesettings );
+						}
+
+						m_bRessourcesLoaded = true;
+					}
+
+					//Der letzte Spielzustand der in die Liste geschoben wurde wird auf enACTIVE gesetzt.
+					m_listActualGameStates.back()->set_GameStateStatus( ety::GamestateStatus::enACTIVE );
+
+					m_listActualGameStates.back()->on_Enter( mp_c_etyCurrentRessourceManager, mp_c_etyCurrentGamesettings );
+				}
+			}
+		}
+
+//Löscht aus den letzten Spielzustand in der List, welcher auch aktivste Spielzustand ist.
+		void							ety::CGameStateManager::popback_GameState					( void )
+		{
+			//Ist die Liste nicht leer...
+			if( m_listActualGameStates.empty() == false )
+			{
+				//Wenn der zu löschende Spielzustand nicht der Ladezustand ist...
+				if( m_listActualGameStates.back()->get_GameStateName() != "LoadingState" )
+				{
+					//werden seine Ressourcen aus dem Speicher entfernt.
+					//m_c_etyGameStateFilemanagement.cleanup_Ressources( m_listActualGameStates.back()->get_GameStateName(), mp_c_etyCurrentRessourceManager );
+				}
+
+				//Der Status wird auf enIDLE gesetzt.
+				m_listActualGameStates.back()->set_GameStateStatus( ety::GamestateStatus::enIDLE );
+
+				m_listActualGameStates.back()->on_Exit( mp_c_etyCurrentRessourceManager, mp_c_etyCurrentGamesettings );
+
+				//Spielzustand wird aus der Liste gelöscht.
+				m_listActualGameStates.pop_back();
+
+				//Und wenn noch ein Spielzustand hinter dem eben gelöschten existiert...
+				if( m_listActualGameStates.empty() == false )
+				{
+					//wird dieser auf enACTIVE gesetzt.
+					m_listActualGameStates.back()->set_GameStateStatus( ety::GamestateStatus::enACTIVE );
+				}
+			}
+		}
+
+//Diese Methoden müssen noch mal bedacht werden.
+		void							ety::CGameStateManager::reinit_Gamestates					( const sf::VideoMode& c_sfNewVideoMode, const bool bFullscreen )
+		{
+			mp_c_etyCurrentGamesettings->set_FullscreenStatus( bFullscreen );
+			mp_c_etyCurrentGamesettings->set_Videomode( c_sfNewVideoMode );
+
+			for( std::map<std::string, ety::CGameState*>::iterator itGamestateByName = m_mapAllGameStates.begin() ; itGamestateByName != m_mapAllGameStates.end() ; itGamestateByName++ )
+			{
+				itGamestateByName->second->reinit_Gamestate( c_sfNewVideoMode, bFullscreen );
+			}
+
+			mp_c_etyCurrentGamesettings->apply_Settings( true, true, true, false );
+		}
+		void							ety::CGameStateManager::reinit_Gamestates					( const std::string strNewLanguage )
+		{
+			//std::map<std::string, ety::CGameState*>		m_mapAllGameStates;
+			mp_c_etyCurrentGamesettings->set_Language( strNewLanguage );
+
+			for( std::map<std::string, ety::CGameState*>::iterator itGamestateByName = m_mapAllGameStates.begin() ; itGamestateByName != m_mapAllGameStates.end() ; itGamestateByName++ )
+			{
+				itGamestateByName->second->reinit_Gamestate( strNewLanguage );
+			}
+		}
+
+//Zeichnet die Objekte und Dialoge etc. aller aktiven Spielzustände und die im Hintergrund laufen.
+		void							ety::CGameStateManager::render_CurrentGameStates			( sf::RenderTexture* const p_c_sfRenderTextureGameScene )
+		{
+			if( m_listActualGameStates.empty() == false )
+			{
+				std::list<ety::CGameState*>::iterator itGameState = m_listActualGameStates.begin();
+
+				for( itGameState; itGameState != m_listActualGameStates.end(); itGameState++)
+				{
+					//Alle Spielzustande die Aktiv oder im Hintergrund laufen werden gezeichnet.
+					if(		(*itGameState)->get_GameStateStatus() == ety::GamestateStatus::enACTIVE 
+						||	(*itGameState)->get_GameStateStatus() == ety::GamestateStatus::enBACKGROUND		)
+					{
+						//Zeichnen der Szene des Spielzustandes in den Zwischenspeicher.
+						(*itGameState)->render_GameState				( p_c_sfRenderTextureGameScene );
+					}
+				}
+			}
+		}
+
+//Aktualisiert alle aktiven und im Hintergrund laufenden Spielzustände.
+		void							ety::CGameStateManager::update_CurrentGameStates			( const sf::Uint32& uiFrameTime )
+{
+	if( m_listActualGameStates.empty() == false )
+	{
+		std::list<ety::CGameState*>::iterator itGameState = m_listActualGameStates.begin();
+
+		for( itGameState; itGameState != m_listActualGameStates.end(); itGameState++)
+		{
+			//Alle Spielzustande die Aktiv oder im Hintergrund laufen werden aktualisiert.
+			if(	(*itGameState)->get_GameStateStatus() == ety::GamestateStatus::enACTIVE || (*itGameState)->get_GameStateStatus() == ety::GamestateStatus::enBACKGROUND )
+			{
+				//Aktualisierung des Spielzustandes.
+				(*itGameState)->update_GameState( uiFrameTime );
+			}
+		}
+	}
+}
+
+//Die Set-Methoden zum setzen privater Membervariablen.
+		void							ety::CGameStateManager::set_RessourceManager				( ety::CRessourceManager*	const p_c_etyNewRessourceManager )
+		{
+			mp_c_etyCurrentRessourceManager = p_c_etyNewRessourceManager;
+		}
+		void							ety::CGameStateManager::set_Gamesettings					( ety::CGamesettings*	const p_c_etyNewGamesettings )
+		{
+			mp_c_etyCurrentGamesettings = p_c_etyNewGamesettings;
+		}
+
+//Die Get-Methoden zur Rückgabe von privaten Membervariablen.
+		ety::CFilemanagement*	const	ety::CGameStateManager::get_Filemanagement					( void )
+		{
+			return &m_c_etyGameStateFilemanagement;
+		}
+		ety::CLua*				const	ety::CGameStateManager::get_LuaScript						( void )
+		{
+			return &m_c_etyLuaScript;
+		}
+		ety::CGameState*		const	ety::CGameStateManager::get_CurrentGameState				( void )
+{
+	if( m_listActualGameStates.empty() == false )
+	{
+		return m_listActualGameStates.back();
+	}
+
+	return NULL;
+}

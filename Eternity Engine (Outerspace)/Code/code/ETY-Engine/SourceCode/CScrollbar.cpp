@@ -1,0 +1,440 @@
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////								CSCROLLBAR.CPP								///////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "CScrollbar.hpp"
+
+#include "CButton.hpp"
+#include "CPictureControl.hpp"
+
+
+
+								ety::CScrollbar::CScrollbar								(void)
+								:mp_c_etyPictureControlBackground						(NULL)
+								,mp_c_etyButtonSlider									(NULL)
+								,m_uiAvailableBlocks									(0)
+								,m_uiCurrentBlock										(0)
+{
+	mp_c_etyDialogitemParentDialogitem	=	NULL;
+	mp_c_etyDialogParentDialog			=	NULL;
+}
+
+
+								ety::CScrollbar::~CScrollbar							(void)
+{
+	if(mp_c_etyPictureControlBackground != NULL)
+	{
+		delete mp_c_etyPictureControlBackground;
+		mp_c_etyPictureControlBackground = NULL;
+	}
+
+	if(mp_c_etyButtonSlider != NULL)
+	{
+		mp_c_etyDialogParentDialog->delete_Dialogitem(mp_c_etyButtonSlider);
+		mp_c_etyButtonSlider = NULL;
+	}
+}
+
+
+
+								ety::CScrollbar::CScrollbar								(
+																						  std::string strCustomID, const sf::Texture& p_c_sfTextureScrollbarSprite, float fWidth, 
+																						  float fHeight, sf::Vector2f c_sfVector2fPosition, sf::IntRect c_sfIntRectScrollbarSubRect,
+																						  CDialogitem* p_c_etyDialogitemParent, CDialog* p_c_etyDialogParentDialog
+																						)
+							:m_c_sfIntRectScrollbarSubRect								(c_sfIntRectScrollbarSubRect)
+							,m_uiAvailableBlocks										(0)
+							,m_uiCurrentBlock											(0)
+{
+	sf::VideoMode c_sfVideoModeGamesettings		=	p_c_etyDialogParentDialog->get_VideoMode();
+
+	m_strCustomID								=	strCustomID;
+	m_bVisibility								=	true;
+	m_bActive									=	true;
+	m_bInternActive								=	true;
+	m_bAnchorCentered							=	false;
+	m_bRealPosition								=	false;
+	m_uiDrawPosition							=	0;
+	m_en_etyAffinity							=	Affinity::enSTANDARD;
+	m_en_etyAnchor								=	Anchor::enTOPLEFT;
+	mp_c_etyDialogitemParentDialogitem			=	p_c_etyDialogitemParent;
+	mp_c_etyDialogParentDialog					=	p_c_etyDialogParentDialog;
+	mp_c_etyDialogitemAnchorOrientation			=	NULL;
+	m_en_etyAttachedType						=	AttachedType::enNOTATTACHED;	
+	m_fWidth									=	c_sfVideoModeGamesettings.width*float(fWidth/1680.f);
+	m_fHeight									=	c_sfVideoModeGamesettings.height*float(fHeight/1050.f);
+	
+	if(p_c_etyDialogitemParent != NULL)
+	{
+		m_en_etyAttachedType					=	AttachedType::enCHILDREN;
+	}
+
+	m_en_etyDialogitemType						=	DialogitemType::enSCROLLBAR;
+
+
+	c_sfVector2fPosition.x						=	c_sfVideoModeGamesettings.width*float(c_sfVector2fPosition.x/1680.f);
+	c_sfVector2fPosition.y						=	c_sfVideoModeGamesettings.height*float(c_sfVector2fPosition.y/1050.f);
+	
+
+	mp_c_etyPictureControlBackground			=	new CPictureControl(strCustomID + "Background", p_c_sfTextureScrollbarSprite, fWidth, fHeight, sf::Vector2f(0,0), 
+																	c_sfIntRectScrollbarSubRect, this, mp_c_etyDialogParentDialog);
+
+
+	
+	sf::IntRect c_sfIntRectSliderSubRect		=	m_c_sfIntRectScrollbarSubRect;
+	c_sfIntRectSliderSubRect.left				+=	c_sfIntRectSliderSubRect.width;
+
+
+	mp_c_etyButtonSlider						=	new CButton(strCustomID + "SliderButton", p_c_sfTextureScrollbarSprite, fWidth, 0.f, sf::Vector2f(0,0), c_sfIntRectSliderSubRect, 
+															this, mp_c_etyDialogParentDialog); 
+
+	//mp_c_etyButtonSlider->set_Visibility(false);
+	mp_c_etyButtonSlider->set_HoverSprite_Visibility(false);
+	mp_c_etyButtonSlider->set_Affinity(Affinity::enFOREGROUND);
+	mp_c_etyButtonSlider->set_DrawPosition(1);
+		
+
+	mp_c_etyDialogParentDialog->add_ChildrenDialogitem(mp_c_etyButtonSlider);
+
+	m_c_sfVector2fPosition					=	c_sfVector2fPosition;
+	
+	calculate_Positions(false);
+}
+
+
+
+
+void							ety::CScrollbar::adjust_SizeToResolution				( const sf::VideoMode& c_sfVideoModeNewSettings, const sf::VideoMode& c_sfVideoModeOldSettings )
+{
+	//Anpassen der Größe
+	m_fWidth	=	m_fWidth * (float(c_sfVideoModeNewSettings.width)/float(c_sfVideoModeOldSettings.width));
+	m_fHeight	=	m_fHeight * (float(c_sfVideoModeNewSettings.height)/float(c_sfVideoModeOldSettings.height));
+
+
+	//,des Backgrounds
+	if(mp_c_etyPictureControlBackground != NULL)
+	{
+		mp_c_etyPictureControlBackground->adjust_SizeToResolution(c_sfVideoModeNewSettings,c_sfVideoModeOldSettings);
+	}
+
+	//und der Position
+	m_c_sfVector2fPosition.x	=	m_c_sfVector2fPosition.x * (float(c_sfVideoModeNewSettings.width)/float(c_sfVideoModeOldSettings.width));
+	m_c_sfVector2fPosition.y	=	m_c_sfVector2fPosition.y * (float(c_sfVideoModeNewSettings.height)/float(c_sfVideoModeOldSettings.height));
+
+	set_CurrentBlock(0);
+
+	update_Dialogitem(0);
+}
+
+
+bool							ety::CScrollbar::check_MouseCoordinates					(void)
+{
+	if(m_bVisibility == true)
+	{
+		sf::Vector2i c_sfVector2iMouseCoordinates = ety::CMouse::get_Position();
+
+		if(c_sfVector2iMouseCoordinates.x >= m_c_sfVector2fRealPosition.x && c_sfVector2iMouseCoordinates.x <= m_c_sfVector2fRealPosition.x + m_fWidth 
+			&& c_sfVector2iMouseCoordinates.y >= m_c_sfVector2fRealPosition.y && c_sfVector2iMouseCoordinates.y <= m_c_sfVector2fRealPosition.y + m_fHeight)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+bool							ety::CScrollbar::draw_Dialogitem						(sf::RenderTexture* p_c_sfRenderTextureScene)
+{
+	if(m_bVisibility == true)
+	{
+		if(mp_c_etyPictureControlBackground != NULL)
+		{
+			mp_c_etyPictureControlBackground->draw_Dialogitem(p_c_sfRenderTextureScene);
+		}
+	}
+
+	return false;
+}
+
+
+void							ety::CScrollbar::handle_InternEvents					(const sf::Event& c_sfEvent)
+{
+	if(c_sfEvent.type	==	sf::Event::MouseButtonPressed)
+	{
+		if(c_sfEvent.mouseButton.button == sf::Mouse::Left)
+		{
+			if(mp_c_etyButtonSlider != NULL)
+			{
+				if(mp_c_etyDialogParentDialog->get_DialogManager()->get_MouseEventDialogitem() == mp_c_etyButtonSlider)
+				{
+					mp_c_etyDialogitemParentDialogitem->handle_InternEvents(c_sfEvent);
+				}
+			}
+		}
+		else
+		{
+
+		}
+	}
+	else if(c_sfEvent.type	==	sf::Event::MouseButtonReleased || c_sfEvent.type	==	sf::Event::MouseButtonNoFocusReleased)
+	{
+		if(c_sfEvent.mouseButton.button == sf::Mouse::Left)
+		{
+			if(mp_c_etyButtonSlider != NULL)
+			{
+				if(mp_c_etyDialogParentDialog->get_DialogManager()->get_MouseEventDialogitem() == mp_c_etyButtonSlider || 
+					mp_c_etyDialogParentDialog->get_DialogManager()->get_MouseNoFocusEventDialogitem() == mp_c_etyButtonSlider)
+				{
+					mp_c_etyDialogitemParentDialogitem->handle_InternEvents(c_sfEvent);
+
+					if(mp_c_etyButtonSlider->get_EventSound(ety::SoundType::enCLICK) != NULL)
+					{
+						mp_c_etyButtonSlider->get_EventSound(ety::SoundType::enCLICK)->play();
+					}
+				}
+			}
+		}
+		else
+		{
+
+		}
+	}
+	else if(c_sfEvent.type	==	sf::Event::MouseMoved)
+	{
+		if(m_bVisibility == true)
+		{
+			if(check_MouseCoordinates() == true)
+			{		
+				
+				if(m_bHoverSoundPlayed == false)
+				{
+					if(get_EventSound(SoundType::enHOVER) != NULL)
+					{
+						get_EventSound(SoundType::enHOVER)->play();
+						m_bHoverSoundPlayed = true;
+					}
+				}	
+			}
+			else
+			{
+				if(m_bHoverSoundPlayed == true)
+				{
+					m_bHoverSoundPlayed = false;
+				}
+			}	
+		}
+	}
+}
+
+
+void							ety::CScrollbar::modificate_Colorfilter					(sf::Vector3f c_sfVector3fFactors)
+{
+	m_c_etyColorShapeColors.r	*= c_sfVector3fFactors.x;
+	m_c_etyColorShapeColors.g	*= c_sfVector3fFactors.y;
+	m_c_etyColorShapeColors.b	*= c_sfVector3fFactors.z;
+
+	if(mp_c_etyPictureControlBackground != NULL)
+	{
+		mp_c_etyPictureControlBackground->modificate_Colorfilter(c_sfVector3fFactors);
+	}
+
+	update_Dialogitem(0);
+}
+
+
+void							ety::CScrollbar::update_Dialogitem						(const sf::Uint32& uiFrameTime)
+{
+	if(mp_c_etyDialogParentDialog->get_DialogManager()->check_IsDialogitemActive(this) == false)
+	{
+		m_bActive = false;
+	}
+	else
+	{
+		m_bActive = m_bInternActive;
+	}
+
+	if(m_bRealPosition == false)
+	{
+		if(mp_c_etyDialogitemParentDialogitem == NULL)
+		{
+			m_c_sfVector2fRealPosition.x = (mp_c_etyDialogParentDialog->get_Anchor(m_en_etyAnchor,false).x) +  m_c_sfVector2fPosition.x;
+			m_c_sfVector2fRealPosition.y = (mp_c_etyDialogParentDialog->get_Anchor(m_en_etyAnchor,false).y) -  m_c_sfVector2fPosition.y;
+		}
+		else
+		{
+			if(mp_c_etyDialogitemAnchorOrientation != NULL)
+			{
+				m_c_sfVector2fRealPosition.x = (mp_c_etyDialogitemAnchorOrientation->get_Anchor(m_en_etyAnchor).x) +  m_c_sfVector2fPosition.x;
+				m_c_sfVector2fRealPosition.y = (mp_c_etyDialogitemAnchorOrientation->get_Anchor(m_en_etyAnchor).y) -  m_c_sfVector2fPosition.y;
+			}
+			else
+			{
+				m_c_sfVector2fRealPosition.x = (mp_c_etyDialogitemParentDialogitem->get_Anchor(m_en_etyAnchor).x) +  m_c_sfVector2fPosition.x;
+				m_c_sfVector2fRealPosition.y = (mp_c_etyDialogitemParentDialogitem->get_Anchor(m_en_etyAnchor).y) -  m_c_sfVector2fPosition.y;
+			}
+		}
+
+
+		if(m_en_etyAnchor == Anchor::enALIGNEDMIDTOP)
+		{
+			m_c_sfVector2fRealPosition.x = m_c_sfVector2fRealPosition.x - (m_fWidth / 2);
+		}
+		else if(m_en_etyAnchor == Anchor::enALIGNEDLEFT)
+		{
+			m_c_sfVector2fRealPosition.y = m_c_sfVector2fRealPosition.y - (m_fHeight / 2);
+		}
+		else if(m_bAnchorCentered == true)
+		{
+			m_c_sfVector2fRealPosition.x		=	m_c_sfVector2fRealPosition.x - (m_fWidth / 2);
+			m_c_sfVector2fRealPosition.y		=	m_c_sfVector2fRealPosition.y - (m_fHeight / 2);
+		}
+	}
+
+
+	if(mp_c_etyPictureControlBackground != NULL)
+	{
+		mp_c_etyPictureControlBackground->update_Dialogitem(uiFrameTime);
+	}
+
+	if(mp_c_etyButtonSlider != NULL)
+	{
+		mp_c_etyButtonSlider->set_Position(sf::Vector2f(0,mp_c_etyButtonSlider->get_Position().y));
+		mp_c_etyButtonSlider->update_Dialogitem(uiFrameTime);
+	}
+}
+
+bool							ety::CScrollbar::update_SliderPosition					(void)
+{
+	if(mp_c_etyButtonSlider != NULL)
+	{
+		float fMousePosition_Y = float(ety::CMouse::get_Position().y);
+		sf::Vector2f c_sfVector2fNewPosition(0,0);
+
+		if(fMousePosition_Y <= m_c_sfVector2fRealPosition.y + (mp_c_etyButtonSlider->get_Height() / 2))
+		{
+			c_sfVector2fNewPosition = sf::Vector2f(0,0);
+			set_CurrentBlock(0);
+		}
+		else if(fMousePosition_Y + mp_c_etyButtonSlider->get_Height() / 2 >= m_c_sfVector2fRealPosition.y + m_fHeight)
+		{
+			c_sfVector2fNewPosition = sf::Vector2f(0, mp_c_etyButtonSlider->get_Height() - m_fHeight);
+			set_CurrentBlock(m_uiAvailableBlocks - 1);
+		}
+		else
+		{
+			c_sfVector2fNewPosition = sf::Vector2f(0, m_c_sfVector2fRealPosition.y - fMousePosition_Y +  mp_c_etyButtonSlider->get_Height() / 2);
+			set_CurrentBlock(unsigned int((c_sfVector2fNewPosition.y * -1) / (m_fHeight / (m_uiAvailableBlocks))));
+		}
+
+		mp_c_etyButtonSlider->set_Position(c_sfVector2fNewPosition);
+
+		return true;
+	}
+
+	return false;
+}
+
+
+
+//Set-Methoden
+void							ety::CScrollbar::set_AvailableBlocks					(unsigned int uiAvailableBlocks)
+{
+	m_uiAvailableBlocks	=	uiAvailableBlocks;
+
+	if(m_uiAvailableBlocks != 0)
+	{
+		mp_c_etyButtonSlider->set_Height(float(m_fHeight / m_uiAvailableBlocks));
+		mp_c_etyButtonSlider->set_HoverSprite_Height(float(m_fHeight / m_uiAvailableBlocks));
+	}
+	else
+	{
+		mp_c_etyButtonSlider->set_Height(0);
+		mp_c_etyButtonSlider->set_HoverSprite_Height(0);
+	}
+}
+
+bool							ety::CScrollbar::set_CurrentBlock						(unsigned int uiCurrentBlock)
+{
+	if(uiCurrentBlock >= m_uiAvailableBlocks)
+	{
+		return false;
+	}
+
+	m_uiCurrentBlock	=	uiCurrentBlock;
+
+	if(m_uiCurrentBlock == 0)
+	{
+		mp_c_etyButtonSlider->set_Position(sf::Vector2f(0,0));
+	}
+	else
+	{
+		mp_c_etyButtonSlider->set_Position(sf::Vector2f(m_c_sfVector2fPosition.x, m_fHeight / m_uiAvailableBlocks *  m_uiCurrentBlock *-1));
+	}
+	
+
+	return true;
+}
+
+void							ety::CScrollbar::set_ShapeColors						(ety::Color c_etyColorShapeColors)
+{
+	m_c_etyColorShapeColors = c_etyColorShapeColors;
+}
+
+void							ety::CScrollbar::set_Active								(bool bActive)
+{
+	m_bActive		=	bActive;
+	m_bInternActive	=	bActive;
+
+	mp_c_etyButtonSlider->set_Active(m_bActive);
+}
+
+void							ety::CScrollbar::set_Height								(float fHeight)
+{
+	m_fHeight	=	fHeight;
+	mp_c_etyPictureControlBackground->set_Height(fHeight);
+}
+
+void							ety::CScrollbar::set_Width								(float fWidth)
+{
+	m_fWidth	=	fWidth;
+	mp_c_etyPictureControlBackground->set_Width(fWidth);
+}
+
+void							ety::CScrollbar::set_Visibility							(bool bVisibility)
+{
+	m_bVisibility		=	bVisibility;
+	mp_c_etyButtonSlider->set_Visibility(bVisibility);
+}
+
+
+
+//Get-Methoden
+unsigned int					ety::CScrollbar::get_AvailableBlocks					(void)
+{
+	return m_uiAvailableBlocks;
+}
+
+unsigned int					ety::CScrollbar::get_CurrentBlock						(void)
+{
+	return m_uiCurrentBlock;
+}
+
+ety::CButton* const				ety::CScrollbar::get_Slider								(void)
+{
+	return mp_c_etyButtonSlider;
+}
+
+ety::CPictureControl* const		ety::CScrollbar::get_Background							(void)
+{
+	return mp_c_etyPictureControlBackground;
+}
+
+ety::Color						ety::CScrollbar::get_ShapeColors						(void)
+{
+	return m_c_etyColorShapeColors;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////								CSCROLLBAR.CPP								///////////
+///////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,858 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="ety::CAttribute" Collapsed="true">
+    <Position X="40" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAwAAAAAAAgAAAAEAAAAAAAAAAAAAAADAAAAAEAAAA=</HashCode>
+      <FileName>SourceCode\CAttribute.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::Color" Collapsed="true">
+    <Position X="43.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAAAAAAAAAAAAAQAAAoAQABgAAAAAA=</HashCode>
+      <FileName>SourceCode\CColor.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CIniFile" Collapsed="true">
+    <Position X="40" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAEAAAAIAAQAAAIAAgAQAAAAAAQAAADCAAIAEAAAg=</HashCode>
+      <FileName>SourceCode\CIniFile.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CIniLoader&lt;T&gt;" Collapsed="true">
+    <Position X="41.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAgAAAAAAAAgAAAAAAAAAgAAAgAxAgAAkBA=</HashCode>
+      <FileName>SourceCode\CIniLoader.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CIniLoader&lt;ety::CWorld&gt;" Collapsed="true">
+    <Position X="43.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IQAAAAAAAAAAACAQBAAAAAAAEAAAAhAAAoAxAgAAkBA=</HashCode>
+      <FileName>SourceCode\CIniLoader.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CLogfile" Collapsed="true">
+    <Position X="5.5" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IIAAggAAAECAAABAAIAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CLogfile.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CMouse" Collapsed="true">
+    <Position X="41.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEBCAAAAAACAAAAACAACAQAAgAAICAAAAAACAIAAgQ=</HashCode>
+      <FileName>SourceCode\CMouse.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CSingleton&lt;T&gt;" Collapsed="true">
+    <Position X="6.75" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAABAAQAAIAAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CSingleton.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CApplication" Collapsed="true">
+    <Position X="38.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QgUAAAgAADBAACAAACQAwFgAAAAgAAgAgIIgACAAkAA=</HashCode>
+      <FileName>SourceCode\CApplication.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CRessourceManager" Collapsed="true">
+    <Position X="38.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAwLAAAAAAAAAAIBAKCBMBAAQAAgEkRAIAAAIABCgA=</HashCode>
+      <FileName>SourceCode\CRessourceManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CGamesettings" Collapsed="true">
+    <Position X="36.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BIIgxAgAQUAAIACAxAKgBAACBigAAEECABAAGAgAioA=</HashCode>
+      <FileName>SourceCode\CGamesettings.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CGameStateManager" Collapsed="true">
+    <Position X="38.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BIAAAAIEASAAEwAIFAIBAAAACAAAgABAAAEQSICAAAQ=</HashCode>
+      <FileName>SourceCode\CGameStateManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CEternityEngine" Collapsed="true">
+    <Position X="41.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAACAAAAAAEAAIAAAACAAABAQAgAIAAAAIAAAg=</HashCode>
+      <FileName>SourceCode\CEternityEngine.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CLabel" Collapsed="true">
+    <Position X="3.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QoAAAQiBAwGEFEQBAAgFQBQAADoBAAAIFBgEACFAJQo=</HashCode>
+      <FileName>SourceCode\CLabel.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CButton" Collapsed="true">
+    <Position X="8.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>auAAqRiAAAgBoAyyAIIVBJAQQEgkAABIAiIAASNEAQA=</HashCode>
+      <FileName>SourceCode\CButton.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CCheckbox" Collapsed="true">
+    <Position X="12.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AggAAUAIIEAgAAQAQAIAACAAEAAAAAQIACAAACEAAgA=</HashCode>
+      <FileName>SourceCode\CCheckbox.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CPictureControl" Collapsed="true">
+    <Position X="17.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CwAAAQCEAAACAAQCAEAgACAQQACAAAAIABAAACEAAgA=</HashCode>
+      <FileName>SourceCode\CPictureControl.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CScrollbar" Collapsed="true">
+    <Position X="19.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QgAAAQAEAAABAAQAIIAAwYCQAACAAAgZQgAAACEAABY=</HashCode>
+      <FileName>SourceCode\CScrollbar.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CComboBox" Collapsed="true">
+    <Position X="21.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>kqAgBQEIEAIhGK4BIZAEABgQgAMFCCIZShABMWFg0kA=</HashCode>
+      <FileName>SourceCode\CComboBox.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CDialogManager" Collapsed="true">
+    <Position X="36.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AMQACAQUAECABagIgJSAAChABAyAAAQAAIAgEAAEAAA=</HashCode>
+      <FileName>SourceCode\CDialogManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CDialogitem" Collapsed="true">
+    <Position X="11.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>RhsABZLAYAAPAqQAgCAXCIBAAAQAAD0YSmUoIuEQCEg=</HashCode>
+      <FileName>SourceCode\CDialogitem.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CDialog" Collapsed="true">
+    <Position X="43.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BtoAAwRA4NAHgDCYBCDXKaEKIgQIQDE0SvkgBCQUAgg=</HashCode>
+      <FileName>SourceCode\CDialog.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CLua" Collapsed="true">
+    <Position X="38.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABBAAAAAAAAAEEAAAAAAAAACQgAQAABAAERCAACYAAA=</HashCode>
+      <FileName>SourceCode\CLua.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CGameState" Collapsed="true">
+    <Position X="12.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEQBAAACBBAQAAAAAAQACCAAAAAgQAQAAAAKIIAAAA=</HashCode>
+      <FileName>SourceCode\CGameState.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CEditControl" Collapsed="true">
+    <Position X="1.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AwAQAQAAAAAAAIYAABgAgAEQAAgAEAAJAkAAIGWAAAA=</HashCode>
+      <FileName>SourceCode\CEditControl.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CRadioButtonBox" Collapsed="true">
+    <Position X="6" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QggAAQEAAAAgACQAAAAAgAAQgAAAIAIJQBAAASGEAgQ=</HashCode>
+      <FileName>SourceCode\CRadioButtonBox.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CSlideControl" Collapsed="true">
+    <Position X="10.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BgAAAQBCIMAAAKYYEAAEQAgQgAYACBaNBCAAAikAAAE=</HashCode>
+      <FileName>SourceCode\CSlideControl.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CTextBox" Collapsed="true">
+    <Position X="15" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAQAAAAMFAAQAABAGAAAQAAEABAAJAgAAACEAAAA=</HashCode>
+      <FileName>SourceCode\CTextBox.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CDialogGameState" Collapsed="true">
+    <Position X="12.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAIAAABAAQAAAAAAAAAAIAAAAAAAQQBAAAAQAAAA=</HashCode>
+      <FileName>SourceCode\CDialogGameState.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CProgressbar" Collapsed="true">
+    <Position X="36.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABgAAAAAAIAAAAEAEgAABgICACAAAAIAAACAAEAAAA=</HashCode>
+      <FileName>SourceCode\CLoadingState.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CLoadingState" Collapsed="true">
+    <Position X="19.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABQBgABADBAQAAAAAAAEAhAAwAAAAARAAAAYAAAAAA=</HashCode>
+      <FileName>SourceCode\CLoadingState.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CFilemanagement" Collapsed="true">
+    <Position X="43.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAARAAACAoAAABAAAARAAAAgACEAAAAgAQAAAgA=</HashCode>
+      <FileName>SourceCode\CFilemanagement.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CAnimatedSprite" Collapsed="true">
+    <Position X="36.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACEBCAAAABAAAAAQAQAAIAwQUAAAEAAAgAAAQKAAA=</HashCode>
+      <FileName>SourceCode\CAnimatedSprite.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CProfile" Collapsed="true">
+    <Position X="10.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AYAAAAAgAAAAAAAAAAQAAIAAAAAAAkAAAABAAAABAAA=</HashCode>
+      <FileName>SourceCode\CProfile.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CETYProfile" Collapsed="true">
+    <Position X="10.5" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CProfile.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CEntity" Collapsed="true">
+    <Position X="38.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgEAAAAAAAAAAQAAAQAAAAABAQAAAAAAAIAggABAAAA=</HashCode>
+      <FileName>SourceCode\CEntity.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CComponent" Collapsed="true">
+    <Position X="22.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAGAAAAAAAiAAAQAAABAAAAAAAAAQAAg=</HashCode>
+      <FileName>SourceCode\CComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CEntitymanager" Collapsed="true">
+    <Position X="40" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAAAAAAAQAAABCAAAMAACABAAAAAAgAA=</HashCode>
+      <FileName>SourceCode\CEntitymanager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CComponentsystem" Collapsed="true">
+    <Position X="3" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAgAAAAAAAAACAAAAAAAAAAEAAAABAACAAAAAA=</HashCode>
+      <FileName>SourceCode\CComponentsystem.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CCollision" Collapsed="true">
+    <Position X="41.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAACAAAAAAAAAAAgAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>SourceCode\CCollision.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CAudioOptionState" Collapsed="true">
+    <Position X="17.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAABAAAAQBAAAAAAAAgSAAAAAAAAgAQAAAAIAAAAAA=</HashCode>
+      <FileName>SourceCode\CAudioOptionState.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CCreditsState" Collapsed="true">
+    <Position X="21.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAADAAAAABAAAAAAABAAAAAAAAAAAAQAAAAIAAAAAA=</HashCode>
+      <FileName>SourceCode\CCreditsState.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CGraphicOptionState" Collapsed="true">
+    <Position X="24" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIABAAAAABAAAQAAAAASAAAAAAAAAAQARAAIAAAAAA=</HashCode>
+      <FileName>SourceCode\CGraphicOptionState.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CIngameState" Collapsed="true">
+    <Position X="1.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAABBAQAAAAAAAAAAAAAAAAAAQAAAAIAQCAAA=</HashCode>
+      <FileName>SourceCode\CIngameState.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CIntroState" Collapsed="true">
+    <Position X="3.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAABgAAAAAAAAAAEAAAAAAAAQAAAAIAAAABA=</HashCode>
+      <FileName>SourceCode\CIntroState.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::COptionState" Collapsed="true">
+    <Position X="6" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEABAAAEABAgAgAAAAASIAQAAAAAAAQAAAAIAAQAAA=</HashCode>
+      <FileName>SourceCode\COptionState.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CProfileState" Collapsed="true">
+    <Position X="8.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABBAgAAEBEAAAQAEQAAAQAAQCIClAQAAAAIAgGAAA=</HashCode>
+      <FileName>SourceCode\CProfileState.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CMenuState" Collapsed="true">
+    <Position X="10.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAIABAgAAJBFgAEAAAAAAQEIABIgAFAQAAECIIAAACA=</HashCode>
+      <FileName>SourceCode\CMenuState.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CSpaceStationHangarState" Collapsed="true">
+    <Position X="12.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAABBAQAAAAAAIAAAAAQAAAAhQAAAAIAAAQAA=</HashCode>
+      <FileName>SourceCode\CSpaceStationHangarState.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CSpaceStationState" Collapsed="true">
+    <Position X="15" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAABAAgABBAwAAQAAQCACCAAAIAAFCRQAAAIABABCA=</HashCode>
+      <FileName>SourceCode\CSpaceStationState.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CAmmunitionDump" Collapsed="true">
+    <Position X="10.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAABAAAAAAABAAQAAEBQAAAAAAACABAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CAmmunitionDump.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CArmor" Collapsed="true">
+    <Position X="12.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AICAiAAAAAAAAAAAAAABEAgAAACAAAAQAEAQQABQAEA=</HashCode>
+      <FileName>SourceCode\CArmor.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CEngine" Collapsed="true">
+    <Position X="14.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAADBQAAAAAAMAAIAAAAAAAAARAAAAgAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CEngine.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CGenerator" Collapsed="true">
+    <Position X="17" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IIACAAAAAAAAAAAAAAAAhAAAACIEAEAAAAAAAAAgAgA=</HashCode>
+      <FileName>SourceCode\CGenerator.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CLaserWeapon" Collapsed="true">
+    <Position X="8" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BYAAgAAAAQAAAAAAAAAAgQAgAAAEAAAAACIAAhAABAA=</HashCode>
+      <FileName>SourceCode\CLaserWeapon.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CProjectileWeapon" Collapsed="true">
+    <Position X="3.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIQAQAAAgAAAgAAAAABAAAAAAAAAAAAAAAAAAAEQAAE=</HashCode>
+      <FileName>SourceCode\CProjectileWeapon.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CRocketLauncher" Collapsed="true">
+    <Position X="5.75" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QIQEIAAAAACAAAgBAABYAACAAIAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>SourceCode\CRocketLauncher.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CShield" Collapsed="true">
+    <Position X="1.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AOAAABQAIAAAAAAAEAAAhRAAAAACAAAAAAAAACAgYIA=</HashCode>
+      <FileName>SourceCode\CShield.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CWeapon" Collapsed="true">
+    <Position X="5.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CIAAAAAgBAAAAAAAEQAAAAAQEiABAAJAwAAAAQAAAQA=</HashCode>
+      <FileName>SourceCode\CWeapon.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CModule" Collapsed="true">
+    <Position X="40" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAIECAEAAAAABAAAEAACAEAAgAAAAAAAACAAAAAA=</HashCode>
+      <FileName>SourceCode\CModule.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CItem" Collapsed="true">
+    <Position X="9" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAACACAAgAGQABEIEoAgAAgAAAAQBAABAwAYxAA=</HashCode>
+      <FileName>SourceCode\CItem.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CItemManagement" Collapsed="true">
+    <Position X="36.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAEEQAAAAAAAAAAAAAAAAAAAAAAAIAAACAAAAAAA=</HashCode>
+      <FileName>SourceCode\CItemManagement.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CTimeEvent" Collapsed="true">
+    <Position X="0.5" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABCAAAAEAAAAAIQAAAAAAACAAAABAAAAAAAAAAAE=</HashCode>
+      <FileName>SourceCode\CTimeEvent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CTriggerEvent" Collapsed="true">
+    <Position X="1.75" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAABADAAAAAAAAAAACAAABAAAAACAAIACAA=</HashCode>
+      <FileName>SourceCode\CTriggerEvent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CTrigger" Collapsed="true">
+    <Position X="40" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQABAAAAAAgAAIAAAAAIEBAAAAAAQAAAAEAAAQ=</HashCode>
+      <FileName>SourceCode\CTrigger.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CUnitEvent" Collapsed="true">
+    <Position X="2.75" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAgAAAAAAAAAIAACAgAAIAAAAABAAAIAA=</HashCode>
+      <FileName>SourceCode\CUnitEvent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CWorld" Collapsed="true">
+    <Position X="7.75" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AShAgAICACAEEBAABgAASMABCAAwALAoACAQYACUxgA=</HashCode>
+      <FileName>SourceCode\CWorld.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CAttributeComponent" Collapsed="true">
+    <Position X="12.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAAgAgAAAAAAAAAAAAAAAAAAAAw=</HashCode>
+      <FileName>SourceCode\CAttributeComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CSpaceshipAttributeComponent" Collapsed="true">
+    <Position X="11.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAg=</HashCode>
+      <FileName>SourceCode\CAttributeComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CEnvironmentAttributeComponent" Collapsed="true">
+    <Position X="13.75" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAg=</HashCode>
+      <FileName>SourceCode\CAttributeComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CCameraComponent" Collapsed="true">
+    <Position X="22.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAgAAAAAAAAABAAAAAEAAgAg=</HashCode>
+      <FileName>SourceCode\CCameraComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CCenteredCameraComponent" Collapsed="true">
+    <Position X="22.75" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAAAAAAAAAABAAAAAAAAAAAAAQAAg=</HashCode>
+      <FileName>SourceCode\CCameraComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CCollisionComponent" Collapsed="true">
+    <Position X="25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAUAAAAAgAAAAAAAAAAAACAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CCollisionComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CCircleCollisionComponent" Collapsed="true">
+    <Position X="25" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAQAAAAAAABAAAEAAAAAAAAEgAAAAAAAAAAAACQAAg=</HashCode>
+      <FileName>SourceCode\CCollisionComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CItemModulesComponent" Collapsed="true">
+    <Position X="27.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAABAAAAAEAAAAggAAEAAAAAAIAAAEAAAQAQg=</HashCode>
+      <FileName>SourceCode\CItemModulesComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CMovableComponent" Collapsed="true">
+    <Position X="31.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAsAAAICAAABAAAQAAoIAAIAAAAACCIIAAAAAAAg=</HashCode>
+      <FileName>SourceCode\CMovableComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CMovablePlayerComponent" Collapsed="true">
+    <Position X="29.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAQAQg=</HashCode>
+      <FileName>SourceCode\CMovableComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CMovableEnvironmentComponent" Collapsed="true">
+    <Position X="31.75" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAQAAg=</HashCode>
+      <FileName>SourceCode\CMovableComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CMovableNPCComponent" Collapsed="true">
+    <Position X="34" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEARAAg=</HashCode>
+      <FileName>SourceCode\CMovableComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CRenderComponent" Collapsed="true">
+    <Position X="18.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAQAAAAAQEQAIAFiACAiAAACAAAAAACAAAAAg=</HashCode>
+      <FileName>SourceCode\CRenderComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CAnimationRenderComponent" Collapsed="true">
+    <Position X="16" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAEAAAAEAAAAgAAQCAAAAAAAAAQIAg=</HashCode>
+      <FileName>SourceCode\CRenderComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CStaticRenderComponent" Collapsed="true">
+    <Position X="18.25" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAEAAAAEAAgAgAAACAAAAAAAgAQAAg=</HashCode>
+      <FileName>SourceCode\CRenderComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CStaticBackgroundRenderComponent" Collapsed="true">
+    <Position X="20.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAAAAEAAAAEAAAAgAAACAAAAAAAgAQAEg=</HashCode>
+      <FileName>SourceCode\CRenderComponent.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CCollisionComponentsystem" Collapsed="true">
+    <Position X="0.75" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAACAABAAA=</HashCode>
+      <FileName>SourceCode\CCollisionComponentsystem.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CMovableComponentsystem" Collapsed="true">
+    <Position X="3" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAIAAAAAAAAAAAAAAAAAAAgAAACAAAAAA=</HashCode>
+      <FileName>SourceCode\CMovableComponentsystem.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ety::CRenderComponentsystem" Collapsed="true">
+    <Position X="5.25" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAgAAAAAAAAAAAAAAAAACAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>SourceCode\CRenderComponentsystem.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="ety::SStandardSound" Collapsed="true">
+    <Position X="36.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CFilemanagement.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Typedef Name="mapItemByModule" Collapsed="true">
+    <Position X="36.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CAttribute.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="mapItemsBySpaceship" Collapsed="true">
+    <Position X="38.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CAttribute.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ety::mapSoundTypeSounds" Collapsed="true">
+    <Position X="43.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CDialogManager.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ety::mapSoundTypeSoundsIT" Collapsed="true">
+    <Position X="36.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CDialogManager.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ety::p_Function" Collapsed="true">
+    <Position X="43.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CDialogGameState.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ety::EventMap" Collapsed="true">
+    <Position X="36.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CDialogGameState.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ety::va_ArgumentList" Collapsed="true">
+    <Position X="36.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CDialogGameState.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ety::mapFileToLoad" Collapsed="true">
+    <Position X="41.75" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CFilemanagement.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ety::mapFileToLoadbyRessourceType" Collapsed="true">
+    <Position X="43.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CFilemanagement.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ety::mapFilesToLoadbyGamestate" Collapsed="true">
+    <Position X="40" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CFilemanagement.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ety::mapSoundsbySoundtype" Collapsed="true">
+    <Position X="41.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CFilemanagement.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ety::mapStandardSoundbySoundtype" Collapsed="true">
+    <Position X="40" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CFilemanagement.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ety::mapStandardSoundbyDialogitemtype" Collapsed="true">
+    <Position X="38.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CFilemanagement.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ety::mapStandardSoundsbyGamestate" Collapsed="true">
+    <Position X="41.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CFilemanagement.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ety::itEntityByUniqueIDTDef" Collapsed="true">
+    <Position X="38.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CEntitymanager.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ety::mapItemsByType" Collapsed="true">
+    <Position X="40" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CItemManagement.hpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Enum Name="ety::FontColors::en_etyFontColor" Collapsed="true">
+    <Position X="38.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAEAAAAAAAAAAAAAAABIAAAAAIAAAAA=</HashCode>
+      <FileName>SourceCode\CLogfile.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::Affinity::en_etyAffinity" Collapsed="true">
+    <Position X="36.5" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAEAAAAAAAAACAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CDialogManager.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::Anchor::en_etyAnchor" Collapsed="true">
+    <Position X="38.25" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAQAABAAAAAABAAAAAIBAIAABAAABCAEAAA=</HashCode>
+      <FileName>SourceCode\CDialogManager.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::AttachedType::en_etyAttachedType" Collapsed="true">
+    <Position X="40" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgABAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CDialogManager.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::EventType::en_etyEventType" Collapsed="true">
+    <Position X="36.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAIAAAAIAAAEAAAAAEAICBAAAAACAAAAAA=</HashCode>
+      <FileName>SourceCode\CDialogManager.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::TextwriteoutStyle::en_etyTextwriteoutStyle" Collapsed="true">
+    <Position X="41.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAEAAAACAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CDialogManager.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::VariableType::en_etyVariableType" Collapsed="true">
+    <Position X="40" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAhAAABAAAAAAAQA=</HashCode>
+      <FileName>SourceCode\CDialogManager.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::GamestateStatus::en_etyGamestateStatus" Collapsed="true">
+    <Position X="41.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAEAAgAA=</HashCode>
+      <FileName>SourceCode\CGameState.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::GameStateRunning::en_etyGameStateRunning" Collapsed="true">
+    <Position X="40" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CGameState.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::SoundType::en_etySoundType" Collapsed="true">
+    <Position X="40" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAACAAAACAAAAAAERAAAAQAAABAAAAQAAAAAA=</HashCode>
+      <FileName>SourceCode\CFilemanagement.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::DialogitemType::en_etyDialogitemType" Collapsed="true">
+    <Position X="43.5" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAQAACEACAgAAAEAAAAAAAAAEQAAAAAAIACAAACAAA=</HashCode>
+      <FileName>SourceCode\CFilemanagement.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::RessourceType::en_etyRessourceType" Collapsed="true">
+    <Position X="38.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAABCAAACAAAAAAAAAAAAECAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CRessourceManager.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::VolumeType::en_etyVolumeType" Collapsed="true">
+    <Position X="41.75" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAA=</HashCode>
+      <FileName>SourceCode\CRessourceManager.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::DeleteType::en_etyDeleteType" Collapsed="true">
+    <Position X="41.75" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACCAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CRessourceManager.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::PadModus::en_etyPadModus" Collapsed="true">
+    <Position X="36.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAAIAAAAAACAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>SourceCode\CSpaceStationState.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::ModuleType::en_etyModuleType" Collapsed="true">
+    <Position X="43.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAIBAAAACAAIAAAQAAAAAIABAAAAAQAAAAAA=</HashCode>
+      <FileName>SourceCode\CItem.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::TimeEventType::en_etyTimeEventType" Collapsed="true">
+    <Position X="43.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CTrigger.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::UnitEventType::en_etyUnitEventType" Collapsed="true">
+    <Position X="38.25" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACACABAAgAAAQAAAAAAAKAAIAAAAAAAAAAQEAAAAA=</HashCode>
+      <FileName>SourceCode\CTrigger.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ety::TriggerEventType::en_etyTriggerEventType" Collapsed="true">
+    <Position X="36.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SourceCode\CTriggerEvent.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

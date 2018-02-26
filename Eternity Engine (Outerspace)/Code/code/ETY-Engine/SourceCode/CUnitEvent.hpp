@@ -1,0 +1,37 @@
+#pragma once
+#include "CTrigger.hpp"
+#include "CTriggerEvent.hpp"
+
+
+namespace ety
+{
+	class CEntity;
+
+	class CUnitEvent :	public CTriggerEvent
+	{
+	private:
+
+	protected:
+
+		bool													m_bSpecificUnitEvent;
+		enum UnitEventType::en_etyUnitEventType					m_en_etyUnitEventType;
+		std::string												m_strEntityID;
+		ety::CEntity*											mp_c_etyEntityTriggeringUnit;
+
+	public:
+																CUnitEvent				( void );
+																~CUnitEvent				( void );
+
+																CUnitEvent				( enum UnitEventType::en_etyUnitEventType en_etyUnitEventType, std::string strEntityID, 
+																						bool bActive, CTrigger* p_c_etyTriggerParent );
+
+
+		virtual	bool											update_Event			( const sf::Uint32& uiFrameTime );
+
+
+		const	bool&											get_SpecificUnitEvent	( void );
+		const	enum ety::UnitEventType::en_etyUnitEventType&	get_UnitEventType		( void );
+				CEntity*	const								get_TriggeringUnit		( void );
+	};	
+}
+

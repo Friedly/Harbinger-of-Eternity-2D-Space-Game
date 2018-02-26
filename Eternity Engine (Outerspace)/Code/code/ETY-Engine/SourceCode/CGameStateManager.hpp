@@ -1,0 +1,149 @@
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////																																	   ///////////
+///////////													CGameStateManager.hpp															   ///////////
+///////////																									                                   ///////////
+///////////			 			Der GameStateManager verwaltet alle Spielzustände und sorgt dafür das sie gezeichnet						   ///////////
+///////////						aktualisiert und deren Events ausgewertet werden. Initialisierung und Laden der Ressourcen					   ///////////
+///////////						für ein Spielzustand wird auch in dieser Klasse abgedeckt.													   ///////////
+///////////																									                                   ///////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+//Includes der Eternity-Engine
+#include "CLoadingState.hpp"
+
+namespace ety
+{
+	class CGameStateManager : private sf::NonCopyable
+	{
+	private:
+		//In dieser Map werden alle Spielzustände die jemals registriert worden sind drinne
+		//und sie werden mit ihrem eigenen Namen als Schlüssel versehen.
+									std::map<std::string, ety::CGameState*>		m_mapAllGameStates;
+
+		//Liste der aktuellen aktiven oder im Hintergrund laufenden Spielzustände.
+									std::list<ety::CGameState*>					m_listActualGameStates;
+
+		//Die Dateiverwaltung lädt mit der Hilfe der Ressourcenverwaltungen die Ressourcen
+		//für den zu initialisierenden Spielzustand.
+									ety::CFilemanagement						m_c_etyGameStateFilemanagement;
+	
+		//Die Ressourcenverwaltungen wird benötigt um die Spielzustände zu initialisieren zu können.
+									ety::CRessourceManager*						mp_c_etyCurrentRessourceManager;
+		//Die aktuellen Spieleinstellungen sind für manche Spielzustände wichtig.
+									ety::CGamesettings*							mp_c_etyCurrentGamesettings;
+
+		//Der Ladezustand ist immer Bestandteil der Verwaltund der Spielzustände.
+		//Wenn Ressourcen für einen Spielzustand registriert worden sind, wird
+		//der Ladezustand vorher aufgerufen um diese zu laden.
+									ety::CLoadingState							m_c_etyLoadingState;
+
+									ety::CLua									m_c_etyLuaScript;
+
+									bool										m_bRessourcesLoaded;
+
+	protected:
+		//Klasse wird nicht abgeleitet.
+
+	public:
+
+		//Standart Konstruktor und Destruktor.
+																				CGameStateManager					( void );
+																				~CGameStateManager					( void );
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		///	Fügt einen Spielzustand zur Verwaltung hinzu.
+		///
+		/// 1P. Der gewünschte Spielzustand.
+		///
+		/// \parameter	ety::CGameState* const	
+		/// \rückgabe	void
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									void										add_GameState						( ety::CGameState* const p_c_newGameState );
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		///	Wertet die aktuelle Eingabe für die aktiven Spielzustände aus.
+		///
+		///	1P. Die aktuelle Eingabe.
+		///
+		/// \parameter	const sf::Event&
+		/// \rückgabe	const bool
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							const	bool										handle_CurrentGameStateEvents		( const sf::Event& sfEventLastEvent );
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		///	Schiebt ein neuen Spielzustand aktiv hinten in die Liste. Der zurzeit aktuelle Spielzustand erhält einen neuen Status.
+		///
+		///	1P. Der Name des neuen Spielzustandes.
+		///	2P. Der neue Status des aktuellen Spielzustandes.x
+		///
+		/// \parameter	const std::string&, const ety::GamestateStatus::en_etyGamestateStatus
+		/// \rückgabe	void
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									void										pushback_GameState					( const std::string& strGamestate, const ety::GamestateStatus::en_etyGamestateStatus en_etyNewCurrentGamestateStatus = ety::GamestateStatus::enIDLE );
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		///	Löscht aus den letzten Spielzustand in der List, welcher auch aktivste Spielzustand ist.
+		///
+		/// \parameter	void
+		/// \rückgabe	void
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									void										popback_GameState					( void );
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		///	Diese Methoden müssen noch mal bedacht werden.
+		///
+		/// \parameter	void
+		/// \rückgabe	void
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									void										reinit_Gamestates					( const sf::VideoMode& c_sfNewVideoMode, const bool bFullscreen );
+									void										reinit_Gamestates					( const std::string strNewLanguage );
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		///	Zeichnet die Objekte und Dialoge etc. aller aktiven Spielzustände und die im Hintergrund laufen.
+		///
+		///	1P. Der Zwischenspeicher der Application.
+		///
+		/// \parameter	sf::RenderTexture* const
+		/// \rückgabe	void
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									void										render_CurrentGameStates			( sf::RenderTexture* const p_c_sfRenderTextureGameScene );
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// \Beschreibung: 
+		///	Aktualisiert alle aktiven und im Hintergrund laufenden Spielzustände. 
+		///
+		/// \parameter	const sf::Uint32&
+		/// \rückgabe	void
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									void										update_CurrentGameStates			( const sf::Uint32& uiFrameTime );
+
+		//Die Set-Methoden zum setzen privater Membervariablen.		
+									void										set_RessourceManager				( ety::CRessourceManager* const p_c_etyNewRessourceManager );
+									void										set_Gamesettings					( ety::CGamesettings* const p_c_etyNewGamesetting );
+
+		//Die Get-Methoden zur Rückgabe von privaten Membervariablen.
+									ety::CFilemanagement*	const				get_Filemanagement					( void );
+									ety::CLua*				const				get_LuaScript						( void );
+									ety::CGameState*		const				get_CurrentGameState				( void );
+
+				template<class T>	T*						const				get_GamestateByGamestateName		( const std::string& strGameStateName )
+				{
+					std::map<std::string, ety::CGameState*>::iterator itGameStateByGamestateName = m_mapAllGameStates.find( strGameStateName );
+
+					if( itGameStateByGamestateName != m_mapAllGameStates.end() )
+					{
+						return static_cast<T*>( itGameStateByGamestateName->second );
+					}
+
+					return NULL;
+				}
+	};
+}
